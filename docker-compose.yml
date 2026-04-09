@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    image: personal-health-tracker:latest
+    container_name: health-tracker
+    ports:
+      - "8080:8080"
+    volumes:
+      - health-tracker-data:/app/data
+    environment:
+      - PORT=8080
+      - OCR_BACKEND=tesseract
+      - MAX_UPLOAD_MB=50
+      - DATA_DIR=/app/data
+    restart: unless-stopped
+
+volumes:
+  health-tracker-data:
