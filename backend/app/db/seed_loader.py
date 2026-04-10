@@ -7,14 +7,17 @@ SEED_PATH = os.path.join(os.path.dirname(__file__), "seed", "biomarkers.json")
 
 
 def load_biomarkers(db: Session) -> None:
-    """Load biomarkers from JSON into DB if the table is empty."""
-    if db.query(Biomarker).count() > 0:
-        return
-
+    """Insert biomarkers from JSON when they do not already exist by name."""
     with open(SEED_PATH, "r") as f:
         entries = json.load(f)
 
+    existing_names = {biomarker.name for biomarker in db.query(Biomarker).all()}
+    added = 0
+
     for entry in entries:
+        if entry["name"] in existing_names:
+            continue
+
         biomarker = Biomarker(
             name=entry["name"],
             loinc_code=entry.get("loinc_code"),
@@ -30,6 +33,8 @@ def load_biomarkers(db: Session) -> None:
             unit_conversions=entry.get("unit_conversions", {}),
         )
         db.add(biomarker)
+        added += 1
 
-    db.commit()
-    print(f"Seeded {len(entries)} biomarkers.")
+    if added:
+        db.commit()
+        print(f"Seeded {added} new biomarkers.")

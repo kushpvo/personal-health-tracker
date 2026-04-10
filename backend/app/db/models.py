@@ -58,6 +58,8 @@ class ReportResult(Base):
     value = Column(Float, nullable=False)
     unit = Column(String, nullable=False)
     is_flagged_unknown = Column(Boolean, default=False)
+    sort_order = Column(Integer, nullable=True)
+    human_matched = Column(Boolean, default=False)
     notes = Column(Text)
 
     report = relationship("Report", back_populates="results")

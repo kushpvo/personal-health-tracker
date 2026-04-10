@@ -94,7 +94,7 @@ def run_pipeline(report_id: int, db: Session) -> None:
         if not parsed:
             raise RuntimeError("OCR completed, but no biomarker rows could be parsed from the report.")
 
-        for item in parsed:
+        for i, item in enumerate(parsed):
             biomarker = _match_biomarker(item.raw_name, db)
             is_unknown = biomarker is None
 
@@ -107,6 +107,7 @@ def run_pipeline(report_id: int, db: Session) -> None:
                     value=item.value,
                     unit=item.unit,
                     is_flagged_unknown=True,
+                    sort_order=i,
                 )
             else:
                 converted_value, used_unit = convert_to_default_unit(
@@ -119,6 +120,7 @@ def run_pipeline(report_id: int, db: Session) -> None:
                     value=converted_value,
                     unit=used_unit,
                     is_flagged_unknown=False,
+                    sort_order=i,
                 )
             db.add(result)
 
