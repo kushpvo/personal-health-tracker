@@ -54,6 +54,23 @@ BARE_DATE_PATTERNS = [
     re.compile(r"\b(\d{4}-\d{2}-\d{2})\b"),
 ]
 
+# Handles: NAME VALUE UNIT REF_LOW - REF_HIGH [FLAG]
+# e.g. "RED CELL COUNT 4.38 x10^12/L 4.40 - 5.80 L"
+# Matches before SINGLE_SPACE_WITH_RANGE so the reference range and flag
+# are never mistaken for the actual value and unit.
+BIOMARKER_WITH_RANGE_FLAG = re.compile(
+    r"^(?P<name>[A-Za-z][A-Za-z0-9\s,\(\)/\-.%]+?)"
+    r"\s+"
+    r"(?P<value>[<>]?\s*\d+\.?\d*)"
+    r"\s+"
+    r"(?P<unit>[A-Za-z%µu£][A-Za-z0-9/%µu·\^\-]*)"
+    r"\s+"
+    r"[<>]?\d+\.?\d*\s*[-–]\s*[<>]?\d+\.?\d*"   # reference range: N - N
+    r"(?:\s+(?:H{1,2}|L{1,2}|N))?"               # optional result flag
+    r"\s*$",
+    re.IGNORECASE,
+)
+
 SINGLE_SPACE_WITH_RANGE = re.compile(
     r"^"
     r"(?P<name>[A-Za-z][A-Za-z0-9\s,\(\)/\-.%]+?)"
@@ -66,6 +83,9 @@ SINGLE_SPACE_WITH_RANGE = re.compile(
     r"\s*$",
     re.IGNORECASE,
 )
+
+# Single-letter result flags that are never valid measurement units
+_RESULT_FLAGS = re.compile(r"^(H{1,2}|L{1,2}|N)$", re.IGNORECASE)
 
 
 def _normalize_ocr_unit(raw_unit: str) -> str:
@@ -124,6 +144,8 @@ def extract_biomarkers(text: str) -> List[ParsedResult]:
 
         m = BIOMARKER_LINE.match(line) or BIOMARKER_INLINE_UNIT.match(line)
         if not m:
+            m = BIOMARKER_WITH_RANGE_FLAG.match(line)
+        if not m:
             m = SINGLE_SPACE_WITH_RANGE.match(line)
         if not m:
             continue
@@ -134,6 +156,8 @@ def extract_biomarkers(text: str) -> List[ParsedResult]:
 
         if not raw_name or not raw_value or not raw_unit:
             continue
+        if _RESULT_FLAGS.match(raw_unit):
+            continue  # unit is a result flag (H/L), not a real unit — bad parse
 
         value = _parse_value(raw_value)
         if value is None:
