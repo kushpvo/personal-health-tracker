@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { api } from "../lib/api";
 import TrendChart from "../components/TrendChart";
@@ -22,6 +23,20 @@ export default function BiomarkerDetail() {
 
   const { biomarker, results } = data;
   const latest = results[results.length - 1];
+  const qc = useQueryClient();
+  const [changingUnit, setChangingUnit] = useState(false);
+
+  async function handleUnitChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const newUnit = e.target.value;
+    setChangingUnit(true);
+    try {
+      await api.biomarkers.changeDefaultUnit(biomarkerId, newUnit);
+      qc.invalidateQueries({ queryKey: ["biomarker", biomarkerId] });
+      qc.invalidateQueries({ queryKey: ["biomarkers-summary"] });
+    } finally {
+      setChangingUnit(false);
+    }
+  }
 
   return (
     <div className="max-w-3xl">
@@ -59,7 +74,26 @@ export default function BiomarkerDetail() {
         )}
       </div>
 
-      {/* Reference ranges */}
+      {/* Reference ranges + unit selector */}
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Reference ranges</p>
+        {biomarker.alternate_units.length > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span>Unit:</span>
+            <select
+              value={biomarker.default_unit ?? ""}
+              onChange={handleUnitChange}
+              disabled={changingUnit}
+              className="px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs disabled:opacity-50"
+            >
+              <option value={biomarker.default_unit ?? ""}>{biomarker.default_unit}</option>
+              {biomarker.alternate_units.map((u) => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-3 mb-6">
         <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
           <p className="text-xs text-gray-500 mb-0.5">Optimal range</p>

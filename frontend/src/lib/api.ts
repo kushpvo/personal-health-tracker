@@ -25,6 +25,7 @@ export interface BiomarkerInfo {
   optimal_max: number | null;
   sufficient_min: number | null;
   sufficient_max: number | null;
+  alternate_units: string[];
 }
 
 export interface BiomarkerSummary {
@@ -125,5 +126,14 @@ export const api = {
     summary: () => get<BiomarkerSummary[]>("/biomarkers/summary"),
     detail: (id: number) => get<BiomarkerDetail>(`/biomarkers/${id}`),
     list: () => get<BiomarkerListItem[]>("/biomarkers/list"),
+    changeDefaultUnit: (id: number, unit: string) =>
+      fetch(`${BASE}/biomarkers/${id}/default-unit`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unit }),
+      }).then(async (res) => {
+        if (!res.ok) throw new Error(`Change unit failed: ${res.status}`);
+        return res.json() as Promise<BiomarkerInfo>;
+      }),
   },
 };

@@ -237,3 +237,66 @@ def test_submit_review_triggers_unit_conversion(client, test_db):
     # 5.6 mmol/L * 38.67 = 216.552 mg/dL
     assert result.unit == "mg/dL"
     assert abs(result.value - 216.552) < 0.01
+
+
+def test_change_default_unit_success(client, test_db):
+    load_biomarkers(test_db)
+    from app.db.models import Biomarker, Report, ReportResult
+    from datetime import datetime
+
+    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+
+    report = Report(
+        filename="u.pdf", original_filename="u.pdf", file_path="/tmp/u.pdf",
+        status="done", uploaded_at=datetime.utcnow(),
+    )
+    test_db.add(report)
+    test_db.commit()
+    test_db.refresh(report)
+
+    result = ReportResult(
+        report_id=report.id, biomarker_id=chol.id,
+        raw_name="Total Cholesterol", value=200.0, unit="mg/dL",
+        is_flagged_unknown=False, sort_order=0,
+    )
+    test_db.add(result)
+    test_db.commit()
+    test_db.refresh(result)
+
+    resp = client.patch(f"/api/biomarkers/{chol.id}/default-unit", json={"unit": "mmol/L"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["default_unit"] == "mmol/L"
+
+    test_db.refresh(chol)
+    test_db.refresh(result)
+    # 200 mg/dL * 0.02586 = 5.172 mmol/L
+    assert result.unit == "mmol/L"
+    assert abs(result.value - 5.172) < 0.01
+    assert chol.default_unit == "mmol/L"
+    assert chol.optimal_min is not None and chol.optimal_min < 10  # was ~100 mg/dL
+
+
+def test_change_default_unit_invalid_unit(client, test_db):
+    load_biomarkers(test_db)
+    from app.db.models import Biomarker
+    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    resp = client.patch(f"/api/biomarkers/{chol.id}/default-unit", json={"unit": "kg/m2"})
+    assert resp.status_code == 400
+
+
+def test_change_default_unit_not_found(client):
+    resp = client.patch("/api/biomarkers/9999/default-unit", json={"unit": "mmol/L"})
+    assert resp.status_code == 404
+
+
+def test_change_default_unit_noop(client, test_db):
+    """Same unit returns 200 with no DB changes."""
+    load_biomarkers(test_db)
+    from app.db.models import Biomarker
+    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    original_min = chol.optimal_min
+    resp = client.patch(f"/api/biomarkers/{chol.id}/default-unit", json={"unit": chol.default_unit})
+    assert resp.status_code == 200
+    test_db.refresh(chol)
+    assert chol.optimal_min == original_min

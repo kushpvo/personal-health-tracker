@@ -6,8 +6,9 @@ from app.db.database import get_db
 from app.db.models import Biomarker, Report, ReportResult
 from app.schemas.schemas import (
     BiomarkerDetail, BiomarkerInfo, BiomarkerListItem, BiomarkerSummary, ResultPoint,
+    ChangeDefaultUnitInput,
 )
-
+from app.services.unit_converter import normalize_unit
 router = APIRouter(prefix="/api/biomarkers", tags=["biomarkers"])
 
 
@@ -95,6 +96,7 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
                     optimal_max=b.optimal_max,
                     sufficient_min=b.sufficient_min,
                     sufficient_max=b.sufficient_max,
+                    alternate_units=b.alternate_units or [],
                 ),
                 latest_value=latest.value,
                 latest_unit=latest.unit,
@@ -134,6 +136,65 @@ def get_biomarker_detail(biomarker_id: int, db: Session = Depends(get_db)):
             optimal_max=b.optimal_max,
             sufficient_min=b.sufficient_min,
             sufficient_max=b.sufficient_max,
+            alternate_units=b.alternate_units or [],
         ),
         results=[_to_result_point(r) for r in results],
+    )
+
+
+@router.patch("/{biomarker_id}/default-unit", response_model=BiomarkerInfo)
+def change_default_unit(
+    biomarker_id: int, body: ChangeDefaultUnitInput, db: Session = Depends(get_db)
+):
+    b = db.query(Biomarker).filter(Biomarker.id == biomarker_id).first()
+    if not b:
+        raise HTTPException(status_code=404, detail="Biomarker not found.")
+
+    new_unit = normalize_unit(body.unit)
+    current_unit = normalize_unit(b.default_unit or "")
+
+    if new_unit == current_unit:
+        return BiomarkerInfo(
+            id=b.id, name=b.name, category=b.category, default_unit=b.default_unit,
+            optimal_min=b.optimal_min, optimal_max=b.optimal_max,
+            sufficient_min=b.sufficient_min, sufficient_max=b.sufficient_max,
+            alternate_units=b.alternate_units or [],
+        )
+
+    valid_units = {normalize_unit(u) for u in (b.alternate_units or [])}
+    if new_unit not in valid_units:
+        raise HTTPException(status_code=400, detail=f"Unit '{new_unit}' is not a known alternate unit.")
+
+    conversions = b.unit_conversions or {}
+    factor = conversions.get(current_unit, {}).get(new_unit)
+    if factor is None:
+        raise HTTPException(status_code=400, detail=f"No conversion factor from '{current_unit}' to '{new_unit}'.")
+
+    def _conv(v):
+        return round(v * factor, 4) if v is not None else None
+
+    b.optimal_min = _conv(b.optimal_min)
+    b.optimal_max = _conv(b.optimal_max)
+    b.sufficient_min = _conv(b.sufficient_min)
+    b.sufficient_max = _conv(b.sufficient_max)
+    b.default_unit = new_unit
+
+    results = (
+        db.query(ReportResult)
+        .filter(ReportResult.biomarker_id == biomarker_id, ReportResult.is_flagged_unknown == False)
+        .all()
+    )
+    for r in results:
+        r_factor = conversions.get(normalize_unit(r.unit), {}).get(new_unit)
+        if r_factor is not None:
+            r.value = round(r.value * r_factor, 6)
+            r.unit = new_unit
+
+    db.commit()
+    db.refresh(b)
+    return BiomarkerInfo(
+        id=b.id, name=b.name, category=b.category, default_unit=b.default_unit,
+        optimal_min=b.optimal_min, optimal_max=b.optimal_max,
+        sufficient_min=b.sufficient_min, sufficient_max=b.sufficient_max,
+        alternate_units=b.alternate_units or [],
     )

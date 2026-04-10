@@ -41,6 +41,7 @@ class BiomarkerInfo(BaseModel):
     optimal_max: Optional[float]
     sufficient_min: Optional[float]
     sufficient_max: Optional[float]
+    alternate_units: List[str] = []
 
     class Config:
         from_attributes = True
@@ -115,3 +116,7 @@ class BiomarkerListItem(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ChangeDefaultUnitInput(BaseModel):
+    unit: str
