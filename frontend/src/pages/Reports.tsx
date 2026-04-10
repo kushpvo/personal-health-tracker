@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, Trash2, FileText, ClipboardEdit } from "lucide-react";
 import { api } from "../lib/api";
@@ -13,6 +13,7 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export default function Reports() {
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["reports"],
@@ -44,7 +45,14 @@ export default function Reports() {
         {reports.map((r: ReportListItem) => (
           <div
             key={r.id}
-            className="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+            onClick={() => {
+              if (r.status === "done") navigate(`/reports/${r.id}`);
+            }}
+            className={`flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors ${
+              r.status === "done"
+                ? "cursor-pointer hover:border-blue-300 dark:hover:border-blue-700"
+                : "cursor-default"
+            }`}
           >
             <div className="min-w-0">
               <p className="font-medium text-sm truncate">
@@ -64,6 +72,7 @@ export default function Reports() {
                 {r.status}
               </span>
               <a
+                onClick={(e) => e.stopPropagation()}
                 href={api.reports.downloadUrl(r.id)}
                 download={r.original_filename}
                 className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
@@ -72,6 +81,7 @@ export default function Reports() {
                 <Download size={15} />
               </a>
               <Link
+                onClick={(e) => e.stopPropagation()}
                 to={`/reports/${r.id}/review`}
                 className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
                 title="Review results"
@@ -79,7 +89,10 @@ export default function Reports() {
                 <ClipboardEdit size={15} />
               </Link>
               <button
-                onClick={() => handleDelete(r.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(r.id);
+                }}
                 className="p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-950 text-gray-400 hover:text-red-500"
                 title="Delete report"
               >

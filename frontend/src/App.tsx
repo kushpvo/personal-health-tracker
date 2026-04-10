@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Upload from "./pages/Upload";
 import BiomarkerDetail from "./pages/BiomarkerDetail";
+import ReportDashboard from "./pages/ReportDashboard";
 import ReviewReport from "./pages/ReviewReport";
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="reports" element={<Reports />} />
           <Route path="reports/upload" element={<Upload />} />
+          <Route path="reports/:id" element={<ReportDashboard />} />
           <Route path="reports/:id/review" element={<ReviewReport />} />
           <Route path="biomarkers/:id" element={<BiomarkerDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />

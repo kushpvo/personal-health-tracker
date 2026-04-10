@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
 from app.schemas.schemas import (
+    BiomarkerInfo, BiomarkerSummary,
     ReportListItem, ReportResultItem, ReportStatus, ReportUploadResponse,
     ReviewReportInput,
 )
@@ -26,6 +27,21 @@ ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp"}
 def _uploads_dir() -> str:
     os.makedirs(UPLOADS_DIR, exist_ok=True)
     return UPLOADS_DIR
+
+
+def _compute_zone(value: float, b: Biomarker) -> str:
+    opt_min = b.optimal_min
+    opt_max = b.optimal_max
+    suf_min = b.sufficient_min
+    suf_max = b.sufficient_max
+
+    if opt_min is not None and opt_max is not None:
+        if opt_min <= value <= opt_max:
+            return "optimal"
+    if suf_min is not None and suf_max is not None:
+        if suf_min <= value <= suf_max:
+            return "sufficient"
+    return "out_of_range"
 
 
 @router.post("", response_model=ReportUploadResponse, status_code=201)
@@ -145,6 +161,55 @@ def get_report_results(report_id: int, db: Session = Depends(get_db)):
         )
         for r in results
     ]
+
+
+@router.get("/{report_id}/summary", response_model=list[BiomarkerSummary])
+def get_report_summary(report_id: int, db: Session = Depends(get_db)):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found.")
+    results = (
+        db.query(ReportResult)
+        .filter(
+            ReportResult.report_id == report_id,
+            ReportResult.biomarker_id.isnot(None),
+            ReportResult.is_flagged_unknown == False,
+        )
+        .order_by(ReportResult.sort_order.asc().nullslast())
+        .all()
+    )
+
+    seen = set()
+    summaries = []
+    for r in results:
+        if r.biomarker_id in seen:
+            continue
+        seen.add(r.biomarker_id)
+        b = r.biomarker
+        if not b:
+            continue
+        zone = _compute_zone(r.value, b)
+        summaries.append(
+            BiomarkerSummary(
+                biomarker=BiomarkerInfo(
+                    id=b.id,
+                    name=b.name,
+                    category=b.category,
+                    default_unit=b.default_unit,
+                    optimal_min=b.optimal_min,
+                    optimal_max=b.optimal_max,
+                    sufficient_min=b.sufficient_min,
+                    sufficient_max=b.sufficient_max,
+                    alternate_units=b.alternate_units or [],
+                ),
+                latest_value=r.value,
+                latest_unit=r.unit,
+                latest_date=report.sample_date,
+                latest_zone=zone,
+                result_count=1,
+            )
+        )
+    return summaries
 
 
 @router.put("/{report_id}/review", response_model=ReportStatus)

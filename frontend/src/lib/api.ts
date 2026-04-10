@@ -94,6 +94,7 @@ async function get<T>(path: string): Promise<T> {
 export const api = {
   reports: {
     list: () => get<ReportListItem[]>("/reports"),
+    summary: (id: number) => get<BiomarkerSummary[]>(`/reports/${id}/summary`),
     status: (id: number) => get<ReportStatus>(`/reports/${id}/status`),
     results: (id: number) => get<ReportResultItem[]>(`/reports/${id}/results`),
     review: (id: number, body: ReviewReportInput) =>
