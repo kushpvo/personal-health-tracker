@@ -11,7 +11,7 @@ from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
 from app.schemas.schemas import (
     BiomarkerInfo, BiomarkerSummary,
     ReportListItem, ReportResultItem, ReportStatus, ReportUploadResponse,
-    ReviewReportInput,
+    ReviewReportInput, NewResultInput,
 )
 from app.services.pipeline import run_pipeline
 from app.services.unit_converter import convert_to_default_unit
@@ -222,6 +222,15 @@ def submit_review(report_id: int, body: ReviewReportInput, db: Session = Depends
     if body.sample_date:
         report.sample_date = body.sample_date
 
+    # Delete removed rows
+    for del_id in body.deleted_result_ids:
+        result = db.query(ReportResult).filter(
+            ReportResult.id == del_id, ReportResult.report_id == report_id
+        ).first()
+        if result:
+            db.delete(result)
+
+    # Update existing rows
     for item in body.results:
         result = db.query(ReportResult).filter(ReportResult.id == item.id).first()
         if not result:
@@ -249,6 +258,24 @@ def submit_review(report_id: int, body: ReviewReportInput, db: Session = Depends
                 )
                 if unknown:
                     unknown.resolved_biomarker_id = item.biomarker_id
+
+    # Insert user-added rows
+    for new_item in body.new_results:
+        biomarker = db.query(Biomarker).filter(Biomarker.id == new_item.biomarker_id).first()
+        if not biomarker:
+            continue
+        converted_value, used_unit = convert_to_default_unit(
+            new_item.value, new_item.unit, biomarker
+        )
+        db.add(ReportResult(
+            report_id=report_id,
+            biomarker_id=biomarker.id,
+            raw_name=biomarker.name,
+            value=converted_value,
+            unit=used_unit,
+            is_flagged_unknown=False,
+            human_matched=True,
+        ))
 
     db.commit()
     return ReportStatus(

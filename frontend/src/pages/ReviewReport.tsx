@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Trash2, Plus } from "lucide-react";
 import { api } from "../lib/api";
 import type { BiomarkerListItem, ReportResultItem } from "../lib/api";
 
@@ -11,15 +12,16 @@ const COMMON_UNITS = [
 ];
 
 type DraftResult = {
-  id: number;
+  id: number;               // negative for user-added rows
   raw_name: string;
   is_flagged_unknown: boolean;
-  biomarker_id: number | null;        // original from pipeline
+  biomarker_id: number | null;
   draftValue: string;
   draftUnit: string;
-  draftBiomarkerId: number | null;    // set by user during review
+  draftBiomarkerId: number | null;
   draftBiomarkerName: string | null;
   valueError: string | null;
+  isNew: boolean;
 };
 
 function unitOptionsFor(
@@ -44,6 +46,7 @@ export default function ReviewReport() {
   const { id } = useParams<{ id: string }>();
   const reportId = Number(id);
   const navigate = useNavigate();
+  const newIdCounter = useRef(-1);
 
   const { data: rawResults, isLoading: loadingResults } = useQuery({
     queryKey: ["report-results", reportId],
@@ -65,9 +68,9 @@ export default function ReviewReport() {
   const [draftTitle, setDraftTitle] = useState("");
   const [draftDate, setDraftDate] = useState("");
   const [drafts, setDrafts] = useState<DraftResult[]>([]);
+  const [deletedIds, setDeletedIds] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
 
-  // Initialise draft state once data arrives — useEffect avoids render-time side effects
   useEffect(() => {
     if (rawResults && drafts.length === 0) {
       setDrafts(
@@ -81,6 +84,7 @@ export default function ReviewReport() {
           draftBiomarkerId: null,
           draftBiomarkerName: null,
           valueError: null,
+          isNew: false,
         }))
       );
     }
@@ -91,7 +95,6 @@ export default function ReviewReport() {
     if (report && !draftDate) setDraftDate(report.sample_date ?? "");
   }, [report]);
 
-  // Group biomarkers by category for the <optgroup> dropdown
   const byCategory = useMemo(() => {
     return allBiomarkers.reduce<Record<string, BiomarkerListItem[]>>((acc, b) => {
       const cat = b.category ?? "Other";
@@ -105,14 +108,49 @@ export default function ReviewReport() {
   }
 
   const recognised = drafts.filter(
-    (d) => !d.is_flagged_unknown || d.draftBiomarkerId !== null
+    (d) => !d.isNew && (!d.is_flagged_unknown || d.draftBiomarkerId !== null)
   ).length;
   const unrecognised = drafts.filter(
-    (d) => d.is_flagged_unknown && d.draftBiomarkerId === null
+    (d) => !d.isNew && d.is_flagged_unknown && d.draftBiomarkerId === null
   ).length;
+  const added = drafts.filter((d) => d.isNew).length;
 
   function updateDraft(id: number, patch: Partial<DraftResult>) {
     setDrafts((prev) => prev.map((d) => (d.id === id ? { ...d, ...patch } : d)));
+  }
+
+  function deleteDraft(id: number) {
+    if (id > 0) setDeletedIds((prev) => [...prev, id]);
+    setDrafts((prev) => prev.filter((d) => d.id !== id));
+  }
+
+  function addNewRow() {
+    const newId = newIdCounter.current--;
+    setDrafts((prev) => [
+      ...prev,
+      {
+        id: newId,
+        raw_name: "",
+        is_flagged_unknown: false,
+        biomarker_id: null,
+        draftValue: "",
+        draftUnit: "",
+        draftBiomarkerId: null,
+        draftBiomarkerName: null,
+        valueError: null,
+        isNew: true,
+      },
+    ]);
+  }
+
+  function selectBiomarkerForNew(draftId: number, biomarkerId: number) {
+    const bm = allBiomarkers.find((b) => b.id === biomarkerId);
+    if (!bm) return;
+    updateDraft(draftId, {
+      draftBiomarkerId: bm.id,
+      draftBiomarkerName: bm.name,
+      draftUnit: bm.default_unit ?? "",
+    });
   }
 
   async function handleSave() {
@@ -129,15 +167,24 @@ export default function ReviewReport() {
 
     setSaving(true);
     try {
+      const existing = validated.filter((d) => !d.isNew);
+      const newRows = validated.filter((d) => d.isNew && d.draftBiomarkerId !== null);
+
       await api.reports.review(reportId, {
         report_name: draftTitle,
         sample_date: draftDate || null,
-        results: validated.map((d) => ({
+        results: existing.map((d) => ({
           id: d.id,
           value: parseFloat(d.draftValue),
           unit: d.draftUnit,
           ...(d.draftBiomarkerId ? { biomarker_id: d.draftBiomarkerId } : {}),
         })),
+        new_results: newRows.map((d) => ({
+          biomarker_id: d.draftBiomarkerId!,
+          value: parseFloat(d.draftValue),
+          unit: d.draftUnit,
+        })),
+        deleted_result_ids: deletedIds,
       });
       navigate("/");
     } finally {
@@ -182,6 +229,7 @@ export default function ReviewReport() {
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-gray-500">
           {drafts.length} extracted · {recognised} recognised · {unrecognised} unrecognised
+          {added > 0 && ` · ${added} added`}
         </p>
         <button
           onClick={handleSave}
@@ -202,19 +250,43 @@ export default function ReviewReport() {
               <th className="px-4 py-3 text-left w-32">Value</th>
               <th className="px-4 py-3 text-left w-44">Unit</th>
               <th className="px-4 py-3 text-left">Status</th>
+              <th className="px-4 py-3 w-10"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {drafts.map((d, idx) => {
-              const isRecognised = !d.is_flagged_unknown;
-              const isMatched = d.is_flagged_unknown && d.draftBiomarkerId !== null;
-              const isUnrecognised = d.is_flagged_unknown && d.draftBiomarkerId === null;
+              const isRecognised = !d.isNew && !d.is_flagged_unknown;
+              const isMatched = !d.isNew && d.is_flagged_unknown && d.draftBiomarkerId !== null;
+              const isUnrecognised = !d.isNew && d.is_flagged_unknown && d.draftBiomarkerId === null;
               const unitOpts = unitOptionsFor(d, allBiomarkers);
 
               return (
-                <tr key={d.id} className="bg-white dark:bg-gray-950">
-                  <td className="px-4 py-3 text-gray-400 text-xs">{idx + 1}</td>
-                  <td className="px-4 py-3 font-medium">{d.raw_name}</td>
+                <tr key={d.id} className={`bg-white dark:bg-gray-950 ${d.isNew ? "bg-blue-50/30 dark:bg-blue-950/20" : ""}`}>
+                  <td className="px-4 py-3 text-gray-400 text-xs">{d.isNew ? "+" : idx + 1}</td>
+
+                  {/* Biomarker name / picker */}
+                  <td className="px-4 py-3 font-medium">
+                    {d.isNew ? (
+                      <select
+                        value={d.draftBiomarkerId ?? ""}
+                        onChange={(e) => selectBiomarkerForNew(d.id, Number(e.target.value))}
+                        className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+                      >
+                        <option value="" disabled>Select biomarker…</option>
+                        {Object.entries(byCategory)
+                          .sort(([a], [b]) => a.localeCompare(b))
+                          .map(([cat, bms]) => (
+                            <optgroup key={cat} label={cat}>
+                              {bms.map((b) => (
+                                <option key={b.id} value={b.id}>{b.name}</option>
+                              ))}
+                            </optgroup>
+                          ))}
+                      </select>
+                    ) : (
+                      d.raw_name
+                    )}
+                  </td>
 
                   {/* Value */}
                   <td className="px-4 py-3">
@@ -308,12 +380,39 @@ export default function ReviewReport() {
                         </select>
                       </div>
                     )}
+                    {d.isNew && d.draftBiomarkerId !== null && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        Added
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Delete */}
+                  <td className="px-2 py-3">
+                    <button
+                      onClick={() => deleteDraft(d.id)}
+                      className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950 text-gray-300 hover:text-red-500 dark:text-gray-700 dark:hover:text-red-400 transition-colors"
+                      aria-label="Delete row"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+
+        {/* Add row button */}
+        <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+          <button
+            onClick={addNewRow}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-1"
+          >
+            <Plus size={13} />
+            Add biomarker
+          </button>
+        </div>
       </div>
 
       {/* Footer actions */}

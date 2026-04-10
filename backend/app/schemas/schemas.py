@@ -101,10 +101,18 @@ class ReviewResultInput(BaseModel):
     biomarker_id: Optional[int] = None
 
 
+class NewResultInput(BaseModel):
+    biomarker_id: int
+    value: float
+    unit: str
+
+
 class ReviewReportInput(BaseModel):
     report_name: str
     sample_date: Optional[date] = None
     results: List[ReviewResultInput]
+    new_results: List[NewResultInput] = []
+    deleted_result_ids: List[int] = []
 
 
 class BiomarkerListItem(BaseModel):

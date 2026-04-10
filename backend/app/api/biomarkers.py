@@ -177,7 +177,14 @@ def change_default_unit(
     b.optimal_max = _conv(b.optimal_max)
     b.sufficient_min = _conv(b.sufficient_min)
     b.sufficient_max = _conv(b.sufficient_max)
+
+    old_unit = b.default_unit
     b.default_unit = new_unit
+    # Keep alternate_units consistent: remove new default, add old default
+    alts = [u for u in (b.alternate_units or []) if normalize_unit(u) != new_unit]
+    if old_unit and normalize_unit(old_unit) not in {normalize_unit(u) for u in alts}:
+        alts.append(old_unit)
+    b.alternate_units = alts
 
     results = (
         db.query(ReportResult)

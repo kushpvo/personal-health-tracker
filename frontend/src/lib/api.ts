@@ -79,10 +79,18 @@ export interface ReviewResultInput {
   biomarker_id?: number;
 }
 
+export interface NewResultInput {
+  biomarker_id: number;
+  value: number;
+  unit: string;
+}
+
 export interface ReviewReportInput {
   report_name: string;
   sample_date: string | null;
   results: ReviewResultInput[];
+  new_results?: NewResultInput[];
+  deleted_result_ids?: number[];
 }
 
 async function get<T>(path: string): Promise<T> {

@@ -88,7 +88,7 @@ export default function BiomarkerDetail() {
               className="px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs disabled:opacity-50"
             >
               <option value={biomarker.default_unit ?? ""}>{biomarker.default_unit}</option>
-              {biomarker.alternate_units.map((u) => (
+              {biomarker.alternate_units.filter((u) => u !== biomarker.default_unit).map((u) => (
                 <option key={u} value={u}>{u}</option>
               ))}
             </select>
