@@ -2,81 +2,160 @@
   {
     "name": "Total Cholesterol",
     "loinc_code": "2093-3",
-    "aliases": ["cholesterol", "total cholesterol", "chol", "cholesterol total"],
+    "aliases": [
+      "cholesterol",
+      "total cholesterol",
+      "chol",
+      "cholesterol total"
+    ],
     "category": "Lipids",
     "description": "Total amount of cholesterol in the blood.",
     "default_unit": "mg/dL",
-    "alternate_units": ["mmol/L"],
+    "alternate_units": [
+      "mmol/L"
+    ],
     "optimal_min": 100,
     "optimal_max": 149,
     "sufficient_min": 150,
     "sufficient_max": 199,
-    "unit_conversions": {"mg/dL": {"mmol/L": 0.02586}, "mmol/L": {"mg/dL": 38.67}}
+    "unit_conversions": {
+      "mg/dL": {
+        "mmol/L": 0.02586
+      },
+      "mmol/L": {
+        "mg/dL": 38.67
+      }
+    }
   },
   {
     "name": "LDL Cholesterol",
     "loinc_code": "2089-1",
-    "aliases": ["ldl", "ldl cholesterol", "ldl-c", "low density lipoprotein"],
+    "aliases": [
+      "ldl",
+      "ldl cholesterol",
+      "ldl-c",
+      "low density lipoprotein"
+    ],
     "category": "Lipids",
     "description": "Low-density lipoprotein cholesterol.",
     "default_unit": "mg/dL",
-    "alternate_units": ["mmol/L"],
+    "alternate_units": [
+      "mmol/L"
+    ],
     "optimal_min": 0,
     "optimal_max": 69,
     "sufficient_min": 70,
     "sufficient_max": 99,
-    "unit_conversions": {"mg/dL": {"mmol/L": 0.02586}, "mmol/L": {"mg/dL": 38.67}}
+    "unit_conversions": {
+      "mg/dL": {
+        "mmol/L": 0.02586
+      },
+      "mmol/L": {
+        "mg/dL": 38.67
+      }
+    }
   },
   {
     "name": "HDL Cholesterol",
     "loinc_code": "2085-9",
-    "aliases": ["hdl", "hdl cholesterol", "hdl-c", "high density lipoprotein"],
+    "aliases": [
+      "hdl",
+      "hdl cholesterol",
+      "hdl-c",
+      "high density lipoprotein"
+    ],
     "category": "Lipids",
     "description": "High-density lipoprotein cholesterol.",
     "default_unit": "mg/dL",
-    "alternate_units": ["mmol/L"],
+    "alternate_units": [
+      "mmol/L"
+    ],
     "optimal_min": 60,
     "optimal_max": 999,
     "sufficient_min": 40,
     "sufficient_max": 59,
-    "unit_conversions": {"mg/dL": {"mmol/L": 0.02586}, "mmol/L": {"mg/dL": 38.67}}
+    "unit_conversions": {
+      "mg/dL": {
+        "mmol/L": 0.02586
+      },
+      "mmol/L": {
+        "mg/dL": 38.67
+      }
+    }
   },
   {
     "name": "Triglycerides",
     "loinc_code": "2571-8",
-    "aliases": ["triglycerides", "trig", "trigs", "triglyceride"],
+    "aliases": [
+      "triglycerides",
+      "trig",
+      "trigs",
+      "triglyceride"
+    ],
     "category": "Lipids",
     "description": "Blood fat level.",
     "default_unit": "mg/dL",
-    "alternate_units": ["mmol/L"],
+    "alternate_units": [
+      "mmol/L"
+    ],
     "optimal_min": 0,
     "optimal_max": 99,
     "sufficient_min": 100,
     "sufficient_max": 149,
-    "unit_conversions": {"mg/dL": {"mmol/L": 0.01129}, "mmol/L": {"mg/dL": 88.57}}
+    "unit_conversions": {
+      "mg/dL": {
+        "mmol/L": 0.01129
+      },
+      "mmol/L": {
+        "mg/dL": 88.57
+      }
+    }
   },
   {
     "name": "Glucose",
     "loinc_code": "2345-7",
-    "aliases": ["glucose", "blood glucose", "fasting glucose", "glucose fasting", "gluc"],
+    "aliases": [
+      "glucose",
+      "blood glucose",
+      "fasting glucose",
+      "glucose fasting",
+      "gluc"
+    ],
     "category": "Metabolic",
     "description": "Fasting blood sugar level.",
     "default_unit": "mg/dL",
-    "alternate_units": ["mmol/L"],
+    "alternate_units": [
+      "mmol/L"
+    ],
     "optimal_min": 70,
     "optimal_max": 85,
     "sufficient_min": 86,
     "sufficient_max": 99,
-    "unit_conversions": {"mg/dL": {"mmol/L": 0.05551}, "mmol/L": {"mg/dL": 18.02}}
+    "unit_conversions": {
+      "mg/dL": {
+        "mmol/L": 0.05551
+      },
+      "mmol/L": {
+        "mg/dL": 18.02
+      }
+    }
   },
   {
     "name": "HbA1c",
     "loinc_code": "4548-4",
-    "aliases": ["hba1c", "hemoglobin a1c", "glycated hemoglobin", "a1c", "glycohemoglobin"],
+    "aliases": [
+      "hba1c",
+      "hemoglobin a1c",
+      "glycated hemoglobin",
+      "a1c",
+      "glycohemoglobin"
+    ],
     "category": "Metabolic",
     "description": "Average blood glucose over 2-3 months.",
     "default_unit": "%",
-    "alternate_units": ["mmol/mol"],
+    "alternate_units": [
+      "mmol/mol"
+    ],
     "optimal_min": 0,
     "optimal_max": 5.3,
     "sufficient_min": 5.4,
@@ -86,119 +165,236 @@
   {
     "name": "TSH",
     "loinc_code": "3016-3",
-    "aliases": ["tsh", "thyroid stimulating hormone", "thyrotropin"],
+    "aliases": [
+      "tsh",
+      "thyroid stimulating hormone",
+      "thyrotropin"
+    ],
     "category": "Thyroid",
     "description": "Thyroid-stimulating hormone.",
     "default_unit": "mIU/L",
-    "alternate_units": ["uIU/mL"],
+    "alternate_units": [
+      "uIU/mL"
+    ],
     "optimal_min": 1.0,
     "optimal_max": 2.5,
     "sufficient_min": 0.4,
     "sufficient_max": 4.5,
-    "unit_conversions": {"mIU/L": {"uIU/mL": 1.0}, "uIU/mL": {"mIU/L": 1.0}}
+    "unit_conversions": {
+      "mIU/L": {
+        "uIU/mL": 1.0
+      },
+      "uIU/mL": {
+        "mIU/L": 1.0
+      }
+    }
   },
   {
     "name": "Free T4",
     "loinc_code": "3024-7",
-    "aliases": ["free t4", "ft4", "free thyroxine", "thyroxine free"],
+    "aliases": [
+      "free t4",
+      "ft4",
+      "free thyroxine",
+      "thyroxine free"
+    ],
     "category": "Thyroid",
     "description": "Free thyroxine hormone.",
     "default_unit": "ng/dL",
-    "alternate_units": ["pmol/L"],
+    "alternate_units": [
+      "pmol/L"
+    ],
     "optimal_min": 1.0,
     "optimal_max": 1.5,
     "sufficient_min": 0.8,
     "sufficient_max": 1.8,
-    "unit_conversions": {"ng/dL": {"pmol/L": 12.87}, "pmol/L": {"ng/dL": 0.0777}}
+    "unit_conversions": {
+      "ng/dL": {
+        "pmol/L": 12.87
+      },
+      "pmol/L": {
+        "ng/dL": 0.0777
+      }
+    }
   },
   {
     "name": "Vitamin D",
     "loinc_code": "1989-3",
-    "aliases": ["vitamin d", "25-oh vitamin d", "25-hydroxyvitamin d", "vitamin d 25-oh", "vit d", "25(oh)d"],
+    "aliases": [
+      "vitamin d",
+      "25-oh vitamin d",
+      "25-hydroxyvitamin d",
+      "vitamin d 25-oh",
+      "vit d",
+      "25(oh)d"
+    ],
     "category": "Vitamins",
     "description": "25-hydroxyvitamin D level.",
     "default_unit": "ng/mL",
-    "alternate_units": ["nmol/L"],
+    "alternate_units": [
+      "nmol/L"
+    ],
     "optimal_min": 50,
     "optimal_max": 80,
     "sufficient_min": 30,
     "sufficient_max": 49,
-    "unit_conversions": {"ng/mL": {"nmol/L": 2.496}, "nmol/L": {"ng/mL": 0.4006}}
+    "unit_conversions": {
+      "ng/mL": {
+        "nmol/L": 2.496
+      },
+      "nmol/L": {
+        "ng/mL": 0.4006
+      }
+    }
   },
   {
     "name": "Vitamin B12",
     "loinc_code": "2132-9",
-    "aliases": ["vitamin b12", "b12", "cobalamin", "cyanocobalamin"],
+    "aliases": [
+      "vitamin b12",
+      "b12",
+      "cobalamin",
+      "cyanocobalamin"
+    ],
     "category": "Vitamins",
     "description": "Vitamin B12 level.",
     "default_unit": "pg/mL",
-    "alternate_units": ["pmol/L"],
+    "alternate_units": [
+      "pmol/L"
+    ],
     "optimal_min": 400,
     "optimal_max": 900,
     "sufficient_min": 200,
     "sufficient_max": 399,
-    "unit_conversions": {"pg/mL": {"pmol/L": 0.7378}, "pmol/L": {"pg/mL": 1.3554}}
+    "unit_conversions": {
+      "pg/mL": {
+        "pmol/L": 0.7378
+      },
+      "pmol/L": {
+        "pg/mL": 1.3554
+      }
+    }
   },
   {
     "name": "Ferritin",
     "loinc_code": "2276-4",
-    "aliases": ["ferritin", "serum ferritin"],
+    "aliases": [
+      "ferritin",
+      "serum ferritin"
+    ],
     "category": "Iron Studies",
     "description": "Iron storage protein.",
     "default_unit": "ng/mL",
-    "alternate_units": ["ug/L"],
+    "alternate_units": [
+      "ug/L"
+    ],
     "optimal_min": 30,
     "optimal_max": 100,
     "sufficient_min": 12,
     "sufficient_max": 29,
-    "unit_conversions": {"ng/mL": {"ug/L": 1.0}, "ug/L": {"ng/mL": 1.0}}
+    "unit_conversions": {
+      "ng/mL": {
+        "ug/L": 1.0
+      },
+      "ug/L": {
+        "ng/mL": 1.0
+      }
+    }
   },
   {
     "name": "WBC",
     "loinc_code": "6690-2",
-    "aliases": ["wbc", "white blood cell", "white blood count", "leukocytes", "wbc count"],
+    "aliases": [
+      "wbc",
+      "white blood cell",
+      "white blood count",
+      "leukocytes",
+      "wbc count"
+    ],
     "category": "CBC",
     "description": "White blood cell count.",
     "default_unit": "K/uL",
-    "alternate_units": ["10^3/uL", "10^9/L"],
+    "alternate_units": [
+      "10^3/uL",
+      "10^9/L"
+    ],
     "optimal_min": 5.0,
     "optimal_max": 7.5,
     "sufficient_min": 4.5,
     "sufficient_max": 11.0,
-    "unit_conversions": {"K/uL": {"10^9/L": 1.0}, "10^9/L": {"K/uL": 1.0}}
+    "unit_conversions": {
+      "K/uL": {
+        "10^9/L": 1.0
+      },
+      "10^9/L": {
+        "K/uL": 1.0
+      }
+    }
   },
   {
     "name": "Hemoglobin",
     "loinc_code": "718-7",
-    "aliases": ["hemoglobin", "haemoglobin", "hgb", "hb"],
+    "aliases": [
+      "hemoglobin",
+      "haemoglobin",
+      "hgb",
+      "hb"
+    ],
     "category": "CBC",
     "description": "Oxygen-carrying protein in red blood cells.",
     "default_unit": "g/dL",
-    "alternate_units": ["g/L"],
+    "alternate_units": [
+      "g/L"
+    ],
     "optimal_min": 14.0,
     "optimal_max": 17.5,
     "sufficient_min": 13.5,
-    "sufficient_max": 13.9,
-    "unit_conversions": {"g/dL": {"g/L": 10.0}, "g/L": {"g/dL": 0.1}}
+    "sufficient_max": 17.5,
+    "unit_conversions": {
+      "g/dL": {
+        "g/L": 10.0
+      },
+      "g/L": {
+        "g/dL": 0.1
+      }
+    }
   },
   {
     "name": "Creatinine",
     "loinc_code": "2160-0",
-    "aliases": ["creatinine", "creat", "serum creatinine"],
+    "aliases": [
+      "creatinine",
+      "creat",
+      "serum creatinine"
+    ],
     "category": "Metabolic",
     "description": "Kidney function marker.",
     "default_unit": "mg/dL",
-    "alternate_units": ["umol/L"],
+    "alternate_units": [
+      "umol/L"
+    ],
     "optimal_min": 0.7,
     "optimal_max": 1.0,
     "sufficient_min": 1.0,
     "sufficient_max": 1.2,
-    "unit_conversions": {"mg/dL": {"umol/L": 88.42}, "umol/L": {"mg/dL": 0.01131}}
+    "unit_conversions": {
+      "mg/dL": {
+        "umol/L": 88.42
+      },
+      "umol/L": {
+        "mg/dL": 0.01131
+      }
+    }
   },
   {
     "name": "eGFR",
     "loinc_code": "62238-1",
-    "aliases": ["egfr", "estimated gfr", "glomerular filtration rate", "gfr"],
+    "aliases": [
+      "egfr",
+      "estimated gfr",
+      "glomerular filtration rate",
+      "gfr"
+    ],
     "category": "Metabolic",
     "description": "Estimated glomerular filtration rate (kidney function).",
     "default_unit": "mL/min/1.73m2",
@@ -212,71 +408,1308 @@
   {
     "name": "ALT",
     "loinc_code": "1742-6",
-    "aliases": ["alt", "alanine aminotransferase", "alanine transaminase", "sgpt"],
+    "aliases": [
+      "alt",
+      "alanine aminotransferase",
+      "alanine transaminase",
+      "sgpt"
+    ],
     "category": "Liver",
     "description": "Liver enzyme; elevated levels suggest liver stress.",
     "default_unit": "U/L",
-    "alternate_units": ["IU/L"],
+    "alternate_units": [
+      "IU/L"
+    ],
     "optimal_min": 7,
     "optimal_max": 25,
     "sufficient_min": 26,
     "sufficient_max": 40,
-    "unit_conversions": {"U/L": {"IU/L": 1.0}, "IU/L": {"U/L": 1.0}}
+    "unit_conversions": {
+      "U/L": {
+        "IU/L": 1.0
+      },
+      "IU/L": {
+        "U/L": 1.0
+      }
+    }
   },
   {
     "name": "AST",
     "loinc_code": "1920-8",
-    "aliases": ["ast", "aspartate aminotransferase", "aspartate transaminase", "sgot"],
+    "aliases": [
+      "ast",
+      "aspartate aminotransferase",
+      "aspartate transaminase",
+      "aspartate transferase",
+      "sgot"
+    ],
     "category": "Liver",
     "description": "Liver and heart enzyme.",
     "default_unit": "U/L",
-    "alternate_units": ["IU/L"],
+    "alternate_units": [
+      "IU/L"
+    ],
     "optimal_min": 10,
     "optimal_max": 25,
     "sufficient_min": 26,
     "sufficient_max": 40,
-    "unit_conversions": {"U/L": {"IU/L": 1.0}, "IU/L": {"U/L": 1.0}}
+    "unit_conversions": {
+      "U/L": {
+        "IU/L": 1.0
+      },
+      "IU/L": {
+        "U/L": 1.0
+      }
+    }
   },
   {
     "name": "CRP",
     "loinc_code": "1988-5",
-    "aliases": ["crp", "c-reactive protein", "c reactive protein", "hs-crp", "high sensitivity crp"],
+    "aliases": [
+      "crp",
+      "c-reactive protein",
+      "c reactive protein"
+    ],
     "category": "Inflammation",
     "description": "Inflammatory marker.",
     "default_unit": "mg/L",
-    "alternate_units": ["mg/dL"],
+    "alternate_units": [
+      "mg/dL"
+    ],
     "optimal_min": 0,
     "optimal_max": 0.5,
     "sufficient_min": 0.5,
     "sufficient_max": 1.0,
-    "unit_conversions": {"mg/L": {"mg/dL": 0.1}, "mg/dL": {"mg/L": 10.0}}
+    "unit_conversions": {
+      "mg/L": {
+        "mg/dL": 0.1
+      },
+      "mg/dL": {
+        "mg/L": 10.0
+      }
+    }
   },
   {
     "name": "Testosterone",
     "loinc_code": "2986-8",
-    "aliases": ["testosterone", "total testosterone", "testosterone total", "test"],
+    "aliases": [
+      "testosterone",
+      "total testosterone",
+      "testosterone total",
+      "test"
+    ],
     "category": "Hormones",
     "description": "Total testosterone level.",
     "default_unit": "ng/dL",
-    "alternate_units": ["nmol/L"],
+    "alternate_units": [
+      "nmol/L"
+    ],
     "optimal_min": 600,
     "optimal_max": 900,
     "sufficient_min": 400,
     "sufficient_max": 599,
-    "unit_conversions": {"ng/dL": {"nmol/L": 0.03467}, "nmol/L": {"ng/dL": 28.84}}
+    "unit_conversions": {
+      "ng/dL": {
+        "nmol/L": 0.03467
+      },
+      "nmol/L": {
+        "ng/dL": 28.84
+      }
+    }
   },
   {
     "name": "Homocysteine",
     "loinc_code": "13965-9",
-    "aliases": ["homocysteine", "homocystine", "hcy"],
+    "aliases": [
+      "homocysteine",
+      "homocystine",
+      "hcy"
+    ],
     "category": "Inflammation",
     "description": "Amino acid; elevated levels linked to cardiovascular risk.",
     "default_unit": "umol/L",
-    "alternate_units": ["mg/L"],
+    "alternate_units": [
+      "mg/L"
+    ],
     "optimal_min": 0,
     "optimal_max": 7.9,
     "sufficient_min": 8.0,
     "sufficient_max": 15.0,
-    "unit_conversions": {"umol/L": {"mg/L": 0.1351}, "mg/L": {"umol/L": 7.397}}
+    "unit_conversions": {
+      "umol/L": {
+        "mg/L": 0.1351
+      },
+      "mg/L": {
+        "umol/L": 7.397
+      }
+    }
+  },
+  {
+    "name": "Haematocrit",
+    "loinc_code": "20570-8",
+    "aliases": [
+      "haematocrit",
+      "hematocrit",
+      "hct",
+      "pcv",
+      "packed cell volume"
+    ],
+    "category": "CBC",
+    "description": "Proportion of blood volume occupied by red blood cells.",
+    "default_unit": "L/L",
+    "alternate_units": [
+      "%"
+    ],
+    "optimal_min": 0.42,
+    "optimal_max": 0.5,
+    "sufficient_min": 0.38,
+    "sufficient_max": 0.52,
+    "unit_conversions": {
+      "L/L": {
+        "%": 100.0
+      },
+      "%": {
+        "L/L": 0.01
+      }
+    }
+  },
+  {
+    "name": "RBC",
+    "loinc_code": "789-8",
+    "aliases": [
+      "rbc",
+      "red blood cells",
+      "red blood count",
+      "erythrocytes"
+    ],
+    "category": "CBC",
+    "description": "Red blood cell count.",
+    "default_unit": "x10e12/L",
+    "alternate_units": [],
+    "optimal_min": 4.5,
+    "optimal_max": 5.5,
+    "sufficient_min": 4.2,
+    "sufficient_max": 5.9,
+    "unit_conversions": {}
+  },
+  {
+    "name": "MCV",
+    "loinc_code": "787-2",
+    "aliases": [
+      "mcv",
+      "mean corpuscular volume",
+      "mean cell volume"
+    ],
+    "category": "CBC",
+    "description": "Average volume of red blood cells.",
+    "default_unit": "fL",
+    "alternate_units": [],
+    "optimal_min": 85,
+    "optimal_max": 95,
+    "sufficient_min": 80,
+    "sufficient_max": 100,
+    "unit_conversions": {}
+  },
+  {
+    "name": "MCH",
+    "loinc_code": "785-6",
+    "aliases": [
+      "mch",
+      "mean corpuscular haemoglobin",
+      "mean corpuscular hemoglobin",
+      "mean cell haemoglobin"
+    ],
+    "category": "CBC",
+    "description": "Average amount of haemoglobin per red blood cell.",
+    "default_unit": "pg",
+    "alternate_units": [],
+    "optimal_min": 27,
+    "optimal_max": 32,
+    "sufficient_min": 27,
+    "sufficient_max": 33,
+    "unit_conversions": {}
+  },
+  {
+    "name": "MCHC",
+    "loinc_code": "786-4",
+    "aliases": [
+      "mchc",
+      "mean corpuscular haemoglobin concentration",
+      "mean cell haemoglobin concentration"
+    ],
+    "category": "CBC",
+    "description": "Average concentration of haemoglobin in red blood cells.",
+    "default_unit": "g/L",
+    "alternate_units": [
+      "g/dL"
+    ],
+    "optimal_min": 320,
+    "optimal_max": 355,
+    "sufficient_min": 315,
+    "sufficient_max": 360,
+    "unit_conversions": {
+      "g/L": {
+        "g/dL": 0.1
+      },
+      "g/dL": {
+        "g/L": 10.0
+      }
+    }
+  },
+  {
+    "name": "RDW",
+    "loinc_code": "788-0",
+    "aliases": [
+      "rdw",
+      "red cell distribution width",
+      "rbc distribution width"
+    ],
+    "category": "CBC",
+    "description": "Variation in red blood cell size.",
+    "default_unit": "%",
+    "alternate_units": [],
+    "optimal_min": 11.5,
+    "optimal_max": 13.0,
+    "sufficient_min": 11.5,
+    "sufficient_max": 14.5,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Platelets",
+    "loinc_code": "777-3",
+    "aliases": [
+      "platelets",
+      "plt",
+      "platelet count",
+      "thrombocytes"
+    ],
+    "category": "CBC",
+    "description": "Platelet count.",
+    "default_unit": "x10e9/L",
+    "alternate_units": [],
+    "optimal_min": 175,
+    "optimal_max": 350,
+    "sufficient_min": 150,
+    "sufficient_max": 400,
+    "unit_conversions": {}
+  },
+  {
+    "name": "MPV",
+    "loinc_code": "32623-1",
+    "aliases": [
+      "mpv",
+      "mean platelet volume"
+    ],
+    "category": "CBC",
+    "description": "Average size of platelets.",
+    "default_unit": "fL",
+    "alternate_units": [],
+    "optimal_min": 9.0,
+    "optimal_max": 12.0,
+    "sufficient_min": 7.5,
+    "sufficient_max": 12.5,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Neutrophils",
+    "loinc_code": "751-8",
+    "aliases": [
+      "neutrophils",
+      "neutrophil count",
+      "neut",
+      "polys",
+      "pmn"
+    ],
+    "category": "CBC",
+    "description": "Neutrophil white blood cell count.",
+    "default_unit": "x10e9/L",
+    "alternate_units": [],
+    "optimal_min": 2.0,
+    "optimal_max": 6.0,
+    "sufficient_min": 1.8,
+    "sufficient_max": 7.5,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Lymphocytes",
+    "loinc_code": "731-0",
+    "aliases": [
+      "lymphocytes",
+      "lymphocyte count",
+      "lymphs"
+    ],
+    "category": "CBC",
+    "description": "Lymphocyte white blood cell count.",
+    "default_unit": "x10e9/L",
+    "alternate_units": [],
+    "optimal_min": 1.5,
+    "optimal_max": 3.5,
+    "sufficient_min": 1.0,
+    "sufficient_max": 4.0,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Monocytes",
+    "loinc_code": "742-7",
+    "aliases": [
+      "monocytes",
+      "monocyte count",
+      "mono"
+    ],
+    "category": "CBC",
+    "description": "Monocyte white blood cell count.",
+    "default_unit": "x10e9/L",
+    "alternate_units": [],
+    "optimal_min": 0.2,
+    "optimal_max": 0.8,
+    "sufficient_min": 0.2,
+    "sufficient_max": 1.0,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Eosinophils",
+    "loinc_code": "711-2",
+    "aliases": [
+      "eosinophils",
+      "eosinophil count",
+      "eos"
+    ],
+    "category": "CBC",
+    "description": "Eosinophil white blood cell count.",
+    "default_unit": "x10e9/L",
+    "alternate_units": [],
+    "optimal_min": 0.02,
+    "optimal_max": 0.3,
+    "sufficient_min": 0.0,
+    "sufficient_max": 0.5,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Basophils",
+    "loinc_code": "704-7",
+    "aliases": [
+      "basophils",
+      "basophil count",
+      "baso"
+    ],
+    "category": "CBC",
+    "description": "Basophil white blood cell count.",
+    "default_unit": "x10e9/L",
+    "alternate_units": [],
+    "optimal_min": 0.0,
+    "optimal_max": 0.08,
+    "sufficient_min": 0.0,
+    "sufficient_max": 0.1,
+    "unit_conversions": {}
+  },
+  {
+    "name": "ESR",
+    "loinc_code": "4537-7",
+    "aliases": [
+      "esr",
+      "erythrocyte sedimentation rate",
+      "sed rate",
+      "sedimentation rate"
+    ],
+    "category": "Inflammatory",
+    "description": "Erythrocyte sedimentation rate, a marker of inflammation.",
+    "default_unit": "mm/Hour",
+    "alternate_units": [],
+    "optimal_min": 0,
+    "optimal_max": 10,
+    "sufficient_min": 0,
+    "sufficient_max": 20,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Total Bilirubin",
+    "loinc_code": "1975-2",
+    "aliases": [
+      "total bilirubin",
+      "bilirubin total",
+      "tbil"
+    ],
+    "category": "Liver",
+    "description": "Total bilirubin, a liver function marker.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "mg/dL"
+    ],
+    "optimal_min": 3.4,
+    "optimal_max": 12.0,
+    "sufficient_min": 3.4,
+    "sufficient_max": 20.5,
+    "unit_conversions": {
+      "umol/L": {
+        "mg/dL": 0.05847
+      },
+      "mg/dL": {
+        "umol/L": 17.1
+      }
+    }
+  },
+  {
+    "name": "ALP",
+    "loinc_code": "6768-6",
+    "aliases": [
+      "alp",
+      "alkaline phosphatase",
+      "alk phos",
+      "alk phosphatase"
+    ],
+    "category": "Liver",
+    "description": "Alkaline phosphatase liver enzyme.",
+    "default_unit": "U/L",
+    "alternate_units": [
+      "IU/L"
+    ],
+    "optimal_min": 44,
+    "optimal_max": 100,
+    "sufficient_min": 44,
+    "sufficient_max": 147,
+    "unit_conversions": {
+      "U/L": {
+        "IU/L": 1.0
+      },
+      "IU/L": {
+        "U/L": 1.0
+      }
+    }
+  },
+  {
+    "name": "GGT",
+    "loinc_code": "2324-2",
+    "aliases": [
+      "ggt",
+      "gamma gt",
+      "gamma-gt",
+      "gamma glutamyl transferase",
+      "gamma glutamyltransferase",
+      "ggtp"
+    ],
+    "category": "Liver",
+    "description": "Gamma-glutamyl transferase liver enzyme.",
+    "default_unit": "U/L",
+    "alternate_units": [
+      "IU/L"
+    ],
+    "optimal_min": 8,
+    "optimal_max": 30,
+    "sufficient_min": 8,
+    "sufficient_max": 61,
+    "unit_conversions": {
+      "U/L": {
+        "IU/L": 1.0
+      },
+      "IU/L": {
+        "U/L": 1.0
+      }
+    }
+  },
+  {
+    "name": "Total Protein",
+    "loinc_code": "2885-2",
+    "aliases": [
+      "total protein",
+      "protein total",
+      "serum protein"
+    ],
+    "category": "Liver",
+    "description": "Total serum protein.",
+    "default_unit": "g/L",
+    "alternate_units": [
+      "g/dL"
+    ],
+    "optimal_min": 65,
+    "optimal_max": 80,
+    "sufficient_min": 60,
+    "sufficient_max": 83,
+    "unit_conversions": {
+      "g/L": {
+        "g/dL": 0.1
+      },
+      "g/dL": {
+        "g/L": 10.0
+      }
+    }
+  },
+  {
+    "name": "Albumin",
+    "loinc_code": "1751-7",
+    "aliases": [
+      "albumin",
+      "alb",
+      "serum albumin"
+    ],
+    "category": "Liver",
+    "description": "Albumin protein level, marker of liver function and nutrition.",
+    "default_unit": "g/L",
+    "alternate_units": [
+      "g/dL"
+    ],
+    "optimal_min": 42,
+    "optimal_max": 52,
+    "sufficient_min": 35,
+    "sufficient_max": 52,
+    "unit_conversions": {
+      "g/L": {
+        "g/dL": 0.1
+      },
+      "g/dL": {
+        "g/L": 10.0
+      }
+    }
+  },
+  {
+    "name": "Globulins",
+    "loinc_code": "10834-0",
+    "aliases": [
+      "globulins",
+      "globulin",
+      "serum globulins"
+    ],
+    "category": "Liver",
+    "description": "Calculated as Total Protein minus Albumin.",
+    "default_unit": "g/L",
+    "alternate_units": [],
+    "optimal_min": 22,
+    "optimal_max": 35,
+    "sufficient_min": 20,
+    "sufficient_max": 40,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Urea",
+    "loinc_code": "3091-6",
+    "aliases": [
+      "urea",
+      "blood urea",
+      "serum urea",
+      "urea nitrogen",
+      "bun"
+    ],
+    "category": "Metabolic",
+    "description": "Blood urea, a kidney function marker.",
+    "default_unit": "mmol/L",
+    "alternate_units": [],
+    "optimal_min": 3.0,
+    "optimal_max": 6.5,
+    "sufficient_min": 2.5,
+    "sufficient_max": 7.8,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Calcium",
+    "loinc_code": "17861-6",
+    "aliases": [
+      "calcium",
+      "ca",
+      "serum calcium",
+      "total calcium"
+    ],
+    "category": "Metabolic",
+    "description": "Total serum calcium.",
+    "default_unit": "mmol/L",
+    "alternate_units": [
+      "mg/dL"
+    ],
+    "optimal_min": 2.2,
+    "optimal_max": 2.5,
+    "sufficient_min": 2.1,
+    "sufficient_max": 2.55,
+    "unit_conversions": {
+      "mmol/L": {
+        "mg/dL": 4.0
+      },
+      "mg/dL": {
+        "mmol/L": 0.25
+      }
+    }
+  },
+  {
+    "name": "Adjusted Calcium",
+    "loinc_code": "2000-8",
+    "aliases": [
+      "adjusted calcium",
+      "corrected calcium",
+      "albumin corrected calcium",
+      "adj calcium"
+    ],
+    "category": "Metabolic",
+    "description": "Calcium corrected for albumin level.",
+    "default_unit": "mmol/L",
+    "alternate_units": [],
+    "optimal_min": 2.2,
+    "optimal_max": 2.5,
+    "sufficient_min": 2.1,
+    "sufficient_max": 2.55,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Phosphate",
+    "loinc_code": "2777-1",
+    "aliases": [
+      "phosphate",
+      "phosphorus",
+      "phos",
+      "inorganic phosphate",
+      "serum phosphate"
+    ],
+    "category": "Metabolic",
+    "description": "Serum phosphate.",
+    "default_unit": "mmol/L",
+    "alternate_units": [
+      "mg/dL"
+    ],
+    "optimal_min": 0.9,
+    "optimal_max": 1.4,
+    "sufficient_min": 0.8,
+    "sufficient_max": 1.5,
+    "unit_conversions": {
+      "mmol/L": {
+        "mg/dL": 3.097
+      },
+      "mg/dL": {
+        "mmol/L": 0.3229
+      }
+    }
+  },
+  {
+    "name": "Urate",
+    "loinc_code": "3084-1",
+    "aliases": [
+      "urate",
+      "uric acid",
+      "serum uric acid",
+      "uric acid serum"
+    ],
+    "category": "Metabolic",
+    "description": "Serum urate (uric acid), elevated in gout.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "mg/dL"
+    ],
+    "optimal_min": 200,
+    "optimal_max": 380,
+    "sufficient_min": 180,
+    "sufficient_max": 420,
+    "unit_conversions": {
+      "umol/L": {
+        "mg/dL": 0.01681
+      },
+      "mg/dL": {
+        "umol/L": 59.48
+      }
+    }
+  },
+  {
+    "name": "Sodium",
+    "loinc_code": "2951-2",
+    "aliases": [
+      "sodium",
+      "na",
+      "serum sodium"
+    ],
+    "category": "Metabolic",
+    "description": "Serum sodium electrolyte.",
+    "default_unit": "mmol/L",
+    "alternate_units": [],
+    "optimal_min": 138,
+    "optimal_max": 142,
+    "sufficient_min": 136,
+    "sufficient_max": 145,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Potassium",
+    "loinc_code": "2823-3",
+    "aliases": [
+      "potassium",
+      "k",
+      "serum potassium"
+    ],
+    "category": "Metabolic",
+    "description": "Serum potassium electrolyte.",
+    "default_unit": "mmol/L",
+    "alternate_units": [],
+    "optimal_min": 4.0,
+    "optimal_max": 5.0,
+    "sufficient_min": 3.5,
+    "sufficient_max": 5.1,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Chloride",
+    "loinc_code": "2075-0",
+    "aliases": [
+      "chloride",
+      "cl",
+      "serum chloride"
+    ],
+    "category": "Metabolic",
+    "description": "Serum chloride electrolyte.",
+    "default_unit": "mmol/L",
+    "alternate_units": [],
+    "optimal_min": 100,
+    "optimal_max": 105,
+    "sufficient_min": 98,
+    "sufficient_max": 107,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Bicarbonate",
+    "loinc_code": "1963-8",
+    "aliases": [
+      "bicarbonate",
+      "hco3",
+      "co2",
+      "carbon dioxide",
+      "bicarb"
+    ],
+    "category": "Metabolic",
+    "description": "Serum bicarbonate, reflects acid-base balance.",
+    "default_unit": "mmol/L",
+    "alternate_units": [],
+    "optimal_min": 24,
+    "optimal_max": 28,
+    "sufficient_min": 22,
+    "sufficient_max": 29,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Magnesium",
+    "loinc_code": "2601-3",
+    "aliases": [
+      "magnesium",
+      "mg",
+      "serum magnesium"
+    ],
+    "category": "Metabolic",
+    "description": "Serum magnesium.",
+    "default_unit": "mmol/L",
+    "alternate_units": [
+      "mg/dL"
+    ],
+    "optimal_min": 0.85,
+    "optimal_max": 1.05,
+    "sufficient_min": 0.7,
+    "sufficient_max": 1.05,
+    "unit_conversions": {
+      "mmol/L": {
+        "mg/dL": 2.431
+      },
+      "mg/dL": {
+        "mmol/L": 0.4114
+      }
+    }
+  },
+  {
+    "name": "Iron",
+    "loinc_code": "2498-4",
+    "aliases": [
+      "iron",
+      "serum iron",
+      "fe",
+      "iron serum"
+    ],
+    "category": "Iron Studies",
+    "description": "Serum iron level.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "ug/dL"
+    ],
+    "optimal_min": 12,
+    "optimal_max": 28,
+    "sufficient_min": 9,
+    "sufficient_max": 30,
+    "unit_conversions": {
+      "umol/L": {
+        "ug/dL": 5.585
+      },
+      "ug/dL": {
+        "umol/L": 0.17907
+      }
+    }
+  },
+  {
+    "name": "UIBC",
+    "loinc_code": "2501-5",
+    "aliases": [
+      "uibc",
+      "unsaturated iron binding capacity",
+      "unbound iron binding capacity"
+    ],
+    "category": "Iron Studies",
+    "description": "Unsaturated iron-binding capacity.",
+    "default_unit": "umol/L",
+    "alternate_units": [],
+    "optimal_min": 25,
+    "optimal_max": 55,
+    "sufficient_min": 22,
+    "sufficient_max": 62,
+    "unit_conversions": {}
+  },
+  {
+    "name": "TIBC",
+    "loinc_code": "2500-7",
+    "aliases": [
+      "tibc",
+      "total iron binding capacity"
+    ],
+    "category": "Iron Studies",
+    "description": "Total iron-binding capacity.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "ug/dL"
+    ],
+    "optimal_min": 45,
+    "optimal_max": 70,
+    "sufficient_min": 45,
+    "sufficient_max": 80,
+    "unit_conversions": {
+      "umol/L": {
+        "ug/dL": 5.585
+      },
+      "ug/dL": {
+        "umol/L": 0.17907
+      }
+    }
+  },
+  {
+    "name": "Transferrin",
+    "loinc_code": "3034-6",
+    "aliases": [
+      "transferrin",
+      "serum transferrin"
+    ],
+    "category": "Iron Studies",
+    "description": "Transferrin protein that transports iron.",
+    "default_unit": "g/L",
+    "alternate_units": [],
+    "optimal_min": 2.2,
+    "optimal_max": 3.4,
+    "sufficient_min": 2.0,
+    "sufficient_max": 3.6,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Transferrin Saturation",
+    "loinc_code": "2502-3",
+    "aliases": [
+      "transferrin saturation",
+      "transferrin sat",
+      "iron saturation",
+      "tsat",
+      "transferrin sat %",
+      "iron sat"
+    ],
+    "category": "Iron Studies",
+    "description": "Percentage of transferrin saturated with iron.",
+    "default_unit": "%",
+    "alternate_units": [],
+    "optimal_min": 25,
+    "optimal_max": 45,
+    "sufficient_min": 20,
+    "sufficient_max": 50,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Free T3",
+    "loinc_code": "3051-0",
+    "aliases": [
+      "free t3",
+      "ft3",
+      "free triiodothyronine",
+      "triiodothyronine free"
+    ],
+    "category": "Thyroid",
+    "description": "Free triiodothyronine (active thyroid hormone).",
+    "default_unit": "pmol/L",
+    "alternate_units": [
+      "pg/mL"
+    ],
+    "optimal_min": 4.0,
+    "optimal_max": 6.5,
+    "sufficient_min": 3.1,
+    "sufficient_max": 6.8,
+    "unit_conversions": {
+      "pmol/L": {
+        "pg/mL": 0.6509
+      },
+      "pg/mL": {
+        "pmol/L": 1.536
+      }
+    }
+  },
+  {
+    "name": "DHEA-S",
+    "loinc_code": "2191-5",
+    "aliases": [
+      "dhea-s",
+      "dheas",
+      "dhea sulfate",
+      "dehydroepiandrosterone sulfate",
+      "dhea sulphate"
+    ],
+    "category": "Hormones",
+    "description": "DHEA sulfate, an adrenal androgen hormone.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "ug/dL"
+    ],
+    "optimal_min": 5.0,
+    "optimal_max": 12.0,
+    "sufficient_min": 2.2,
+    "sufficient_max": 15.0,
+    "unit_conversions": {
+      "umol/L": {
+        "ug/dL": 38.61
+      },
+      "ug/dL": {
+        "umol/L": 0.0259
+      }
+    }
+  },
+  {
+    "name": "Cortisol",
+    "loinc_code": "2143-6",
+    "aliases": [
+      "cortisol",
+      "serum cortisol",
+      "morning cortisol",
+      "hydrocortisone"
+    ],
+    "category": "Hormones",
+    "description": "Cortisol (stress hormone), typically measured in morning.",
+    "default_unit": "nmol/L",
+    "alternate_units": [
+      "ug/dL"
+    ],
+    "optimal_min": 350,
+    "optimal_max": 580,
+    "sufficient_min": 138,
+    "sufficient_max": 690,
+    "unit_conversions": {
+      "nmol/L": {
+        "ug/dL": 0.03625
+      },
+      "ug/dL": {
+        "nmol/L": 27.59
+      }
+    }
+  },
+  {
+    "name": "Estradiol",
+    "loinc_code": "2243-4",
+    "aliases": [
+      "estradiol",
+      "oestradiol",
+      "e2",
+      "17-beta estradiol"
+    ],
+    "category": "Hormones",
+    "description": "Estradiol, primary estrogen hormone.",
+    "default_unit": "pmol/L",
+    "alternate_units": [
+      "pg/mL"
+    ],
+    "optimal_min": 40,
+    "optimal_max": 130,
+    "sufficient_min": 40,
+    "sufficient_max": 161,
+    "unit_conversions": {
+      "pmol/L": {
+        "pg/mL": 0.2724
+      },
+      "pg/mL": {
+        "pmol/L": 3.671
+      }
+    }
+  },
+  {
+    "name": "Progesterone",
+    "loinc_code": "2839-9",
+    "aliases": [
+      "progesterone",
+      "prog",
+      "serum progesterone"
+    ],
+    "category": "Hormones",
+    "description": "Progesterone hormone.",
+    "default_unit": "nmol/L",
+    "alternate_units": [
+      "ng/mL"
+    ],
+    "optimal_min": 0.5,
+    "optimal_max": 2.0,
+    "sufficient_min": 0.3,
+    "sufficient_max": 2.5,
+    "unit_conversions": {
+      "nmol/L": {
+        "ng/mL": 0.3145
+      },
+      "ng/mL": {
+        "nmol/L": 3.18
+      }
+    }
+  },
+  {
+    "name": "LH",
+    "loinc_code": "10501-5",
+    "aliases": [
+      "lh",
+      "luteinising hormone",
+      "luteinizing hormone",
+      "lutropin"
+    ],
+    "category": "Hormones",
+    "description": "Luteinising hormone.",
+    "default_unit": "IU/L",
+    "alternate_units": [],
+    "optimal_min": 2.0,
+    "optimal_max": 8.0,
+    "sufficient_min": 1.5,
+    "sufficient_max": 9.3,
+    "unit_conversions": {}
+  },
+  {
+    "name": "FSH",
+    "loinc_code": "15067-2",
+    "aliases": [
+      "fsh",
+      "follicle stimulating hormone",
+      "follitropin"
+    ],
+    "category": "Hormones",
+    "description": "Follicle-stimulating hormone.",
+    "default_unit": "IU/L",
+    "alternate_units": [],
+    "optimal_min": 2.0,
+    "optimal_max": 10.0,
+    "sufficient_min": 1.4,
+    "sufficient_max": 18.1,
+    "unit_conversions": {}
+  },
+  {
+    "name": "SHBG",
+    "loinc_code": "13967-5",
+    "aliases": [
+      "shbg",
+      "sex hormone binding globulin",
+      "sex hormone-binding globulin"
+    ],
+    "category": "Hormones",
+    "description": "Sex hormone-binding globulin.",
+    "default_unit": "nmol/L",
+    "alternate_units": [],
+    "optimal_min": 20,
+    "optimal_max": 55,
+    "sufficient_min": 10,
+    "sufficient_max": 70,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Prolactin",
+    "loinc_code": "2842-3",
+    "aliases": [
+      "prolactin",
+      "prl",
+      "serum prolactin"
+    ],
+    "category": "Hormones",
+    "description": "Prolactin hormone.",
+    "default_unit": "mIU/L",
+    "alternate_units": [
+      "ng/mL"
+    ],
+    "optimal_min": 45,
+    "optimal_max": 250,
+    "sufficient_min": 45,
+    "sufficient_max": 375,
+    "unit_conversions": {
+      "mIU/L": {
+        "ng/mL": 0.04706
+      },
+      "ng/mL": {
+        "mIU/L": 21.2
+      }
+    }
+  },
+  {
+    "name": "Insulin",
+    "loinc_code": "20448-7",
+    "aliases": [
+      "insulin",
+      "fasting insulin",
+      "serum insulin"
+    ],
+    "category": "Metabolic",
+    "description": "Fasting insulin level.",
+    "default_unit": "mIU/L",
+    "alternate_units": [
+      "pmol/L"
+    ],
+    "optimal_min": 2.6,
+    "optimal_max": 12.0,
+    "sufficient_min": 2.6,
+    "sufficient_max": 24.9,
+    "unit_conversions": {
+      "mIU/L": {
+        "pmol/L": 6.945
+      },
+      "pmol/L": {
+        "mIU/L": 0.144
+      }
+    }
+  },
+  {
+    "name": "PSA",
+    "loinc_code": "2857-1",
+    "aliases": [
+      "psa",
+      "prostate specific antigen",
+      "prostate-specific antigen",
+      "total psa"
+    ],
+    "category": "Cancer Markers",
+    "description": "Prostate-specific antigen.",
+    "default_unit": "ng/mL",
+    "alternate_units": [
+      "ug/L"
+    ],
+    "optimal_min": 0,
+    "optimal_max": 2.5,
+    "sufficient_min": 0,
+    "sufficient_max": 4.0,
+    "unit_conversions": {
+      "ng/mL": {
+        "ug/L": 1.0
+      },
+      "ug/L": {
+        "ng/mL": 1.0
+      }
+    }
+  },
+  {
+    "name": "Folate",
+    "loinc_code": "2284-8",
+    "aliases": [
+      "folate",
+      "folic acid",
+      "serum folate",
+      "vitamin b9",
+      "b9"
+    ],
+    "category": "Vitamins",
+    "description": "Serum folate (folic acid, vitamin B9).",
+    "default_unit": "nmol/L",
+    "alternate_units": [
+      "ng/mL"
+    ],
+    "optimal_min": 13.6,
+    "optimal_max": 45.0,
+    "sufficient_min": 7.0,
+    "sufficient_max": 45.0,
+    "unit_conversions": {
+      "nmol/L": {
+        "ng/mL": 0.4413
+      },
+      "ng/mL": {
+        "nmol/L": 2.266
+      }
+    }
+  },
+  {
+    "name": "Zinc",
+    "loinc_code": "5759-9",
+    "aliases": [
+      "zinc",
+      "serum zinc",
+      "zn"
+    ],
+    "category": "Minerals",
+    "description": "Serum zinc.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "ug/dL"
+    ],
+    "optimal_min": 12,
+    "optimal_max": 18,
+    "sufficient_min": 10,
+    "sufficient_max": 20,
+    "unit_conversions": {
+      "umol/L": {
+        "ug/dL": 6.54
+      },
+      "ug/dL": {
+        "umol/L": 0.1529
+      }
+    }
+  },
+  {
+    "name": "Copper",
+    "loinc_code": "5773-0",
+    "aliases": [
+      "copper",
+      "serum copper",
+      "cu"
+    ],
+    "category": "Minerals",
+    "description": "Serum copper.",
+    "default_unit": "umol/L",
+    "alternate_units": [
+      "ug/dL"
+    ],
+    "optimal_min": 12,
+    "optimal_max": 20,
+    "sufficient_min": 11,
+    "sufficient_max": 22,
+    "unit_conversions": {
+      "umol/L": {
+        "ug/dL": 6.354
+      },
+      "ug/dL": {
+        "umol/L": 0.1574
+      }
+    }
+  },
+  {
+    "name": "Fibrinogen",
+    "loinc_code": "3255-7",
+    "aliases": [
+      "fibrinogen",
+      "plasma fibrinogen",
+      "factor i"
+    ],
+    "category": "Coagulation",
+    "description": "Fibrinogen, a coagulation factor and inflammatory marker.",
+    "default_unit": "g/L",
+    "alternate_units": [],
+    "optimal_min": 2.0,
+    "optimal_max": 3.5,
+    "sufficient_min": 2.0,
+    "sufficient_max": 4.5,
+    "unit_conversions": {}
+  },
+  {
+    "name": "HsCRP",
+    "loinc_code": "30522-7",
+    "aliases": [
+      "hscrp",
+      "hs-crp",
+      "high sensitivity crp",
+      "high-sensitivity c-reactive protein",
+      "hsCRP",
+      "ultrasensitive crp"
+    ],
+    "category": "Inflammatory",
+    "description": "High-sensitivity C-reactive protein, cardiovascular risk marker.",
+    "default_unit": "mg/L",
+    "alternate_units": [],
+    "optimal_min": 0,
+    "optimal_max": 1.0,
+    "sufficient_min": 0,
+    "sufficient_max": 3.0,
+    "unit_conversions": {}
   }
 ]
