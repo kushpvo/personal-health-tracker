@@ -147,6 +147,7 @@
       "hba1c",
       "hemoglobin a1c",
       "glycated hemoglobin",
+      "glycated hb",
       "a1c",
       "glycohemoglobin"
     ],
@@ -580,6 +581,7 @@
       "rbc",
       "red blood cells",
       "red blood count",
+      "red cell count",
       "erythrocytes"
     ],
     "category": "CBC",
