@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   ReferenceArea,
+  ReferenceLine,
   ResponsiveContainer,
   Dot,
 } from "recharts";
@@ -50,6 +51,11 @@ function CustomTooltip({ active, payload }: any) {
   );
 }
 
+function fmtTick(v: number): string {
+  if (!isFinite(v) || Math.abs(v) > 1e6) return "";
+  return parseFloat(v.toFixed(1)).toString();
+}
+
 export default function TrendChart({ biomarker, results }: Props) {
   if (results.length === 0) {
     return <p className="text-sm text-gray-400">No data points yet.</p>;
@@ -63,19 +69,37 @@ export default function TrendChart({ biomarker, results }: Props) {
     unit: r.unit,
   }));
 
-  const allValues = data.map((d) => d.value);
-  const dataMin = Math.min(...allValues);
-  const dataMax = Math.max(...allValues);
-  const padding = (dataMax - dataMin) * 0.3 || 10;
-  const yMin = Math.max(0, dataMin - padding);
-  const yMax = dataMax + padding;
-
   const { optimal_min, optimal_max, sufficient_min, sufficient_max } = biomarker;
   const hasOptimal = optimal_min != null && optimal_max != null;
   const hasSufficient = sufficient_min != null && sufficient_max != null;
 
-  const lowerOutOfRangeEnd = hasOptimal ? optimal_min : hasSufficient ? sufficient_min : yMin;
-  const upperOutOfRangeStart = hasSufficient ? sufficient_max : hasOptimal ? optimal_max : yMax;
+  // Build domain from data values AND all reference range boundaries so
+  // ticks are always clean numbers — no ifOverflow surprises.
+  const allBoundaries: number[] = [
+    ...data.map((d) => d.value),
+    ...(hasOptimal ? [optimal_min!, optimal_max!] : []),
+    ...(hasSufficient ? [sufficient_min!, sufficient_max!] : []),
+  ];
+  const rawMin = Math.min(...allBoundaries);
+  const rawMax = Math.max(...allBoundaries);
+  const padding = (rawMax - rawMin) * 0.25 || 5;
+  const yMin = Math.max(0, rawMin - padding);
+  const yMax = rawMax + padding;
+
+  // Zone band boundaries
+  const lowerOorEnd   = hasOptimal ? optimal_min! : hasSufficient ? sufficient_min! : yMin;
+  const upperOorStart = hasSufficient ? sufficient_max! : hasOptimal ? optimal_max! : yMax;
+
+  // Boundary lines to draw (between zones)
+  const boundaryLines: { y: number; color: string }[] = [];
+  if (hasOptimal) {
+    boundaryLines.push({ y: optimal_min!, color: "#22c55e" });
+    boundaryLines.push({ y: optimal_max!, color: "#22c55e" });
+  }
+  if (hasSufficient) {
+    boundaryLines.push({ y: sufficient_min!, color: "#06b6d4" });
+    boundaryLines.push({ y: sufficient_max!, color: "#06b6d4" });
+  }
 
   return (
     <div className="rounded-[28px] border border-slate-800/80 bg-[#050914] px-4 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
@@ -103,65 +127,54 @@ export default function TrendChart({ biomarker, results }: Props) {
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} margin={{ top: 12, right: 24, left: 4, bottom: 8 }}>
-          <defs>
-            <linearGradient id="chartSurfaceGlow" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0b1220" />
-              <stop offset="100%" stopColor="#060913" />
-            </linearGradient>
-            <linearGradient id="optimalBand" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#22c55e" stopOpacity="0.14" />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity="0.08" />
-            </linearGradient>
-            <linearGradient id="sufficientBand" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.15" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.08" />
-            </linearGradient>
-            <linearGradient id="outOfRangeBand" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#f97316" stopOpacity="0.14" />
-              <stop offset="100%" stopColor="#f97316" stopOpacity="0.07" />
-            </linearGradient>
-          </defs>
 
-          <ReferenceArea y1={yMin} y2={yMax} fill="url(#chartSurfaceGlow)" fillOpacity={1} />
-
-          {lowerOutOfRangeEnd > yMin && (
+          {/* Zone bands — solid fills, no horizontal gradient */}
+          {lowerOorEnd > yMin && (
             <ReferenceArea
-              y1={yMin}
-              y2={lowerOutOfRangeEnd}
-              fill="url(#outOfRangeBand)"
-              ifOverflow="extendDomain"
+              y1={yMin} y2={lowerOorEnd}
+              fill="#f97316" fillOpacity={0.07}
+              stroke="none"
             />
           )}
           {hasSufficient && (
             <ReferenceArea
-              y1={sufficient_min!}
-              y2={sufficient_max!}
-              fill="url(#sufficientBand)"
-              ifOverflow="extendDomain"
+              y1={sufficient_min!} y2={sufficient_max!}
+              fill="#06b6d4" fillOpacity={0.10}
+              stroke="none"
             />
           )}
           {hasOptimal && (
             <ReferenceArea
-              y1={optimal_min!}
-              y2={optimal_max!}
-              fill="url(#optimalBand)"
-              ifOverflow="extendDomain"
+              y1={optimal_min!} y2={optimal_max!}
+              fill="#22c55e" fillOpacity={0.12}
+              stroke="none"
             />
           )}
-          {upperOutOfRangeStart < yMax && (
+          {upperOorStart < yMax && (
             <ReferenceArea
-              y1={upperOutOfRangeStart}
-              y2={yMax}
-              fill="url(#outOfRangeBand)"
-              ifOverflow="extendDomain"
+              y1={upperOorStart} y2={yMax}
+              fill="#f97316" fillOpacity={0.07}
+              stroke="none"
             />
           )}
 
-          <CartesianGrid vertical={false} stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="0" />
+          {/* Thin boundary lines at zone edges */}
+          {boundaryLines.map(({ y, color }) => (
+            <ReferenceLine
+              key={`${y}-${color}`}
+              y={y}
+              stroke={color}
+              strokeOpacity={0.35}
+              strokeWidth={1}
+              strokeDasharray="4 3"
+            />
+          ))}
+
+          <CartesianGrid vertical={false} stroke="rgba(148, 163, 184, 0.08)" strokeDasharray="0" />
 
           <XAxis
             dataKey="date"
-            axisLine={{ stroke: "rgba(148, 163, 184, 0.28)" }}
+            axisLine={{ stroke: "rgba(148, 163, 184, 0.2)" }}
             tickLine={false}
             tick={{ fontSize: 11, fill: "#7c8598" }}
             tickFormatter={(v) => formatDate(v)}
@@ -170,16 +183,17 @@ export default function TrendChart({ biomarker, results }: Props) {
           <YAxis
             domain={[yMin, yMax]}
             width={55}
-            axisLine={{ stroke: "rgba(148, 163, 184, 0.28)" }}
+            axisLine={{ stroke: "rgba(148, 163, 184, 0.2)" }}
             tickLine={false}
             tick={{ fontSize: 11, fill: "#7c8598" }}
+            tickFormatter={fmtTick}
           />
           <Tooltip content={<CustomTooltip />} />
 
           <Line
             type="monotone"
             dataKey="value"
-            stroke="rgba(226, 232, 240, 0.24)"
+            stroke="rgba(226, 232, 240, 0.3)"
             strokeWidth={2}
             dot={<CustomDot />}
             activeDot={false}
