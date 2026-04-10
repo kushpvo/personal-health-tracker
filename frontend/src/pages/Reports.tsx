@@ -1,5 +1,6 @@
+import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, Trash2, FileText } from "lucide-react";
+import { Download, Trash2, FileText, ClipboardEdit } from "lucide-react";
 import { api } from "../lib/api";
 import type { ReportListItem } from "../lib/api";
 import { formatDate } from "../lib/utils";
@@ -70,6 +71,13 @@ export default function Reports() {
               >
                 <Download size={15} />
               </a>
+              <Link
+                to={`/reports/${r.id}/review`}
+                className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                title="Review results"
+              >
+                <ClipboardEdit size={15} />
+              </Link>
               <button
                 onClick={() => handleDelete(r.id)}
                 className="p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-950 text-gray-400 hover:text-red-500"

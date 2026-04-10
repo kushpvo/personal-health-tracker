@@ -7,9 +7,13 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.db.models import Report, ReportResult
-from app.schemas.schemas import ReportListItem, ReportStatus, ReportUploadResponse
+from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
+from app.schemas.schemas import (
+    ReportListItem, ReportResultItem, ReportStatus, ReportUploadResponse,
+    ReviewReportInput,
+)
 from app.services.pipeline import run_pipeline
+from app.services.unit_converter import convert_to_default_unit
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 
@@ -114,3 +118,74 @@ def delete_report(report_id: int, db: Session = Depends(get_db)):
         os.remove(report.file_path)
     db.delete(report)
     db.commit()
+
+
+@router.get("/{report_id}/results", response_model=list[ReportResultItem])
+def get_report_results(report_id: int, db: Session = Depends(get_db)):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found.")
+    results = (
+        db.query(ReportResult)
+        .filter(ReportResult.report_id == report_id)
+        .order_by(ReportResult.sort_order.asc().nullslast())
+        .all()
+    )
+    return [
+        ReportResultItem(
+            id=r.id,
+            raw_name=r.raw_name,
+            value=r.value,
+            unit=r.unit,
+            is_flagged_unknown=r.is_flagged_unknown,
+            human_matched=r.human_matched or False,
+            sort_order=r.sort_order,
+            biomarker_id=r.biomarker_id,
+            biomarker_name=r.biomarker.name if r.biomarker else None,
+        )
+        for r in results
+    ]
+
+
+@router.put("/{report_id}/review", response_model=ReportStatus)
+def submit_review(report_id: int, body: ReviewReportInput, db: Session = Depends(get_db)):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found.")
+
+    report.report_name = body.report_name
+    if body.sample_date:
+        report.sample_date = body.sample_date
+
+    for item in body.results:
+        result = db.query(ReportResult).filter(ReportResult.id == item.id).first()
+        if not result:
+            continue
+
+        result.value = item.value
+        result.unit = item.unit
+
+        if item.biomarker_id and result.biomarker_id != item.biomarker_id:
+            biomarker = db.query(Biomarker).filter(Biomarker.id == item.biomarker_id).first()
+            if biomarker:
+                converted_value, used_unit = convert_to_default_unit(
+                    item.value, item.unit, biomarker
+                )
+                result.value = converted_value
+                result.unit = used_unit
+                result.biomarker_id = item.biomarker_id
+                result.is_flagged_unknown = False
+                result.human_matched = True
+
+                unknown = (
+                    db.query(UnknownBiomarker)
+                    .filter(UnknownBiomarker.raw_name == result.raw_name)
+                    .first()
+                )
+                if unknown:
+                    unknown.resolved_biomarker_id = item.biomarker_id
+
+    db.commit()
+    return ReportStatus(
+        id=report.id, status=report.status, error_message=report.error_message
+    )

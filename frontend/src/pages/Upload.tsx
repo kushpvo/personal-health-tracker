@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { XCircle, Loader2 } from "lucide-react";
 import UploadZone from "../components/UploadZone";
 import { api } from "../lib/api";
 
-type Stage = "idle" | "uploading" | "processing" | "done" | "failed";
+type Stage = "idle" | "uploading" | "processing" | "failed";
 
 export default function Upload() {
   const navigate = useNavigate();
@@ -32,8 +32,8 @@ export default function Upload() {
       try {
         const { status, error_message } = await api.reports.status(reportId);
         if (status === "done") {
-          setStage("done");
           clearInterval(interval);
+          navigate(`/reports/${reportId}/review`);
         } else if (status === "failed") {
           setError(error_message ?? "Processing failed");
           setStage("failed");
@@ -44,7 +44,7 @@ export default function Upload() {
       }
     }, 2000);
     return () => clearInterval(interval);
-  }, [stage, reportId]);
+  }, [stage, reportId, navigate]);
 
   return (
     <div className="max-w-xl">
@@ -66,29 +66,6 @@ export default function Upload() {
         <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
           <Loader2 size={18} className="animate-spin" />
           Extracting biomarkers via OCR… this may take a moment.
-        </div>
-      )}
-
-      {stage === "done" && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-            <CheckCircle size={20} />
-            <span className="text-sm font-medium">Report processed successfully.</span>
-          </div>
-          <div className="flex gap-3">
-            <button
-              className="text-sm px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-              onClick={() => navigate("/")}
-            >
-              View Dashboard
-            </button>
-            <button
-              className="text-sm px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
-              onClick={() => { setStage("idle"); setReportId(null); }}
-            >
-              Upload Another
-            </button>
-          </div>
         </div>
       )}
 

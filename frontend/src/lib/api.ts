@@ -51,6 +51,39 @@ export interface BiomarkerDetail {
   results: ResultPoint[];
 }
 
+export interface ReportResultItem {
+  id: number;
+  raw_name: string;
+  value: number;
+  unit: string;
+  is_flagged_unknown: boolean;
+  human_matched: boolean;
+  sort_order: number | null;
+  biomarker_id: number | null;
+  biomarker_name: string | null;
+}
+
+export interface BiomarkerListItem {
+  id: number;
+  name: string;
+  category: string | null;
+  default_unit: string | null;
+  alternate_units: string[];
+}
+
+export interface ReviewResultInput {
+  id: number;
+  value: number;
+  unit: string;
+  biomarker_id?: number;
+}
+
+export interface ReviewReportInput {
+  report_name: string;
+  sample_date: string | null;
+  results: ReviewResultInput[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
   if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
@@ -61,6 +94,16 @@ export const api = {
   reports: {
     list: () => get<ReportListItem[]>("/reports"),
     status: (id: number) => get<ReportStatus>(`/reports/${id}/status`),
+    results: (id: number) => get<ReportResultItem[]>(`/reports/${id}/results`),
+    review: (id: number, body: ReviewReportInput) =>
+      fetch(`${BASE}/reports/${id}/review`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then(async (res) => {
+        if (!res.ok) throw new Error(`Review failed: ${res.status}`);
+        return res.json();
+      }),
     downloadUrl: (id: number) => `${BASE}/reports/${id}/download`,
     delete: (id: number) =>
       fetch(`${BASE}/reports/${id}`, { method: "DELETE" }),
@@ -81,5 +124,6 @@ export const api = {
   biomarkers: {
     summary: () => get<BiomarkerSummary[]>("/biomarkers/summary"),
     detail: (id: number) => get<BiomarkerDetail>(`/biomarkers/${id}`),
+    list: () => get<BiomarkerListItem[]>("/biomarkers/list"),
   },
 };

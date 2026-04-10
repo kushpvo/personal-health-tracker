@@ -74,3 +74,44 @@ class BiomarkerSummary(BaseModel):
     latest_date: Optional[date]
     latest_zone: str
     result_count: int
+
+
+# ── Review flow ────────────────────────────────────────────────────────────────
+
+class ReportResultItem(BaseModel):
+    id: int
+    raw_name: str
+    value: float
+    unit: str
+    is_flagged_unknown: bool
+    human_matched: bool
+    sort_order: Optional[int]
+    biomarker_id: Optional[int]
+    biomarker_name: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class ReviewResultInput(BaseModel):
+    id: int
+    value: float
+    unit: str
+    biomarker_id: Optional[int] = None
+
+
+class ReviewReportInput(BaseModel):
+    report_name: str
+    sample_date: Optional[date] = None
+    results: List[ReviewResultInput]
+
+
+class BiomarkerListItem(BaseModel):
+    id: int
+    name: str
+    category: Optional[str]
+    default_unit: Optional[str]
+    alternate_units: List[str] = []
+
+    class Config:
+        from_attributes = True

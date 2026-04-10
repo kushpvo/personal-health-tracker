@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.models import Biomarker, Report, ReportResult
-from app.schemas.schemas import BiomarkerDetail, BiomarkerInfo, BiomarkerSummary, ResultPoint
+from app.schemas.schemas import (
+    BiomarkerDetail, BiomarkerInfo, BiomarkerListItem, BiomarkerSummary, ResultPoint,
+)
 
 router = APIRouter(prefix="/api/biomarkers", tags=["biomarkers"])
 
@@ -38,6 +40,22 @@ def _to_result_point(result: ReportResult) -> ResultPoint:
         unit=result.unit,
         zone=zone,
     )
+
+
+@router.get("/list", response_model=List[BiomarkerListItem])
+def list_all_biomarkers(db: Session = Depends(get_db)):
+    """All biomarkers alphabetically — for dropdowns. Must be before /{biomarker_id}."""
+    biomarkers = db.query(Biomarker).order_by(Biomarker.name.asc()).all()
+    return [
+        BiomarkerListItem(
+            id=b.id,
+            name=b.name,
+            category=b.category,
+            default_unit=b.default_unit,
+            alternate_units=b.alternate_units or [],
+        )
+        for b in biomarkers
+    ]
 
 
 @router.get("/summary", response_model=List[BiomarkerSummary])
