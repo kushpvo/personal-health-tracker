@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 from datetime import datetime
 from typing import Optional
@@ -23,11 +24,13 @@ def _get_ocr_backend() -> OCRBackend:
 def _match_biomarker(raw_name: str, db: Session) -> Optional[Biomarker]:
     """Find a biomarker by matching raw_name against name and aliases."""
     normalized = raw_name.lower().strip()
+    normalized = re.sub(r"\s+", " ", normalized)
+    simplified = re.sub(r"\s*\([^)]*\)", "", normalized).strip()
     biomarkers = db.query(Biomarker).all()
     for b in biomarkers:
-        if normalized == b.name.lower():
-            return b
-        if normalized in (b.aliases or []):
+        names = [b.name.lower(), *((b.aliases or []))]
+        normalized_names = [re.sub(r"\s+", " ", name.strip().lower()) for name in names]
+        if normalized in normalized_names or simplified in normalized_names:
             return b
     return None
 
@@ -84,8 +87,13 @@ def run_pipeline(report_id: int, db: Session) -> None:
         if not report.report_name:
             report.report_name = os.path.splitext(report.original_filename)[0]
 
+        db.query(ReportResult).filter(ReportResult.report_id == report.id).delete()
+
         # Extract and persist biomarker results
         parsed = extract_biomarkers(full_text)
+        if not parsed:
+            raise RuntimeError("OCR completed, but no biomarker rows could be parsed from the report.")
+
         for item in parsed:
             biomarker = _match_biomarker(item.raw_name, db)
             is_unknown = biomarker is None

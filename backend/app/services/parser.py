@@ -54,6 +54,26 @@ BARE_DATE_PATTERNS = [
     re.compile(r"\b(\d{4}-\d{2}-\d{2})\b"),
 ]
 
+SINGLE_SPACE_WITH_RANGE = re.compile(
+    r"^"
+    r"(?P<name>[A-Za-z][A-Za-z0-9\s,\(\)/\-.%]+?)"
+    r"\s+"
+    r"(?P<value>[<>]?\s*\d+\.?\d*)"
+    r"\s+"
+    r"(?:(?P<flag>H|L|HH|LL|-)\s+)?"
+    r"(?:[\(\{\|]\s*[^)]*?[)\}]?\s+)?"
+    r"(?P<unit>[A-Za-z%µu£][A-Za-z0-9/%µu·\^\-]*)"
+    r"\s*$",
+    re.IGNORECASE,
+)
+
+
+def _normalize_ocr_unit(raw_unit: str) -> str:
+    unit = raw_unit.strip()
+    unit = unit.replace("£", "f")
+    unit = unit.replace("xl0", "x10")
+    return unit
+
 
 def _parse_value(raw: str) -> Optional[float]:
     raw = raw.strip().lstrip("<>").strip()
@@ -104,11 +124,13 @@ def extract_biomarkers(text: str) -> List[ParsedResult]:
 
         m = BIOMARKER_LINE.match(line) or BIOMARKER_INLINE_UNIT.match(line)
         if not m:
+            m = SINGLE_SPACE_WITH_RANGE.match(line)
+        if not m:
             continue
 
-        raw_name = m.group(1).strip().rstrip(".,")
-        raw_value = m.group(2).strip()
-        raw_unit = m.group(3).strip()
+        raw_name = (m.groupdict().get("name") or m.group(1)).strip().rstrip(".,")
+        raw_value = (m.groupdict().get("value") or m.group(2)).strip()
+        raw_unit = _normalize_ocr_unit((m.groupdict().get("unit") or m.group(3)).strip())
 
         if not raw_name or not raw_value or not raw_unit:
             continue

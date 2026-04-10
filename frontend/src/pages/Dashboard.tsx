@@ -5,10 +5,18 @@ import type { BiomarkerSummary } from "../lib/api";
 import BiomarkerCard from "../components/BiomarkerCard";
 
 export default function Dashboard() {
-  const { data: summaries = [], isLoading } = useQuery({
+  const { data: summaries = [], isLoading: isLoadingSummaries } = useQuery({
     queryKey: ["biomarkers-summary"],
     queryFn: api.biomarkers.summary,
   });
+  const { data: reports = [], isLoading: isLoadingReports } = useQuery({
+    queryKey: ["reports"],
+    queryFn: api.reports.list,
+  });
+
+  const isLoading = isLoadingSummaries || isLoadingReports;
+  const parsedResultsCount = reports.reduce((total, report) => total + report.result_count, 0);
+  const recognizedCount = summaries.length;
 
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>;
 
@@ -32,7 +40,12 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {parsedResultsCount} parsed results / {recognizedCount} recognized
+        </p>
+      </div>
       <div className="space-y-8">
         {Object.entries(byCategory).map(([category, items]) => (
           <section key={category}>

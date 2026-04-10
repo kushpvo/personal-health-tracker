@@ -27,7 +27,18 @@ def prepare_images(file_path: str) -> List[str]:
 
     if suffix == ".pdf":
         from pdf2image import convert_from_path
-        pages = convert_from_path(file_path, dpi=300)
+        from pdf2image.exceptions import PDFInfoNotInstalledError
+
+        poppler_path = os.getenv("POPPLER_PATH")
+        try:
+            pages = convert_from_path(file_path, dpi=300, poppler_path=poppler_path)
+        except PDFInfoNotInstalledError as exc:
+            raise RuntimeError(
+                "Poppler is required to process PDF uploads. Install it and ensure "
+                "`pdfinfo` is on PATH. On macOS: `brew install poppler`. "
+                "On Debian/Ubuntu: `sudo apt-get install poppler-utils`. "
+                "If Poppler is installed outside PATH, set `POPPLER_PATH` to its bin directory."
+            ) from exc
         pil_images = pages
     else:
         pil_images = [Image.open(file_path).convert("RGB")]

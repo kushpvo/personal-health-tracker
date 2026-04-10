@@ -71,3 +71,37 @@ def test_no_false_positives_on_headers():
     raw_names = [r.raw_name for r in results]
     assert not any("TEST NAME" in n for n in raw_names)
     assert not any("PATIENT" in n for n in raw_names)
+
+
+def test_extract_biomarkers_handles_single_space_lab_rows():
+    text = """
+    Haemoglobin 143 ( 130-170 ) g/L
+    Glucose (Non-Fasting) 4.6 - mmol/L
+    Total Cholesterol 5.6 H ( < 5.0 ) mmol/L
+    Vitamin D (25-0OH) 68 nmol/L
+    """
+
+    results = extract_biomarkers(text)
+
+    assert len(results) == 4
+    assert results[0].raw_name == "Haemoglobin"
+    assert results[0].value == 143.0
+    assert results[0].unit == "g/L"
+    assert results[1].raw_name == "Glucose (Non-Fasting)"
+    assert results[1].unit == "mmol/L"
+    assert results[2].raw_name == "Total Cholesterol"
+    assert results[2].value == 5.6
+    assert results[3].raw_name == "Vitamin D (25-0OH)"
+
+
+def test_extract_biomarkers_normalizes_common_ocr_unit_errors():
+    text = """
+    MCV 94.4 ( 81-101 ) £L
+    Platelets 419 H ( 150-410 ) xl0e9/L
+    """
+
+    results = extract_biomarkers(text)
+
+    assert len(results) == 2
+    assert results[0].unit == "fL"
+    assert results[1].unit == "x10e9/L"
