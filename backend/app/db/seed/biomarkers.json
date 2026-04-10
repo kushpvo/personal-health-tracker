@@ -200,14 +200,14 @@
     ],
     "category": "Thyroid",
     "description": "Free thyroxine hormone.",
-    "default_unit": "ng/dL",
+    "default_unit": "pmol/L",
     "alternate_units": [
-      "pmol/L"
+      "ng/dL"
     ],
-    "optimal_min": 1.0,
-    "optimal_max": 1.5,
-    "sufficient_min": 0.8,
-    "sufficient_max": 1.8,
+    "optimal_min": 12.9,
+    "optimal_max": 19.3,
+    "sufficient_min": 10.3,
+    "sufficient_max": 23.2,
     "unit_conversions": {
       "ng/dL": {
         "pmol/L": 12.87
