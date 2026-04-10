@@ -12,6 +12,9 @@ export default function BiomarkerDetail() {
   const navigate = useNavigate();
   const biomarkerId = Number(id);
 
+  const qc = useQueryClient();
+  const [changingUnit, setChangingUnit] = useState(false);
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["biomarker", biomarkerId],
     queryFn: () => api.biomarkers.detail(biomarkerId),
@@ -23,8 +26,6 @@ export default function BiomarkerDetail() {
 
   const { biomarker, results } = data;
   const latest = results[results.length - 1];
-  const qc = useQueryClient();
-  const [changingUnit, setChangingUnit] = useState(false);
 
   async function handleUnitChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const newUnit = e.target.value;
