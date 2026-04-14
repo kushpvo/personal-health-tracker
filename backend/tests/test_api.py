@@ -20,7 +20,7 @@ def test_dashboard_summary_empty(client, create_user, auth_headers):
 def test_dashboard_summary_with_data(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Report, ReportResult
-    from datetime import date, datetime
+    from datetime import date, datetime, timezone
 
     user = create_user()
     report = Report(
@@ -29,7 +29,7 @@ def test_dashboard_summary_with_data(client, test_db, create_user, auth_headers)
         file_path="/tmp/test.pdf",
         report_name="Test Report",
         sample_date=date(2025, 3, 15),
-        uploaded_at=datetime.utcnow(),
+        uploaded_at=datetime.now(timezone.utc),
         status="done",
         user_id=user.id,
     )
@@ -37,7 +37,9 @@ def test_dashboard_summary_with_data(client, test_db, create_user, auth_headers)
     test_db.commit()
     test_db.refresh(report)
 
-    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    chol = (
+        test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    )
     result = ReportResult(
         report_id=report.id,
         biomarker_id=chol.id,
@@ -84,7 +86,7 @@ def test_biomarker_not_found(client, create_user, auth_headers):
 def test_biomarker_detail_with_data(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Report, ReportResult
-    from datetime import date, datetime
+    from datetime import date, datetime, timezone
 
     user = create_user()
     report = Report(
@@ -93,7 +95,7 @@ def test_biomarker_detail_with_data(client, test_db, create_user, auth_headers):
         file_path="/tmp/test2.pdf",
         report_name="Test Report 2",
         sample_date=date(2025, 6, 1),
-        uploaded_at=datetime.utcnow(),
+        uploaded_at=datetime.now(timezone.utc),
         status="done",
         user_id=user.id,
     )
@@ -137,29 +139,46 @@ def test_biomarkers_list(client, test_db, create_user, auth_headers):
 def test_get_report_results(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Report, ReportResult
-    from datetime import datetime
+    from datetime import datetime, timezone, timezone
 
     user = create_user()
     report = Report(
-        filename="r.pdf", original_filename="r.pdf", file_path="/tmp/r.pdf",
-        status="done", uploaded_at=datetime.utcnow(),
+        filename="r.pdf",
+        original_filename="r.pdf",
+        file_path="/tmp/r.pdf",
+        status="done",
+        uploaded_at=datetime.now(timezone.utc),
         user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
     test_db.refresh(report)
 
-    test_db.add(ReportResult(
-        report_id=report.id, raw_name="Glucose", value=90.0,
-        unit="mg/dL", is_flagged_unknown=False, sort_order=0,
-    ))
-    test_db.add(ReportResult(
-        report_id=report.id, raw_name="Unknown Marker", value=5.0,
-        unit="g/L", is_flagged_unknown=True, sort_order=1,
-    ))
+    test_db.add(
+        ReportResult(
+            report_id=report.id,
+            raw_name="Glucose",
+            value=90.0,
+            unit="mg/dL",
+            is_flagged_unknown=False,
+            sort_order=0,
+        )
+    )
+    test_db.add(
+        ReportResult(
+            report_id=report.id,
+            raw_name="Unknown Marker",
+            value=5.0,
+            unit="g/L",
+            is_flagged_unknown=True,
+            sort_order=1,
+        )
+    )
     test_db.commit()
 
-    response = client.get(f"/api/reports/{report.id}/results", headers=auth_headers(user))
+    response = client.get(
+        f"/api/reports/{report.id}/results", headers=auth_headers(user)
+    )
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 2
@@ -172,26 +191,36 @@ def test_get_report_results(client, test_db, create_user, auth_headers):
 def test_submit_review(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
-    from datetime import datetime
+    from datetime import datetime, timezone, timezone
 
     user = create_user()
     report = Report(
-        filename="rev.pdf", original_filename="rev.pdf", file_path="/tmp/rev.pdf",
-        status="done", uploaded_at=datetime.utcnow(), report_name="Old Name",
+        filename="rev.pdf",
+        original_filename="rev.pdf",
+        file_path="/tmp/rev.pdf",
+        status="done",
+        uploaded_at=datetime.now(timezone.utc),
+        report_name="Old Name",
         user_id=user.id,
     )
     test_db.add(report)
     unknown = UnknownBiomarker(
-        raw_name="Mystery Marker", raw_unit="g/L",
-        first_seen_at=datetime.utcnow(), last_seen_at=datetime.utcnow(),
+        raw_name="Mystery Marker",
+        raw_unit="g/L",
+        first_seen_at=datetime.now(timezone.utc),
+        last_seen_at=datetime.now(timezone.utc),
     )
     test_db.add(unknown)
     test_db.commit()
     test_db.refresh(report)
 
     result = ReportResult(
-        report_id=report.id, raw_name="Mystery Marker",
-        value=5.0, unit="g/L", is_flagged_unknown=True, sort_order=0,
+        report_id=report.id,
+        raw_name="Mystery Marker",
+        value=5.0,
+        unit="g/L",
+        is_flagged_unknown=True,
+        sort_order=0,
     )
     test_db.add(result)
     test_db.commit()
@@ -200,11 +229,22 @@ def test_submit_review(client, test_db, create_user, auth_headers):
 
     glucose = test_db.query(Biomarker).filter(Biomarker.name == "Glucose").first()
 
-    response = client.put(f"/api/reports/{report.id}/review", json={
-        "report_name": "New Name",
-        "sample_date": "2025-01-12",
-        "results": [{"id": result.id, "value": 88.0, "unit": "mg/dL", "biomarker_id": glucose.id}],
-    }, headers=auth_headers(user))
+    response = client.put(
+        f"/api/reports/{report.id}/review",
+        json={
+            "report_name": "New Name",
+            "sample_date": "2025-01-12",
+            "results": [
+                {
+                    "id": result.id,
+                    "value": 88.0,
+                    "unit": "mg/dL",
+                    "biomarker_id": glucose.id,
+                }
+            ],
+        },
+        headers=auth_headers(user),
+    )
     assert response.status_code == 200
 
     test_db.refresh(result)
@@ -218,16 +258,21 @@ def test_submit_review(client, test_db, create_user, auth_headers):
     assert unknown.resolved_biomarker_id == glucose.id
 
 
-def test_submit_review_triggers_unit_conversion(client, test_db, create_user, auth_headers):
+def test_submit_review_triggers_unit_conversion(
+    client, test_db, create_user, auth_headers
+):
     """When a user matches an unrecognised result, value is converted to default unit."""
     load_biomarkers(test_db)
     from app.db.models import Biomarker, Report, ReportResult
-    from datetime import datetime
+    from datetime import datetime, timezone, timezone
 
     user = create_user()
     report = Report(
-        filename="conv.pdf", original_filename="conv.pdf", file_path="/tmp/conv.pdf",
-        status="done", uploaded_at=datetime.utcnow(),
+        filename="conv.pdf",
+        original_filename="conv.pdf",
+        file_path="/tmp/conv.pdf",
+        status="done",
+        uploaded_at=datetime.now(timezone.utc),
         user_id=user.id,
     )
     test_db.add(report)
@@ -235,20 +280,37 @@ def test_submit_review_triggers_unit_conversion(client, test_db, create_user, au
     test_db.refresh(report)
 
     result = ReportResult(
-        report_id=report.id, raw_name="Total Cholesterol",
-        value=5.6, unit="mmol/L", is_flagged_unknown=True, sort_order=0,
+        report_id=report.id,
+        raw_name="Total Cholesterol",
+        value=5.6,
+        unit="mmol/L",
+        is_flagged_unknown=True,
+        sort_order=0,
     )
     test_db.add(result)
     test_db.commit()
     test_db.refresh(result)
 
-    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    chol = (
+        test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    )
 
-    client.put(f"/api/reports/{report.id}/review", json={
-        "report_name": "Conv Test",
-        "sample_date": None,
-        "results": [{"id": result.id, "value": 5.6, "unit": "mmol/L", "biomarker_id": chol.id}],
-    }, headers=auth_headers(user))
+    client.put(
+        f"/api/reports/{report.id}/review",
+        json={
+            "report_name": "Conv Test",
+            "sample_date": None,
+            "results": [
+                {
+                    "id": result.id,
+                    "value": 5.6,
+                    "unit": "mmol/L",
+                    "biomarker_id": chol.id,
+                }
+            ],
+        },
+        headers=auth_headers(user),
+    )
 
     test_db.refresh(result)
     # 5.6 mmol/L * 38.67 = 216.552 mg/dL
@@ -259,14 +321,19 @@ def test_submit_review_triggers_unit_conversion(client, test_db, create_user, au
 def test_change_default_unit_success(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Biomarker, Report, ReportResult
-    from datetime import datetime
+    from datetime import datetime, timezone, timezone
 
-    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    chol = (
+        test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    )
 
     user = create_user()
     report = Report(
-        filename="u.pdf", original_filename="u.pdf", file_path="/tmp/u.pdf",
-        status="done", uploaded_at=datetime.utcnow(),
+        filename="u.pdf",
+        original_filename="u.pdf",
+        file_path="/tmp/u.pdf",
+        status="done",
+        uploaded_at=datetime.now(timezone.utc),
         user_id=user.id,
     )
     test_db.add(report)
@@ -274,9 +341,13 @@ def test_change_default_unit_success(client, test_db, create_user, auth_headers)
     test_db.refresh(report)
 
     result = ReportResult(
-        report_id=report.id, biomarker_id=chol.id,
-        raw_name="Total Cholesterol", value=200.0, unit="mg/dL",
-        is_flagged_unknown=False, sort_order=0,
+        report_id=report.id,
+        biomarker_id=chol.id,
+        raw_name="Total Cholesterol",
+        value=200.0,
+        unit="mg/dL",
+        is_flagged_unknown=False,
+        sort_order=0,
     )
     test_db.add(result)
     test_db.commit()
@@ -303,8 +374,11 @@ def test_change_default_unit_success(client, test_db, create_user, auth_headers)
 def test_change_default_unit_invalid_unit(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Biomarker
+
     user = create_user()
-    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    chol = (
+        test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    )
     resp = client.patch(
         f"/api/biomarkers/{chol.id}/default-unit",
         json={"unit": "kg/m2"},
@@ -327,8 +401,11 @@ def test_change_default_unit_noop(client, test_db, create_user, auth_headers):
     """Same unit returns 200 with no DB changes."""
     load_biomarkers(test_db)
     from app.db.models import Biomarker
+
     user = create_user()
-    chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    chol = (
+        test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
+    )
     original_min = chol.optimal_min
     resp = client.patch(
         f"/api/biomarkers/{chol.id}/default-unit",
@@ -398,7 +475,7 @@ def test_admin_can_manage_users(client, create_user, auth_headers):
 
 def test_reports_are_isolated_by_user(client, test_db, create_user, auth_headers):
     from app.db.models import Report
-    from datetime import datetime
+    from datetime import datetime, timezone, timezone
 
     user_one = create_user(username="one")
     user_two = create_user(username="two")
@@ -408,7 +485,7 @@ def test_reports_are_isolated_by_user(client, test_db, create_user, auth_headers
             original_filename="one.pdf",
             file_path="/tmp/one.pdf",
             status="done",
-            uploaded_at=datetime.utcnow(),
+            uploaded_at=datetime.now(timezone.utc),
             user_id=user_one.id,
         )
     )
