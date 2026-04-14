@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Activity, FileText, LogOut, Settings, Shield, Upload } from "lucide-react";
+import { Activity, FileText, LogOut, Moon, Settings, Shield, Sun, Upload } from "lucide-react";
 import { cn } from "../lib/utils";
 import {
   clearTokens,
@@ -12,6 +13,21 @@ import {
 
 export default function Layout() {
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  function handleThemeToggle() {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }
   const token = getToken();
   const payload = token ? parseToken(token) : null;
   const impersonating = isImpersonating();
@@ -78,7 +94,14 @@ export default function Layout() {
               </NavLink>
             ))}
           </nav>
-          <div className="px-3 pb-4">
+          <div className="px-3 pb-4 space-y-1">
+            <button
+              onClick={handleThemeToggle}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? "Light mode" : "Dark mode"}
+            </button>
             <button
               onClick={handleLogout}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
