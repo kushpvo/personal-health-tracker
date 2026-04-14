@@ -3,6 +3,7 @@ import { Activity, FileText, LogOut, Settings, Shield, Upload } from "lucide-rea
 import { cn } from "../lib/utils";
 import {
   clearTokens,
+  getImpersonatedUsername,
   getToken,
   isImpersonating,
   parseToken,
@@ -14,6 +15,7 @@ export default function Layout() {
   const token = getToken();
   const payload = token ? parseToken(token) : null;
   const impersonating = isImpersonating();
+  const impersonatedUsername = getImpersonatedUsername();
 
   function handleLogout() {
     clearTokens();
@@ -37,10 +39,10 @@ export default function Layout() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col">
       {impersonating && payload?.acting_as && (
         <div className="flex w-full items-center justify-between bg-yellow-400 px-4 py-2 text-sm font-medium text-yellow-900">
-          <span>Viewing as another user</span>
+          <span>Viewing as {impersonatedUsername}</span>
           <button className="font-semibold underline" onClick={handleExitImpersonation}>
             Exit
           </button>

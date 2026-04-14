@@ -92,7 +92,13 @@ def _normalize_ocr_unit(raw_unit: str) -> str:
     unit = raw_unit.strip()
     unit = unit.replace("£", "f")
     unit = unit.replace("xl0", "x10")
+    # OCR reads superscript exponent marker: x10^9/L → x1049/L (^ read as 4)
+    unit = re.sub(r"x104(\d)", r"x10^\1", unit)
     return unit
+
+
+# Trailing differential percentage: "Neutrophils 49.2%" → "Neutrophils"
+_TRAILING_PCT = re.compile(r"\s+\d+\.?\d*%\s*$")
 
 
 def _parse_value(raw: str) -> Optional[float]:
@@ -151,6 +157,7 @@ def extract_biomarkers(text: str) -> List[ParsedResult]:
             continue
 
         raw_name = (m.groupdict().get("name") or m.group(1)).strip().rstrip(".,")
+        raw_name = _TRAILING_PCT.sub("", raw_name).strip()
         raw_value = (m.groupdict().get("value") or m.group(2)).strip()
         raw_unit = _normalize_ocr_unit((m.groupdict().get("unit") or m.group(3)).strip())
 

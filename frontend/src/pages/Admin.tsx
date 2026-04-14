@@ -30,9 +30,10 @@ export default function Admin() {
   });
 
   const impersonate = useMutation({
-    mutationFn: (userId: number) => api.admin.impersonate(userId),
-    onSuccess: (data) => {
-      startImpersonation(data.access_token);
+    mutationFn: ({ userId }: { userId: number; username: string }) =>
+      api.admin.impersonate(userId),
+    onSuccess: (data, { username }) => {
+      startImpersonation(data.access_token, username);
       navigate("/");
       window.location.reload();
     },
@@ -96,7 +97,7 @@ export default function Admin() {
                 </button>
                 <button
                   className="rounded border px-2 py-1 text-xs"
-                  onClick={() => impersonate.mutate(u.id)}
+                  onClick={() => impersonate.mutate({ userId: u.id, username: u.username })}
                 >
                   View as
                 </button>

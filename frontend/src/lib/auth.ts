@@ -1,5 +1,6 @@
 export const TOKEN_KEY = "auth_token";
 export const ADMIN_TOKEN_KEY = "admin_token";
+export const IMPERSONATED_USERNAME_KEY = "impersonated_username";
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -12,18 +13,24 @@ export function setToken(token: string): void {
 export function clearTokens(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ADMIN_TOKEN_KEY);
+  localStorage.removeItem(IMPERSONATED_USERNAME_KEY);
 }
 
 export function getAdminToken(): string | null {
   return localStorage.getItem(ADMIN_TOKEN_KEY);
 }
 
-export function startImpersonation(impersonationToken: string): void {
+export function getImpersonatedUsername(): string | null {
+  return localStorage.getItem(IMPERSONATED_USERNAME_KEY);
+}
+
+export function startImpersonation(impersonationToken: string, username: string): void {
   const current = getToken();
   if (current) {
     localStorage.setItem(ADMIN_TOKEN_KEY, current);
   }
   setToken(impersonationToken);
+  localStorage.setItem(IMPERSONATED_USERNAME_KEY, username);
 }
 
 export function stopImpersonation(): void {
@@ -31,6 +38,7 @@ export function stopImpersonation(): void {
   if (adminToken) {
     setToken(adminToken);
     localStorage.removeItem(ADMIN_TOKEN_KEY);
+    localStorage.removeItem(IMPERSONATED_USERNAME_KEY);
   }
 }
 

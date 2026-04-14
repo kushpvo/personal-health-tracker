@@ -146,7 +146,9 @@
     "aliases": [
       "hba1c",
       "hemoglobin a1c",
+      "haemoglobin a1c",
       "glycated hemoglobin",
+      "glycated haemoglobin",
       "glycated hb",
       "a1c",
       "glycohemoglobin"
@@ -309,6 +311,8 @@
       "wbc",
       "white blood cell",
       "white blood count",
+      "white cell count",
+      "white blood cell count",
       "leukocytes",
       "wbc count"
     ],
@@ -413,6 +417,7 @@
       "alt",
       "alanine aminotransferase",
       "alanine transaminase",
+      "alanine transferase",
       "sgpt"
     ],
     "category": "Liver",
@@ -829,6 +834,7 @@
     "aliases": [
       "total bilirubin",
       "bilirubin total",
+      "bilirubin",
       "tbil"
     ],
     "category": "Liver",
