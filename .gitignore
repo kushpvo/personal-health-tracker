@@ -14,5 +14,6 @@ frontend/dist/
 .claude/settings.local.json
 data/
 db.sqlite
+docs/
 package.json
 package-lock.json
