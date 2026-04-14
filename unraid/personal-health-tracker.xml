@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>personal-health-tracker</Name>
+  <Repository>kushpvo/personal-health-tracker:latest</Repository>
+  <Registry>https://hub.docker.com/r/kushpvo/personal-health-tracker</Registry>
+  <Network>bridge</Network>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support/>
+  <Project>https://github.com/kushpvo/personal-health-tracker</Project>
+  <Overview>
+    A self-hosted app for tracking blood work and lab results over time.
+    Upload PDF or image lab reports, review OCR-extracted values, and visualize
+    trends across tests. Supports multiple users with JWT authentication and an
+    admin panel. 71 built-in biomarkers across CBC, Lipids, Metabolic, Hormones,
+    Thyroid, Vitamins, Liver, Iron Studies, Inflammation, Minerals, Coagulation,
+    and Cancer Markers panels.
+
+    FIRST RUN: visit http://[your-unraid-ip]:[Host Port]/setup to create your
+    admin account. Make sure to set a strong SECRET_KEY before use.
+  </Overview>
+  <Category>Tools: Status:Stable</Category>
+  <WebUI>http://[IP]:[PORT:8080]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/kushpvo/personal-health-tracker/main/unraid/personal-health-tracker.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/kushpvo/personal-health-tracker/main/frontend/public/favicon.svg</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+
+  <!-- Port -->
+  <Config
+    Name="Web UI Port"
+    Target="8080"
+    Default="8080"
+    Mode="tcp"
+    Description="Port to access the web interface."
+    Type="Port"
+    Display="always"
+    Required="true"
+    Mask="false">8080</Config>
+
+  <!-- Data volume -->
+  <Config
+    Name="Data Directory"
+    Target="/app/data"
+    Default="/mnt/user/appdata/personal-health-tracker"
+    Mode="rw"
+    Description="Stores the SQLite database and uploaded lab report files."
+    Type="Path"
+    Display="always"
+    Required="true"
+    Mask="false">/mnt/user/appdata/personal-health-tracker</Config>
+
+  <!-- Environment variables -->
+  <Config
+    Name="Secret Key"
+    Target="SECRET_KEY"
+    Default=""
+    Mode=""
+    Description="Required. A random secret used to sign JWTs. Generate one with: python3 -c &quot;import secrets; print(secrets.token_hex(32))&quot;"
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="true"/>
+
+  <Config
+    Name="Max Upload Size (MB)"
+    Target="MAX_UPLOAD_MB"
+    Default="50"
+    Mode=""
+    Description="Maximum file size for uploaded lab reports in megabytes."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">50</Config>
+
+  <Config
+    Name="OCR Backend"
+    Target="OCR_BACKEND"
+    Default="tesseract"
+    Mode=""
+    Description="OCR engine to use. Only 'tesseract' is supported."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">tesseract</Config>
+
+  <Config
+    Name="Data Directory (internal)"
+    Target="DATA_DIR"
+    Default="/app/data"
+    Mode=""
+    Description="Internal path where data is stored. Do not change unless you know what you're doing."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">/app/data</Config>
+
+</Container>
