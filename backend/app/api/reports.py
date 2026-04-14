@@ -6,6 +6,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFi
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_effective_user_id
 from app.db.database import get_db
 from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
 from app.schemas.schemas import (
@@ -49,6 +50,7 @@ async def upload_report(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
 ):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS:
@@ -71,6 +73,7 @@ async def upload_report(
         original_filename=file.filename or stored_name,
         file_path=file_path,
         status="pending",
+        user_id=effective_user_id,
     )
     db.add(report)
     db.commit()
@@ -82,8 +85,16 @@ async def upload_report(
 
 
 @router.get("", response_model=list[ReportListItem])
-def list_reports(db: Session = Depends(get_db)):
-    reports = db.query(Report).order_by(Report.uploaded_at.desc()).all()
+def list_reports(
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
+    reports = (
+        db.query(Report)
+        .filter(Report.user_id == effective_user_id)
+        .order_by(Report.uploaded_at.desc())
+        .all()
+    )
     items = []
     for r in reports:
         count = db.query(ReportResult).filter(ReportResult.report_id == r.id).count()
@@ -102,9 +113,13 @@ def list_reports(db: Session = Depends(get_db)):
 
 
 @router.get("/{report_id}/status", response_model=ReportStatus)
-def get_report_status(report_id: int, db: Session = Depends(get_db)):
+def get_report_status(
+    report_id: int,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
+    if not report or report.user_id != effective_user_id:
         raise HTTPException(status_code=404, detail="Report not found.")
     return ReportStatus(
         id=report.id, status=report.status, error_message=report.error_message
@@ -112,9 +127,13 @@ def get_report_status(report_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{report_id}/download")
-def download_report(report_id: int, db: Session = Depends(get_db)):
+def download_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
+    if not report or report.user_id != effective_user_id:
         raise HTTPException(status_code=404, detail="Report not found.")
     if not os.path.exists(report.file_path):
         raise HTTPException(status_code=404, detail="File not found on disk.")
@@ -126,9 +145,13 @@ def download_report(report_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{report_id}", status_code=204)
-def delete_report(report_id: int, db: Session = Depends(get_db)):
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
+    if not report or report.user_id != effective_user_id:
         raise HTTPException(status_code=404, detail="Report not found.")
     if os.path.exists(report.file_path):
         os.remove(report.file_path)
@@ -137,9 +160,13 @@ def delete_report(report_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{report_id}/results", response_model=list[ReportResultItem])
-def get_report_results(report_id: int, db: Session = Depends(get_db)):
+def get_report_results(
+    report_id: int,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
+    if not report or report.user_id != effective_user_id:
         raise HTTPException(status_code=404, detail="Report not found.")
     results = (
         db.query(ReportResult)
@@ -164,9 +191,13 @@ def get_report_results(report_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{report_id}/summary", response_model=list[BiomarkerSummary])
-def get_report_summary(report_id: int, db: Session = Depends(get_db)):
+def get_report_summary(
+    report_id: int,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
+    if not report or report.user_id != effective_user_id:
         raise HTTPException(status_code=404, detail="Report not found.")
     results = (
         db.query(ReportResult)
@@ -213,9 +244,14 @@ def get_report_summary(report_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{report_id}/review", response_model=ReportStatus)
-def submit_review(report_id: int, body: ReviewReportInput, db: Session = Depends(get_db)):
+def submit_review(
+    report_id: int,
+    body: ReviewReportInput,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
+    if not report or report.user_id != effective_user_id:
         raise HTTPException(status_code=404, detail="Report not found.")
 
     report.report_name = body.report_name

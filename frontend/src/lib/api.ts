@@ -1,3 +1,5 @@
+import { clearTokens, getToken } from "./auth";
+
 const BASE = "/api";
 
 export interface ReportListItem {
@@ -93,20 +95,120 @@ export interface ReviewReportInput {
   deleted_result_ids?: number[];
 }
 
+export interface UserInfo {
+  id: number;
+  username: string;
+  role: string;
+  is_active: boolean;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function authFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const res = await fetch(`${BASE}${path}`, {
+    ...init,
+    headers: {
+      ...authHeaders(),
+      ...((init.headers as Record<string, string> | undefined) ?? {}),
+    },
+  });
+  if (res.status === 401) {
+    clearTokens();
+    window.location.href = "/login";
+    throw new Error("Unauthorized");
+  }
+  return res;
+}
+
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`);
+  const res = await authFetch(path);
   if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
   return res.json();
 }
 
 export const api = {
+  auth: {
+    setupRequired: (): Promise<{ required: boolean }> =>
+      fetch(`${BASE}/auth/setup-required`).then((r) => r.json()),
+    setup: (username: string, password: string): Promise<TokenResponse> =>
+      fetch(`${BASE}/auth/setup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Setup failed");
+        return r.json();
+      }),
+    login: (username: string, password: string): Promise<TokenResponse> =>
+      fetch(`${BASE}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Login failed");
+        return r.json();
+      }),
+    me: (): Promise<UserInfo> => get("/auth/me"),
+    changePassword: (current_password: string, new_password: string) =>
+      authFetch("/auth/me/password", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ current_password, new_password }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json();
+      }),
+  },
+  admin: {
+    listUsers: (): Promise<UserInfo[]> => get("/admin/users"),
+    createUser: (
+      username: string,
+      password: string,
+      role: string,
+    ): Promise<UserInfo> =>
+      authFetch("/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, role }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json();
+      }),
+    updateUser: (
+      id: number,
+      body: { is_active?: boolean; password?: string },
+    ): Promise<UserInfo> =>
+      authFetch(`/admin/users/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json();
+      }),
+    impersonate: (userId: number): Promise<TokenResponse> =>
+      authFetch(`/admin/impersonate/${userId}`, { method: "POST" }).then(
+        async (r) => {
+          if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+          return r.json();
+        },
+      ),
+  },
   reports: {
     list: () => get<ReportListItem[]>("/reports"),
     summary: (id: number) => get<BiomarkerSummary[]>(`/reports/${id}/summary`),
     status: (id: number) => get<ReportStatus>(`/reports/${id}/status`),
     results: (id: number) => get<ReportResultItem[]>(`/reports/${id}/results`),
     review: (id: number, body: ReviewReportInput) =>
-      fetch(`${BASE}/reports/${id}/review`, {
+      authFetch(`/reports/${id}/review`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -114,13 +216,24 @@ export const api = {
         if (!res.ok) throw new Error(`Review failed: ${res.status}`);
         return res.json();
       }),
-    downloadUrl: (id: number) => `${BASE}/reports/${id}/download`,
-    delete: (id: number) =>
-      fetch(`${BASE}/reports/${id}`, { method: "DELETE" }),
+    download: async (id: number, filename: string) => {
+      const res = await authFetch(`/reports/${id}/download`);
+      if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    },
+    delete: (id: number) => authFetch(`/reports/${id}`, { method: "DELETE" }),
     upload: (file: File) => {
       const form = new FormData();
       form.append("file", file);
-      return fetch(`${BASE}/reports`, { method: "POST", body: form }).then(
+      return authFetch("/reports", { method: "POST", body: form }).then(
         async (res) => {
           if (!res.ok) {
             const err = await res.json().catch(() => ({ detail: res.statusText }));
@@ -136,7 +249,7 @@ export const api = {
     detail: (id: number) => get<BiomarkerDetail>(`/biomarkers/${id}`),
     list: () => get<BiomarkerListItem[]>("/biomarkers/list"),
     changeDefaultUnit: (id: number, unit: string) =>
-      fetch(`${BASE}/biomarkers/${id}/default-unit`, {
+      authFetch(`/biomarkers/${id}/default-unit`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ unit }),

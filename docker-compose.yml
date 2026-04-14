@@ -12,6 +12,7 @@ services:
       - OCR_BACKEND=tesseract
       - MAX_UPLOAD_MB=50
       - DATA_DIR=/app/data
+      - SECRET_KEY=change-me-in-production
     restart: unless-stopped
 
 volumes:

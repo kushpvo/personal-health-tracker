@@ -2,8 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_current_user, get_effective_user_id
 from app.db.database import get_db
-from app.db.models import Biomarker, Report, ReportResult
+from app.db.models import Biomarker, Report, ReportResult, User
 from app.schemas.schemas import (
     BiomarkerDetail, BiomarkerInfo, BiomarkerListItem, BiomarkerSummary, ResultPoint,
     ChangeDefaultUnitInput,
@@ -44,7 +45,10 @@ def _to_result_point(result: ReportResult) -> ResultPoint:
 
 
 @router.get("/list", response_model=List[BiomarkerListItem])
-def list_all_biomarkers(db: Session = Depends(get_db)):
+def list_all_biomarkers(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
     """All biomarkers alphabetically — for dropdowns. Must be before /{biomarker_id}."""
     biomarkers = db.query(Biomarker).order_by(Biomarker.name.asc()).all()
     return [
@@ -60,7 +64,10 @@ def list_all_biomarkers(db: Session = Depends(get_db)):
 
 
 @router.get("/summary", response_model=List[BiomarkerSummary])
-def get_dashboard_summary(db: Session = Depends(get_db)):
+def get_dashboard_summary(
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     """
     Returns one entry per biomarker the user has data for.
     Each entry has the latest result and zone.
@@ -76,6 +83,7 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
                 ReportResult.is_flagged_unknown == False,
             )
             .join(Report)
+            .filter(Report.user_id == effective_user_id)
             .order_by(Report.sample_date.desc(), Report.uploaded_at.desc())
             .all()
         )
@@ -110,7 +118,11 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
 
 
 @router.get("/{biomarker_id}", response_model=BiomarkerDetail)
-def get_biomarker_detail(biomarker_id: int, db: Session = Depends(get_db)):
+def get_biomarker_detail(
+    biomarker_id: int,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
     b = db.query(Biomarker).filter(Biomarker.id == biomarker_id).first()
     if not b:
         raise HTTPException(status_code=404, detail="Biomarker not found.")
@@ -122,6 +134,7 @@ def get_biomarker_detail(biomarker_id: int, db: Session = Depends(get_db)):
             ReportResult.is_flagged_unknown == False,
         )
         .join(Report)
+        .filter(Report.user_id == effective_user_id)
         .order_by(Report.sample_date.asc())
         .all()
     )
@@ -144,7 +157,10 @@ def get_biomarker_detail(biomarker_id: int, db: Session = Depends(get_db)):
 
 @router.patch("/{biomarker_id}/default-unit", response_model=BiomarkerInfo)
 def change_default_unit(
-    biomarker_id: int, body: ChangeDefaultUnitInput, db: Session = Depends(get_db)
+    biomarker_id: int,
+    body: ChangeDefaultUnitInput,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
 ):
     b = db.query(Biomarker).filter(Biomarker.id == biomarker_id).first()
     if not b:

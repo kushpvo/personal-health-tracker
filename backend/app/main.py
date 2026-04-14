@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
+from app.api import admin as admin_router
+from app.api import auth as auth_router
 from app.api import reports as reports_router
 from app.api import biomarkers as biomarkers_router
 from app.db.database import Base, SessionLocal, engine
@@ -47,6 +49,8 @@ app.add_middleware(
 
 app.include_router(reports_router.router)
 app.include_router(biomarkers_router.router)
+app.include_router(auth_router.router)
+app.include_router(admin_router.router)
 
 # Serve React static build — must come last
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")

@@ -29,6 +29,19 @@ class Biomarker(Base):
     results = relationship("ReportResult", back_populates="biomarker")
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, nullable=False, unique=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="user")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    reports = relationship("Report", back_populates="owner")
+
+
 class Report(Base):
     __tablename__ = "reports"
 
@@ -42,7 +55,9 @@ class Report(Base):
     ocr_raw_text = Column(Text)
     status = Column(String, default="pending")   # pending|processing|done|failed
     error_message = Column(Text)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
+    owner = relationship("User", back_populates="reports")
     results = relationship(
         "ReportResult", back_populates="report", cascade="all, delete-orphan"
     )

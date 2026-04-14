@@ -50,13 +50,14 @@ def test_newly_seeded_markers_match_by_alias(test_db):
         assert result.name == expected_name, f"Alias {alias!r}: expected {expected_name!r}, got {result.name!r}"
 
 
-def test_pipeline_sets_sort_order(test_db):
+def test_pipeline_sets_sort_order(test_db, create_user):
     """sort_order on saved results must match OCR extraction order."""
     from app.db.models import ReportResult
     from datetime import datetime
     from app.db.models import Report
 
     load_biomarkers(test_db)
+    user = create_user()
 
     report = Report(
         filename="sort_test.txt",
@@ -64,6 +65,7 @@ def test_pipeline_sets_sort_order(test_db):
         file_path="/dev/null",
         status="pending",
         uploaded_at=datetime.utcnow(),
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()

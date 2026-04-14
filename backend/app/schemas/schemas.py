@@ -128,3 +128,48 @@ class BiomarkerListItem(BaseModel):
 
 class ChangeDefaultUnitInput(BaseModel):
     unit: str
+
+
+# ── Auth ──────────────────────────────────────────────────────────────────────
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class LoginInput(BaseModel):
+    username: str
+    password: str
+
+
+class SetupInput(BaseModel):
+    username: str
+    password: str
+
+
+class UserInfo(BaseModel):
+    id: int
+    username: str
+    role: str
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class ChangePasswordInput(BaseModel):
+    current_password: str
+    new_password: str
+
+
+# ── Admin ─────────────────────────────────────────────────────────────────────
+
+class CreateUserInput(BaseModel):
+    username: str
+    password: str
+    role: str = "user"
+
+
+class UpdateUserInput(BaseModel):
+    is_active: Optional[bool] = None
+    password: Optional[str] = None

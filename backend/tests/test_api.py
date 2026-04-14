@@ -3,23 +3,26 @@ from app.db.models import Biomarker
 from app.db.seed_loader import load_biomarkers
 
 
-def test_list_reports_empty(client):
-    response = client.get("/api/reports")
+def test_list_reports_empty(client, create_user, auth_headers):
+    user = create_user()
+    response = client.get("/api/reports", headers=auth_headers(user))
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_dashboard_summary_empty(client):
-    response = client.get("/api/biomarkers/summary")
+def test_dashboard_summary_empty(client, create_user, auth_headers):
+    user = create_user()
+    response = client.get("/api/biomarkers/summary", headers=auth_headers(user))
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_dashboard_summary_with_data(client, test_db):
+def test_dashboard_summary_with_data(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Report, ReportResult
     from datetime import date, datetime
 
+    user = create_user()
     report = Report(
         filename="test.pdf",
         original_filename="test.pdf",
@@ -28,6 +31,7 @@ def test_dashboard_summary_with_data(client, test_db):
         sample_date=date(2025, 3, 15),
         uploaded_at=datetime.utcnow(),
         status="done",
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
@@ -45,7 +49,7 @@ def test_dashboard_summary_with_data(client, test_db):
     test_db.add(result)
     test_db.commit()
 
-    response = client.get("/api/biomarkers/summary")
+    response = client.get("/api/biomarkers/summary", headers=auth_headers(user))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -55,29 +59,34 @@ def test_dashboard_summary_with_data(client, test_db):
     assert data[0]["latest_zone"] == "sufficient"
 
 
-def test_upload_invalid_extension(client):
+def test_upload_invalid_extension(client, create_user, auth_headers):
+    user = create_user()
     response = client.post(
         "/api/reports",
         files={"file": ("report.docx", b"fake content", "application/octet-stream")},
+        headers=auth_headers(user),
     )
     assert response.status_code == 422
 
 
-def test_report_not_found_status(client):
-    response = client.get("/api/reports/9999/status")
+def test_report_not_found_status(client, create_user, auth_headers):
+    user = create_user()
+    response = client.get("/api/reports/9999/status", headers=auth_headers(user))
     assert response.status_code == 404
 
 
-def test_biomarker_not_found(client):
-    response = client.get("/api/biomarkers/9999")
+def test_biomarker_not_found(client, create_user, auth_headers):
+    user = create_user()
+    response = client.get(f"/api/biomarkers/9999", headers=auth_headers(user))
     assert response.status_code == 404
 
 
-def test_biomarker_detail_with_data(client, test_db):
+def test_biomarker_detail_with_data(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Report, ReportResult
     from datetime import date, datetime
 
+    user = create_user()
     report = Report(
         filename="test2.pdf",
         original_filename="test2.pdf",
@@ -86,6 +95,7 @@ def test_biomarker_detail_with_data(client, test_db):
         sample_date=date(2025, 6, 1),
         uploaded_at=datetime.utcnow(),
         status="done",
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
@@ -103,7 +113,7 @@ def test_biomarker_detail_with_data(client, test_db):
     test_db.add(result)
     test_db.commit()
 
-    response = client.get(f"/api/biomarkers/{glucose.id}")
+    response = client.get(f"/api/biomarkers/{glucose.id}", headers=auth_headers(user))
     assert response.status_code == 200
     data = response.json()
     assert data["biomarker"]["name"] == "Glucose"
@@ -111,9 +121,10 @@ def test_biomarker_detail_with_data(client, test_db):
     assert data["results"][0]["zone"] == "optimal"  # 82 is in 70-85
 
 
-def test_biomarkers_list(client, test_db):
+def test_biomarkers_list(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
-    response = client.get("/api/biomarkers/list")
+    user = create_user()
+    response = client.get("/api/biomarkers/list", headers=auth_headers(user))
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 20
@@ -123,14 +134,16 @@ def test_biomarkers_list(client, test_db):
     assert "alternate_units" in data[0]
 
 
-def test_get_report_results(client, test_db):
+def test_get_report_results(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Report, ReportResult
     from datetime import datetime
 
+    user = create_user()
     report = Report(
         filename="r.pdf", original_filename="r.pdf", file_path="/tmp/r.pdf",
         status="done", uploaded_at=datetime.utcnow(),
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
@@ -146,7 +159,7 @@ def test_get_report_results(client, test_db):
     ))
     test_db.commit()
 
-    response = client.get(f"/api/reports/{report.id}/results")
+    response = client.get(f"/api/reports/{report.id}/results", headers=auth_headers(user))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 2
@@ -156,14 +169,16 @@ def test_get_report_results(client, test_db):
     assert data[1]["sort_order"] == 1
 
 
-def test_submit_review(client, test_db):
+def test_submit_review(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
     from datetime import datetime
 
+    user = create_user()
     report = Report(
         filename="rev.pdf", original_filename="rev.pdf", file_path="/tmp/rev.pdf",
         status="done", uploaded_at=datetime.utcnow(), report_name="Old Name",
+        user_id=user.id,
     )
     test_db.add(report)
     unknown = UnknownBiomarker(
@@ -189,7 +204,7 @@ def test_submit_review(client, test_db):
         "report_name": "New Name",
         "sample_date": "2025-01-12",
         "results": [{"id": result.id, "value": 88.0, "unit": "mg/dL", "biomarker_id": glucose.id}],
-    })
+    }, headers=auth_headers(user))
     assert response.status_code == 200
 
     test_db.refresh(result)
@@ -203,15 +218,17 @@ def test_submit_review(client, test_db):
     assert unknown.resolved_biomarker_id == glucose.id
 
 
-def test_submit_review_triggers_unit_conversion(client, test_db):
+def test_submit_review_triggers_unit_conversion(client, test_db, create_user, auth_headers):
     """When a user matches an unrecognised result, value is converted to default unit."""
     load_biomarkers(test_db)
     from app.db.models import Biomarker, Report, ReportResult
     from datetime import datetime
 
+    user = create_user()
     report = Report(
         filename="conv.pdf", original_filename="conv.pdf", file_path="/tmp/conv.pdf",
         status="done", uploaded_at=datetime.utcnow(),
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
@@ -231,7 +248,7 @@ def test_submit_review_triggers_unit_conversion(client, test_db):
         "report_name": "Conv Test",
         "sample_date": None,
         "results": [{"id": result.id, "value": 5.6, "unit": "mmol/L", "biomarker_id": chol.id}],
-    })
+    }, headers=auth_headers(user))
 
     test_db.refresh(result)
     # 5.6 mmol/L * 38.67 = 216.552 mg/dL
@@ -239,16 +256,18 @@ def test_submit_review_triggers_unit_conversion(client, test_db):
     assert abs(result.value - 216.552) < 0.01
 
 
-def test_change_default_unit_success(client, test_db):
+def test_change_default_unit_success(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Biomarker, Report, ReportResult
     from datetime import datetime
 
     chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
 
+    user = create_user()
     report = Report(
         filename="u.pdf", original_filename="u.pdf", file_path="/tmp/u.pdf",
         status="done", uploaded_at=datetime.utcnow(),
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
@@ -263,7 +282,11 @@ def test_change_default_unit_success(client, test_db):
     test_db.commit()
     test_db.refresh(result)
 
-    resp = client.patch(f"/api/biomarkers/{chol.id}/default-unit", json={"unit": "mmol/L"})
+    resp = client.patch(
+        f"/api/biomarkers/{chol.id}/default-unit",
+        json={"unit": "mmol/L"},
+        headers=auth_headers(user),
+    )
     assert resp.status_code == 200
     data = resp.json()
     assert data["default_unit"] == "mmol/L"
@@ -277,26 +300,120 @@ def test_change_default_unit_success(client, test_db):
     assert chol.optimal_min is not None and chol.optimal_min < 10  # was ~100 mg/dL
 
 
-def test_change_default_unit_invalid_unit(client, test_db):
+def test_change_default_unit_invalid_unit(client, test_db, create_user, auth_headers):
     load_biomarkers(test_db)
     from app.db.models import Biomarker
+    user = create_user()
     chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
-    resp = client.patch(f"/api/biomarkers/{chol.id}/default-unit", json={"unit": "kg/m2"})
+    resp = client.patch(
+        f"/api/biomarkers/{chol.id}/default-unit",
+        json={"unit": "kg/m2"},
+        headers=auth_headers(user),
+    )
     assert resp.status_code == 400
 
 
-def test_change_default_unit_not_found(client):
-    resp = client.patch("/api/biomarkers/9999/default-unit", json={"unit": "mmol/L"})
+def test_change_default_unit_not_found(client, create_user, auth_headers):
+    user = create_user()
+    resp = client.patch(
+        "/api/biomarkers/9999/default-unit",
+        json={"unit": "mmol/L"},
+        headers=auth_headers(user),
+    )
     assert resp.status_code == 404
 
 
-def test_change_default_unit_noop(client, test_db):
+def test_change_default_unit_noop(client, test_db, create_user, auth_headers):
     """Same unit returns 200 with no DB changes."""
     load_biomarkers(test_db)
     from app.db.models import Biomarker
+    user = create_user()
     chol = test_db.query(Biomarker).filter(Biomarker.name == "Total Cholesterol").first()
     original_min = chol.optimal_min
-    resp = client.patch(f"/api/biomarkers/{chol.id}/default-unit", json={"unit": chol.default_unit})
+    resp = client.patch(
+        f"/api/biomarkers/{chol.id}/default-unit",
+        json={"unit": chol.default_unit},
+        headers=auth_headers(user),
+    )
     assert resp.status_code == 200
     test_db.refresh(chol)
     assert chol.optimal_min == original_min
+
+
+def test_setup_login_and_me_flow(client):
+    response = client.get("/api/auth/setup-required")
+    assert response.status_code == 200
+    assert response.json() == {"required": True}
+
+    setup = client.post(
+        "/api/auth/setup",
+        json={"username": "admin", "password": "password123"},
+    )
+    assert setup.status_code == 200
+    token = setup.json()["access_token"]
+
+    me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me.status_code == 200
+    assert me.json()["role"] == "admin"
+    assert me.json()["username"] == "admin"
+
+    login = client.post(
+        "/api/auth/login",
+        json={"username": "admin", "password": "password123"},
+    )
+    assert login.status_code == 200
+
+
+def test_admin_can_manage_users(client, create_user, auth_headers):
+    admin = create_user(username="admin", role="admin")
+    headers = auth_headers(admin)
+
+    create_response = client.post(
+        "/api/admin/users",
+        json={"username": "alice", "password": "password123", "role": "user"},
+        headers=headers,
+    )
+    assert create_response.status_code == 201
+    created_user = create_response.json()
+
+    list_response = client.get("/api/admin/users", headers=headers)
+    assert list_response.status_code == 200
+    assert len(list_response.json()) == 2
+
+    update_response = client.patch(
+        f"/api/admin/users/{created_user['id']}",
+        json={"is_active": False},
+        headers=headers,
+    )
+    assert update_response.status_code == 200
+    assert update_response.json()["is_active"] is False
+
+    impersonate_response = client.post(
+        f"/api/admin/impersonate/{created_user['id']}",
+        headers=headers,
+    )
+    assert impersonate_response.status_code == 200
+    assert impersonate_response.json()["token_type"] == "bearer"
+
+
+def test_reports_are_isolated_by_user(client, test_db, create_user, auth_headers):
+    from app.db.models import Report
+    from datetime import datetime
+
+    user_one = create_user(username="one")
+    user_two = create_user(username="two")
+    test_db.add(
+        Report(
+            filename="one.pdf",
+            original_filename="one.pdf",
+            file_path="/tmp/one.pdf",
+            status="done",
+            uploaded_at=datetime.utcnow(),
+            user_id=user_one.id,
+        )
+    )
+    test_db.commit()
+
+    response = client.get("/api/reports", headers=auth_headers(user_two))
+    assert response.status_code == 200
+    assert response.json() == []

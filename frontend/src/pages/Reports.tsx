@@ -27,6 +27,10 @@ export default function Reports() {
     qc.invalidateQueries({ queryKey: ["biomarkers-summary"] });
   }
 
+  async function handleDownload(id: number, filename: string) {
+    await api.reports.download(id, filename);
+  }
+
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>;
 
   if (reports.length === 0) {
@@ -71,15 +75,16 @@ export default function Reports() {
               >
                 {r.status}
               </span>
-              <a
-                onClick={(e) => e.stopPropagation()}
-                href={api.reports.downloadUrl(r.id)}
-                download={r.original_filename}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void handleDownload(r.id, r.original_filename);
+                }}
                 className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
                 title="Download original"
               >
                 <Download size={15} />
-              </a>
+              </button>
               <Link
                 onClick={(e) => e.stopPropagation()}
                 to={`/reports/${r.id}/review`}
