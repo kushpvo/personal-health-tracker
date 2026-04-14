@@ -1,6 +1,6 @@
 # Personal Health Tracker
 
-A self-hosted app for tracking blood work and lab results over time. Upload PDF or image lab reports, review the OCR-extracted values, and visualize trends across tests.
+A self-hosted app for tracking blood work and lab results over time. Upload PDF or image lab reports, review the OCR-extracted values, and visualize trends across tests. Supports multiple users with JWT authentication and an admin panel.
 
 ## Features
 
@@ -9,6 +9,7 @@ A self-hosted app for tracking blood work and lab results over time. Upload PDF 
 - **Trend charts** — plot any biomarker over time with optimal/sufficient/out-of-range zone bands
 - **71 built-in biomarkers** across CBC, Lipids, Metabolic, Hormones, Thyroid, Vitamins, Liver, Iron Studies, Inflammation, Minerals, Coagulation, and Cancer Markers panels
 - **Unit switching** — change a biomarker's display unit (e.g. mg/dL ↔ mmol/L) and all historical values convert retroactively
+- **Multi-user** — each user sees only their own data; admin can manage users and impersonate accounts
 
 ## Running with Docker (recommended)
 
@@ -17,6 +18,13 @@ docker-compose up
 ```
 
 App is available at `http://localhost:8080`. Lab report files and the database are stored in a persistent Docker volume (`health-tracker-data`).
+
+> **First run:** visit `http://localhost:8080/setup` to create the admin account. Set `SECRET_KEY` to a strong random value in `docker-compose.yml` (or as an environment variable) before deploying — it signs all JWTs.
+
+Generate a secret key:
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
 
 ## Running locally
 
@@ -46,6 +54,7 @@ The Vite dev server proxies `/api` requests to the backend on port 8080.
 | Layer | Technology |
 |-------|-----------|
 | Backend | Python 3.12, FastAPI, SQLAlchemy, SQLite |
+| Auth | JWT (python-jose), bcrypt (passlib) |
 | OCR | Tesseract 4 via pytesseract, pdf2image, OpenCV |
 | Frontend | React 19, TypeScript, Vite, TanStack Query |
 | Styling | Tailwind CSS |
