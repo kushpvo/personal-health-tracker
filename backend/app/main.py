@@ -40,9 +40,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Blood Work Tracker", lifespan=lifespan)
 
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "")
+ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

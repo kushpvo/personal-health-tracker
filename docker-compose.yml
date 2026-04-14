@@ -13,6 +13,9 @@ services:
       - MAX_UPLOAD_MB=50
       - DATA_DIR=/app/data
       - SECRET_KEY=change-me-in-production
+      # Set ALLOWED_ORIGINS only if accessing the API from a different origin (e.g. dev mode).
+      # Self-hosted single-origin deployments do not need this.
+      # - ALLOWED_ORIGINS=https://yourdomain.com
     restart: unless-stopped
 
 volumes:
