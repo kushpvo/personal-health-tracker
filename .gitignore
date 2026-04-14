@@ -12,3 +12,7 @@ frontend/dist/
 .DS_Store
 .claude/settings.json
 .claude/settings.local.json
+data/
+db.sqlite
+package.json
+package-lock.json

@@ -10,7 +10,7 @@ import type { Zone } from "../lib/utils";
 const STATUS_ORDER: Zone[] = ["out_of_range", "sufficient", "optimal", "unknown"];
 
 export default function Dashboard() {
-  const [groupBy, setGroupBy] = useState<"category" | "status">("category");
+  const [groupBy, setGroupBy] = useState<"category" | "status">("status");
   const { data: summaries = [], isLoading: isLoadingSummaries } = useQuery({
     queryKey: ["biomarkers-summary"],
     queryFn: api.biomarkers.summary,
