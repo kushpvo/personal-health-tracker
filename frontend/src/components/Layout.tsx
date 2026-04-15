@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Activity, FileText, LogOut, Moon, Settings, Shield, Sun, Upload } from "lucide-react";
+import { Activity, AlertCircle, FileText, LogOut, Moon, Settings, Shield, Sun, Upload } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
+import { api } from "../lib/api";
 import {
   clearTokens,
   getImpersonatedUsername,
@@ -28,6 +30,12 @@ export default function Layout() {
       localStorage.setItem("theme", "light");
     }
   }
+  const { data: unknowns = [] } = useQuery({
+    queryKey: ["unknowns"],
+    queryFn: api.unknowns.list,
+    staleTime: 60_000,
+  });
+
   const token = getToken();
   const payload = token ? parseToken(token) : null;
   const impersonating = isImpersonating();
@@ -49,6 +57,9 @@ export default function Layout() {
     { to: "/reports", label: "Reports", icon: FileText, end: false },
     { to: "/reports/upload", label: "Upload", icon: Upload, end: false },
     { to: "/settings", label: "Settings", icon: Settings, end: false },
+    ...(unknowns.length > 0
+      ? [{ to: "/unknown-biomarkers", label: `Unknowns (${unknowns.length})`, icon: AlertCircle, end: false }]
+      : []),
     ...(payload?.role === "admin"
       ? [{ to: "/admin", label: "Admin", icon: Shield, end: false }]
       : []),

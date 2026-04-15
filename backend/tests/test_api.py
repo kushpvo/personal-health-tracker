@@ -494,3 +494,53 @@ def test_reports_are_isolated_by_user(client, test_db, create_user, auth_headers
     response = client.get("/api/reports", headers=auth_headers(user_two))
     assert response.status_code == 200
     assert response.json() == []
+
+
+def test_list_and_resolve_unknowns(client, test_db, create_user, auth_headers):
+    from app.db.models import Report, ReportResult, UnknownBiomarker
+    from app.db.seed_loader import load_biomarkers
+    from datetime import datetime, timezone
+
+    load_biomarkers(test_db)
+    user = create_user()
+
+    report = Report(
+        filename="u.pdf", original_filename="u.pdf",
+        file_path="/tmp/u.pdf", status="done",
+        uploaded_at=datetime.now(timezone.utc), user_id=user.id,
+    )
+    test_db.add(report)
+    test_db.commit()
+
+    test_db.add(ReportResult(
+        report_id=report.id, raw_name="GLUC",
+        value=95.0, unit="mg/dL", is_flagged_unknown=True,
+    ))
+    test_db.add(UnknownBiomarker(
+        raw_name="GLUC", raw_unit="mg/dL",
+        times_seen=1, first_seen_at=datetime.now(timezone.utc),
+        last_seen_at=datetime.now(timezone.utc),
+    ))
+    test_db.commit()
+
+    resp = client.get("/api/unknowns", headers=auth_headers(user))
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert data[0]["raw_name"] == "GLUC"
+
+    from app.db.models import Biomarker
+    glucose = test_db.query(Biomarker).filter(Biomarker.name == "Glucose").first()
+
+    resolve_resp = client.patch(
+        f"/api/unknowns/{data[0]['id']}/resolve",
+        json={"biomarker_id": glucose.id},
+        headers=auth_headers(user),
+    )
+    assert resolve_resp.status_code == 200
+
+    resp2 = client.get("/api/unknowns", headers=auth_headers(user))
+    assert resp2.json() == []
+
+    test_db.refresh(glucose)
+    assert "gluc" in [a.lower() for a in (glucose.aliases or [])]
