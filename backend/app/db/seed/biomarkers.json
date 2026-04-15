@@ -1925,5 +1925,113 @@
     "optimal_min": 0, "optimal_max": 2,
     "sufficient_min": 0, "sufficient_max": 7,
     "unit_conversions": {}
+  },
+  {
+    "name": "Direct Bilirubin",
+    "loinc_code": "1968-8",
+    "aliases": ["direct bilirubin", "conjugated bilirubin", "direct bili", "bilirubin direct", "bilirubin conjugated"],
+    "category": "Liver",
+    "description": "Conjugated (direct) bilirubin. Elevated indicates hepatic obstruction or liver disease. Optimal 0-5 umol/L; clinical 0-7 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 0, "optimal_max": 5,
+    "sufficient_min": 0, "sufficient_max": 7,
+    "unit_conversions": {"umol/L": {"mg/dL": 0.0585}, "mg/dL": {"umol/L": 17.1}}
+  },
+  {
+    "name": "LDH",
+    "loinc_code": "2532-0",
+    "aliases": ["ldh", "lactate dehydrogenase", "lactic dehydrogenase", "lactic acid dehydrogenase", "ld"],
+    "category": "Liver",
+    "description": "Lactate dehydrogenase — tissue damage marker. Optimal 140-220 U/L; clinical 140-280 U/L.",
+    "default_unit": "U/L",
+    "alternate_units": [],
+    "optimal_min": 140, "optimal_max": 220,
+    "sufficient_min": 140, "sufficient_max": 280,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Cystatin C",
+    "loinc_code": "33863-2",
+    "aliases": ["cystatin c", "cys c", "cystatin-c", "serum cystatin c"],
+    "category": "Metabolic",
+    "description": "Cystatin C — kidney function marker, less affected by muscle mass than creatinine. Optimal 0.51-0.80 mg/L; clinical 0.51-0.98 mg/L.",
+    "default_unit": "mg/L",
+    "alternate_units": [],
+    "optimal_min": 0.51, "optimal_max": 0.80,
+    "sufficient_min": 0.51, "sufficient_max": 0.98,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Microalbumin",
+    "loinc_code": "14957-5",
+    "aliases": ["microalbumin", "urine albumin", "albumin urine", "urinary albumin", "microalbuminuria"],
+    "category": "Metabolic",
+    "description": "Urine microalbumin — early marker of kidney damage. Optimal <15 mg/L; clinical normal <30 mg/L (microalbuminuria threshold).",
+    "default_unit": "mg/L",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 15,
+    "sufficient_min": 0, "sufficient_max": 30,
+    "unit_conversions": {}
+  },
+  {
+    "name": "UACR",
+    "loinc_code": "9318-7",
+    "aliases": ["uacr", "urine albumin creatinine ratio", "albumin creatinine ratio", "acr", "albumin to creatinine ratio"],
+    "category": "Metabolic",
+    "description": "Urine albumin-to-creatinine ratio — sensitive marker for diabetic nephropathy. Optimal <10 mg/g; clinical normal <30 mg/g.",
+    "default_unit": "mg/g",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 10,
+    "sufficient_min": 0, "sufficient_max": 30,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Lead (Blood)",
+    "loinc_code": "5671-3",
+    "aliases": ["lead", "blood lead", "lead level", "pb", "serum lead", "lead blood"],
+    "category": "Heavy Metals",
+    "description": "Blood lead level. No safe level — lower is better. Optimal <0.10 umol/L (<2 ug/dL); action level >0.24 umol/L (>5 ug/dL).",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 0, "optimal_max": 0.10,
+    "sufficient_min": 0, "sufficient_max": 0.24,
+    "unit_conversions": {"umol/L": {"ug/dL": 20.72}, "ug/dL": {"umol/L": 0.04826}}
+  },
+  {
+    "name": "Mercury (Blood)",
+    "loinc_code": "5695-2",
+    "aliases": ["mercury", "blood mercury", "mercury level", "hg", "serum mercury", "mercury blood"],
+    "category": "Heavy Metals",
+    "description": "Blood mercury level. Optimal <15 nmol/L (<3 ug/L); clinical normal <45 nmol/L (<9 ug/L).",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ug/L"],
+    "optimal_min": 0, "optimal_max": 15,
+    "sufficient_min": 0, "sufficient_max": 45,
+    "unit_conversions": {"nmol/L": {"ug/L": 0.2006}, "ug/L": {"nmol/L": 4.985}}
+  },
+  {
+    "name": "Arsenic (Urine)",
+    "loinc_code": "5583-0",
+    "aliases": ["arsenic", "urine arsenic", "arsenic level", "as", "urinary arsenic", "arsenic urine"],
+    "category": "Heavy Metals",
+    "description": "Urine total arsenic. Optimal <0.13 umol/L (<10 ug/L); clinical normal <0.47 umol/L (<35 ug/L).",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/L"],
+    "optimal_min": 0, "optimal_max": 0.13,
+    "sufficient_min": 0, "sufficient_max": 0.47,
+    "unit_conversions": {"umol/L": {"ug/L": 74.9}, "ug/L": {"umol/L": 0.01334}}
+  },
+  {
+    "name": "Calprotectin",
+    "loinc_code": "48166-0",
+    "aliases": ["calprotectin", "fecal calprotectin", "faecal calprotectin", "stool calprotectin", "calprotectin fecal"],
+    "category": "Gut",
+    "description": "Fecal calprotectin — marker of intestinal inflammation. Elevated in IBD. Optimal <30 ug/g; clinical normal <50 ug/g.",
+    "default_unit": "ug/g",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 30,
+    "sufficient_min": 0, "sufficient_max": 50,
+    "unit_conversions": {}
   }
 ]
