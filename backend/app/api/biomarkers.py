@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -67,12 +67,19 @@ def list_all_biomarkers(
 def get_dashboard_summary(
     db: Session = Depends(get_db),
     effective_user_id: int = Depends(get_effective_user_id),
+    search: Optional[str] = None,
+    category: Optional[str] = None,
 ):
     """
     Returns one entry per biomarker the user has data for.
     Each entry has the latest result and zone.
     """
-    biomarkers = db.query(Biomarker).all()
+    biomarkers_query = db.query(Biomarker)
+    if category:
+        biomarkers_query = biomarkers_query.filter(Biomarker.category == category)
+    if search:
+        biomarkers_query = biomarkers_query.filter(Biomarker.name.ilike(f"%{search}%"))
+    biomarkers = biomarkers_query.all()
     summaries = []
 
     for b in biomarkers:

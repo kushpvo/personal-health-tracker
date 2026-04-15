@@ -1,6 +1,8 @@
 import os
 import uuid
+from datetime import date as date_type
 from pathlib import Path
+from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
@@ -88,27 +90,27 @@ async def upload_report(
 def list_reports(
     db: Session = Depends(get_db),
     effective_user_id: int = Depends(get_effective_user_id),
+    from_date: Optional[date_type] = None,
+    to_date: Optional[date_type] = None,
 ):
-    reports = (
-        db.query(Report)
-        .filter(Report.user_id == effective_user_id)
-        .order_by(Report.uploaded_at.desc())
-        .all()
-    )
+    q = db.query(Report).filter(Report.user_id == effective_user_id)
+    if from_date:
+        q = q.filter(Report.sample_date >= from_date)
+    if to_date:
+        q = q.filter(Report.sample_date <= to_date)
+    reports = q.order_by(Report.uploaded_at.desc()).all()
     items = []
     for r in reports:
         count = db.query(ReportResult).filter(ReportResult.report_id == r.id).count()
-        items.append(
-            ReportListItem(
-                id=r.id,
-                report_name=r.report_name,
-                original_filename=r.original_filename,
-                sample_date=r.sample_date,
-                uploaded_at=r.uploaded_at,
-                status=r.status,
-                result_count=count,
-            )
-        )
+        items.append(ReportListItem(
+            id=r.id,
+            report_name=r.report_name,
+            original_filename=r.original_filename,
+            sample_date=r.sample_date,
+            uploaded_at=r.uploaded_at,
+            status=r.status,
+            result_count=count,
+        ))
     return items
 
 

@@ -12,6 +12,8 @@ const STATUS_ORDER: Zone[] = ["out_of_range", "sufficient", "optimal", "unknown"
 export default function Dashboard() {
   const [groupBy, setGroupBy] = useState<"category" | "status">("status");
   const [exporting, setExporting] = useState(false);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
   async function handleExport() {
     setExporting(true);
@@ -22,9 +24,17 @@ export default function Dashboard() {
     }
   }
   const { data: summaries = [], isLoading: isLoadingSummaries } = useQuery({
-    queryKey: ["biomarkers-summary"],
-    queryFn: api.biomarkers.summary,
+    queryKey: ["biomarkers-summary", search, categoryFilter],
+    queryFn: () => api.biomarkers.summary({
+      search: search || undefined,
+      category: categoryFilter || undefined,
+    }),
   });
+  const { data: allSummaries = [] } = useQuery({
+    queryKey: ["biomarkers-summary"],
+    queryFn: () => api.biomarkers.summary(),
+  });
+  const categories = [...new Set(allSummaries.map(s => s.biomarker.category).filter(Boolean))].sort();
   const { data: reports = [], isLoading: isLoadingReports } = useQuery({
     queryKey: ["reports"],
     queryFn: api.reports.list,
@@ -69,7 +79,24 @@ export default function Dashboard() {
             {parsedResultsCount} parsed results / {recognizedCount} recognized
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <div className="flex gap-2 items-center">
+            <input
+              type="search"
+              placeholder="Search biomarkers…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="rounded border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 w-44"
+            />
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="rounded border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+            >
+              <option value="">All categories</option>
+              {categories.map(c => <option key={c} value={c!}>{c}</option>)}
+            </select>
+          </div>
           <button
             onClick={handleExport}
             disabled={exporting || summaries.length === 0}
