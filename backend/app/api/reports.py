@@ -243,6 +243,29 @@ def get_report_summary(
     return summaries
 
 
+@router.post("/{report_id}/reprocess", status_code=202)
+def reprocess_report(
+    report_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report or report.user_id != effective_user_id:
+        raise HTTPException(status_code=404, detail="Report not found.")
+    if not os.path.exists(report.file_path):
+        raise HTTPException(status_code=404, detail="Original file no longer on disk.")
+
+    db.query(ReportResult).filter(ReportResult.report_id == report_id).delete()
+    report.status = "pending"
+    report.error_message = None
+    report.ocr_raw_text = None
+    db.commit()
+
+    background_tasks.add_task(run_pipeline, report.id, db)
+    return {"id": report.id, "status": "pending"}
+
+
 @router.put("/{report_id}/review", response_model=ReportStatus)
 def submit_review(
     report_id: int,
