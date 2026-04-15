@@ -1733,5 +1733,101 @@
     "optimal_min": 4.1, "optimal_max": 8.1,
     "sufficient_min": 1.9, "sufficient_max": 10.9,
     "unit_conversions": {"umol/L": {"ug/dL": 36.84}, "ug/dL": {"umol/L": 0.02714}}
+  },
+  {
+    "name": "Reverse T3",
+    "loinc_code": "3051-0",
+    "aliases": ["reverse t3", "rt3", "rt 3", "reverse triiodothyronine", "r-t3", "reverse t 3", "rT3"],
+    "category": "Thyroid",
+    "description": "Reverse T3 — inactive form of T3. Elevated levels can block thyroid receptor sites. Optimal <15 ng/dL; clinical 9-24 ng/dL.",
+    "default_unit": "ng/dL",
+    "alternate_units": [],
+    "optimal_min": 9, "optimal_max": 15,
+    "sufficient_min": 9, "sufficient_max": 24,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Total T3",
+    "loinc_code": "3053-6",
+    "aliases": ["total t3", "t3 total", "triiodothyronine total", "t3", "tri-iodothyronine", "t 3 total"],
+    "category": "Thyroid",
+    "description": "Total triiodothyronine. Optimal 1.7-2.2 nmol/L (111-143 ng/dL); clinical 1.2-2.7 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ng/dL"],
+    "optimal_min": 1.7, "optimal_max": 2.2,
+    "sufficient_min": 1.2, "sufficient_max": 2.7,
+    "unit_conversions": {"nmol/L": {"ng/dL": 65.1}, "ng/dL": {"nmol/L": 0.01536}}
+  },
+  {
+    "name": "Total T4",
+    "loinc_code": "3026-2",
+    "aliases": ["total t4", "t4 total", "thyroxine total", "t4", "t 4 total", "total thyroxine"],
+    "category": "Thyroid",
+    "description": "Total thyroxine. Optimal 80-120 nmol/L (6.2-9.3 ug/dL); clinical 58-154 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 80, "optimal_max": 120,
+    "sufficient_min": 58, "sufficient_max": 154,
+    "unit_conversions": {"nmol/L": {"ug/dL": 0.07775}, "ug/dL": {"nmol/L": 12.87}}
+  },
+  {
+    "name": "Thyroid Peroxidase Ab",
+    "loinc_code": "2798-7",
+    "aliases": ["tpo ab", "tpo antibody", "anti-tpo", "antitpo", "thyroid peroxidase antibody", "thyroid peroxidase antibodies", "tpo-ab", "anti tpo", "microsomal antibodies"],
+    "category": "Thyroid",
+    "description": "Thyroid peroxidase antibodies. Elevated indicates autoimmune thyroid disease (Hashimoto's). Optimal <10 IU/mL; negative <35 IU/mL.",
+    "default_unit": "IU/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 9,
+    "sufficient_min": 0, "sufficient_max": 34,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Thyroglobulin Ab",
+    "loinc_code": "2800-1",
+    "aliases": ["tgab", "tg ab", "anti-tg", "thyroglobulin antibody", "thyroglobulin antibodies", "anti thyroglobulin", "anti-thyroglobulin"],
+    "category": "Thyroid",
+    "description": "Thyroglobulin antibodies. Elevated indicates autoimmune thyroid disease. Optimal <11 IU/mL; negative <40 IU/mL.",
+    "default_unit": "IU/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 10,
+    "sufficient_min": 0, "sufficient_max": 40,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Selenium",
+    "loinc_code": "2993-4",
+    "aliases": ["selenium", "serum selenium", "selenium level", "se"],
+    "category": "Vitamins",
+    "description": "Serum selenium. Optimal 1.2-1.8 umol/L (95-142 ug/L); clinical 0.8-2.0 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/L"],
+    "optimal_min": 1.2, "optimal_max": 1.8,
+    "sufficient_min": 0.8, "sufficient_max": 2.0,
+    "unit_conversions": {"umol/L": {"ug/L": 79.0}, "ug/L": {"umol/L": 0.01266}}
+  },
+  {
+    "name": "Vitamin A",
+    "loinc_code": "2923-1",
+    "aliases": ["vitamin a", "retinol", "vit a", "serum retinol", "retinol level"],
+    "category": "Vitamins",
+    "description": "Serum retinol (Vitamin A). Optimal 1.7-2.8 umol/L; clinical 1.05-3.49 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 1.7, "optimal_max": 2.8,
+    "sufficient_min": 1.05, "sufficient_max": 3.49,
+    "unit_conversions": {"umol/L": {"ug/dL": 28.65}, "ug/dL": {"umol/L": 0.03491}}
+  },
+  {
+    "name": "Vitamin E",
+    "loinc_code": "2968-6",
+    "aliases": ["vitamin e", "alpha-tocopherol", "alpha tocopherol", "vit e", "tocopherol"],
+    "category": "Vitamins",
+    "description": "Serum alpha-tocopherol (Vitamin E). Optimal 25-35 umol/L; clinical 12-42 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["mg/L"],
+    "optimal_min": 25, "optimal_max": 35,
+    "sufficient_min": 12, "sufficient_max": 42,
+    "unit_conversions": {"umol/L": {"mg/L": 0.4306}, "mg/L": {"umol/L": 2.322}}
   }
 ]
