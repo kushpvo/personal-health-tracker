@@ -107,6 +107,7 @@ def list_reports(
                 uploaded_at=r.uploaded_at,
                 status=r.status,
                 result_count=count,
+                tags=r.tags,
             )
         )
     return items
@@ -185,6 +186,7 @@ def get_report_results(
             sort_order=r.sort_order,
             biomarker_id=r.biomarker_id,
             biomarker_name=r.biomarker.name if r.biomarker else None,
+            notes=r.notes,
         )
         for r in results
     ]
@@ -281,6 +283,9 @@ def submit_review(
     if body.sample_date:
         report.sample_date = body.sample_date
 
+    if body.tags is not None:
+        report.tags = body.tags
+
     # Delete removed rows
     for del_id in body.deleted_result_ids:
         result = db.query(ReportResult).filter(
@@ -335,6 +340,14 @@ def submit_review(
             is_flagged_unknown=False,
             human_matched=True,
         ))
+
+    for result_id, note_text in body.result_notes.items():
+        result = db.query(ReportResult).filter(
+            ReportResult.id == result_id,
+            ReportResult.report_id == report_id,
+        ).first()
+        if result:
+            result.notes = note_text
 
     db.commit()
     return ReportStatus(
