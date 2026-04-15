@@ -230,6 +230,11 @@ export const api = {
       URL.revokeObjectURL(url);
     },
     delete: (id: number) => authFetch(`/reports/${id}`, { method: "DELETE" }),
+    reprocess: (id: number) =>
+      authFetch(`/reports/${id}/reprocess`, { method: "POST" }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<{ id: number; status: string }>;
+      }),
     upload: (file: File) => {
       const form = new FormData();
       form.append("file", file);

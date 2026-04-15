@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, Trash2, FileText, ClipboardEdit } from "lucide-react";
+import { Download, Trash2, FileText, ClipboardEdit, RefreshCw } from "lucide-react";
 import { api } from "../lib/api";
 import type { ReportListItem } from "../lib/api";
 import { formatDate } from "../lib/utils";
@@ -29,6 +29,11 @@ export default function Reports() {
 
   async function handleDownload(id: number, filename: string) {
     await api.reports.download(id, filename);
+  }
+
+  async function handleReprocess(id: number) {
+    await api.reports.reprocess(id);
+    qc.invalidateQueries({ queryKey: ["reports"] });
   }
 
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>;
@@ -85,6 +90,18 @@ export default function Reports() {
               >
                 <Download size={15} />
               </button>
+              {(r.status === "done" || r.status === "failed") && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void handleReprocess(r.id);
+                  }}
+                  className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                  title="Reprocess with OCR"
+                >
+                  <RefreshCw size={15} />
+                </button>
+              )}
               <Link
                 onClick={(e) => e.stopPropagation()}
                 to={`/reports/${r.id}/review`}

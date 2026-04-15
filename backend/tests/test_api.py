@@ -494,3 +494,37 @@ def test_reports_are_isolated_by_user(client, test_db, create_user, auth_headers
     response = client.get("/api/reports", headers=auth_headers(user_two))
     assert response.status_code == 200
     assert response.json() == []
+
+
+def test_reprocess_report_resets_status(client, test_db, create_user, auth_headers):
+    from app.db.models import Report
+    from datetime import datetime, timezone
+    from unittest.mock import patch
+    import tempfile, os
+
+    user = create_user()
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+        f.write(b"%PDF-1.4 fake")
+        tmp_path = f.name
+
+    report = Report(
+        filename="r.pdf", original_filename="r.pdf",
+        file_path=tmp_path, status="failed",
+        uploaded_at=datetime.now(timezone.utc), user_id=user.id,
+    )
+    test_db.add(report)
+    test_db.commit()
+
+    with patch("app.api.reports.run_pipeline"):
+        resp = client.post(
+            f"/api/reports/{report.id}/reprocess",
+            headers=auth_headers(user),
+        )
+
+    assert resp.status_code == 202
+    assert resp.json()["status"] == "pending"
+
+    test_db.refresh(report)
+    assert report.status == "pending"
+
+    os.unlink(tmp_path)
