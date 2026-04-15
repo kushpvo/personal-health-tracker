@@ -1,7 +1,7 @@
 import os
 import re
 import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -28,7 +28,7 @@ def _match_biomarker(raw_name: str, db: Session) -> Optional[Biomarker]:
     simplified = re.sub(r"\s*\([^)]*\)", "", normalized).strip()
     biomarkers = db.query(Biomarker).all()
     for b in biomarkers:
-        names = [b.name.lower(), *((b.aliases or []))]
+        names = [b.name.lower(), *(b.aliases or [])]
         normalized_names = [re.sub(r"\s+", " ", name.strip().lower()) for name in names]
         if normalized in normalized_names or simplified in normalized_names:
             return b
@@ -37,11 +37,9 @@ def _match_biomarker(raw_name: str, db: Session) -> Optional[Biomarker]:
 
 def _upsert_unknown(raw_name: str, raw_unit: str, db: Session) -> None:
     existing = (
-        db.query(UnknownBiomarker)
-        .filter(UnknownBiomarker.raw_name == raw_name)
-        .first()
+        db.query(UnknownBiomarker).filter(UnknownBiomarker.raw_name == raw_name).first()
     )
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if existing:
         existing.times_seen += 1
         existing.last_seen_at = now
@@ -92,7 +90,9 @@ def run_pipeline(report_id: int, db: Session) -> None:
         # Extract and persist biomarker results
         parsed = extract_biomarkers(full_text)
         if not parsed:
-            raise RuntimeError("OCR completed, but no biomarker rows could be parsed from the report.")
+            raise RuntimeError(
+                "OCR completed, but no biomarker rows could be parsed from the report."
+            )
 
         for i, item in enumerate(parsed):
             biomarker = _match_biomarker(item.raw_name, db)

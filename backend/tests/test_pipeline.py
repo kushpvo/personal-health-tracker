@@ -18,17 +18,45 @@ def test_newly_seeded_markers_all_match(test_db):
     load_biomarkers(test_db)
     for name in [
         # CBC
-        "Haematocrit", "RBC", "MCV", "MCH", "MCHC", "RDW",
-        "Platelets", "MPV", "Neutrophils", "Lymphocytes", "Monocytes",
-        "Eosinophils", "Basophils", "ESR",
+        "Haematocrit",
+        "RBC",
+        "MCV",
+        "MCH",
+        "MCHC",
+        "RDW",
+        "Platelets",
+        "MPV",
+        "Neutrophils",
+        "Lymphocytes",
+        "Monocytes",
+        "Eosinophils",
+        "Basophils",
+        "ESR",
         # Liver
-        "Total Bilirubin", "ALP", "GGT", "Albumin", "Globulins", "Total Protein",
+        "Total Bilirubin",
+        "ALP",
+        "GGT",
+        "Albumin",
+        "Globulins",
+        "Total Protein",
         "Aspartate Transferase",
         # Metabolic / electrolytes
-        "Urea", "Calcium", "Adjusted Calcium", "Phosphate", "Urate",
-        "Sodium", "Potassium", "Chloride", "Bicarbonate", "Magnesium",
+        "Urea",
+        "Calcium",
+        "Adjusted Calcium",
+        "Phosphate",
+        "Urate",
+        "Sodium",
+        "Potassium",
+        "Chloride",
+        "Bicarbonate",
+        "Magnesium",
         # Iron
-        "Iron", "UIBC", "TIBC", "Transferrin", "Transferrin Saturation",
+        "Iron",
+        "UIBC",
+        "TIBC",
+        "Transferrin",
+        "Transferrin Saturation",
     ]:
         result = _match_biomarker(name, test_db)
         assert result is not None, f"Expected {name!r} to match a biomarker"
@@ -47,13 +75,15 @@ def test_newly_seeded_markers_match_by_alias(test_db):
     for alias, expected_name in alias_cases:
         result = _match_biomarker(alias, test_db)
         assert result is not None, f"Alias {alias!r} matched nothing"
-        assert result.name == expected_name, f"Alias {alias!r}: expected {expected_name!r}, got {result.name!r}"
+        assert result.name == expected_name, (
+            f"Alias {alias!r}: expected {expected_name!r}, got {result.name!r}"
+        )
 
 
 def test_pipeline_sets_sort_order(test_db, create_user):
     """sort_order on saved results must match OCR extraction order."""
     from app.db.models import ReportResult
-    from datetime import datetime
+    from datetime import datetime, timezone
     from app.db.models import Report
 
     load_biomarkers(test_db)
@@ -64,7 +94,7 @@ def test_pipeline_sets_sort_order(test_db, create_user):
         original_filename="sort_test.txt",
         file_path="/dev/null",
         status="pending",
-        uploaded_at=datetime.utcnow(),
+        uploaded_at=datetime.now(timezone.utc),
         user_id=user.id,
     )
     test_db.add(report)

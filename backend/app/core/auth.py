@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
@@ -43,7 +43,7 @@ def create_access_token(
         "sub": str(user_id),
         "role": role,
         "acting_as": str(acting_as) if acting_as is not None else None,
-        "exp": datetime.utcnow() + delta,
+        "exp": datetime.now(timezone.utc) + delta,
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
