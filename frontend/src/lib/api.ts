@@ -161,6 +161,7 @@ export interface UserInfo {
   username: string;
   role: string;
   is_active: boolean;
+  sex: "male" | "female" | "other" | null;
 }
 
 export interface TokenResponse {
@@ -260,6 +261,15 @@ export const api = {
         if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
         return r.json();
       }),
+    updateProfile: (sex: "male" | "female" | "other" | null) =>
+      authFetch("/auth/me/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sex }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<UserInfo>;
+      }),
   },
   admin: {
     listUsers: (): Promise<UserInfo[]> => get("/admin/users"),
@@ -278,7 +288,7 @@ export const api = {
       }),
     updateUser: (
       id: number,
-      body: { is_active?: boolean; password?: string },
+      body: { is_active?: boolean; password?: string; sex?: "male" | "female" | "other" | null },
     ): Promise<UserInfo> =>
       authFetch(`/admin/users/${id}`, {
         method: "PATCH",
