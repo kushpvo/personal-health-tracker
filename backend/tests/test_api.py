@@ -505,22 +505,34 @@ def test_list_and_resolve_unknowns(client, test_db, create_user, auth_headers):
     user = create_user()
 
     report = Report(
-        filename="u.pdf", original_filename="u.pdf",
-        file_path="/tmp/u.pdf", status="done",
-        uploaded_at=datetime.now(timezone.utc), user_id=user.id,
+        filename="u.pdf",
+        original_filename="u.pdf",
+        file_path="/tmp/u.pdf",
+        status="done",
+        uploaded_at=datetime.now(timezone.utc),
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
 
-    test_db.add(ReportResult(
-        report_id=report.id, raw_name="GLUC",
-        value=95.0, unit="mg/dL", is_flagged_unknown=True,
-    ))
-    test_db.add(UnknownBiomarker(
-        raw_name="GLUC", raw_unit="mg/dL",
-        times_seen=1, first_seen_at=datetime.now(timezone.utc),
-        last_seen_at=datetime.now(timezone.utc),
-    ))
+    test_db.add(
+        ReportResult(
+            report_id=report.id,
+            raw_name="GLUC",
+            value=95.0,
+            unit="mg/dL",
+            is_flagged_unknown=True,
+        )
+    )
+    test_db.add(
+        UnknownBiomarker(
+            raw_name="GLUC",
+            raw_unit="mg/dL",
+            times_seen=1,
+            first_seen_at=datetime.now(timezone.utc),
+            last_seen_at=datetime.now(timezone.utc),
+        )
+    )
     test_db.commit()
 
     resp = client.get("/api/unknowns", headers=auth_headers(user))
@@ -530,6 +542,7 @@ def test_list_and_resolve_unknowns(client, test_db, create_user, auth_headers):
     assert data[0]["raw_name"] == "GLUC"
 
     from app.db.models import Biomarker
+
     glucose = test_db.query(Biomarker).filter(Biomarker.name == "Glucose").first()
 
     resolve_resp = client.patch(
@@ -546,6 +559,41 @@ def test_list_and_resolve_unknowns(client, test_db, create_user, auth_headers):
     assert "gluc" in [a.lower() for a in (glucose.aliases or [])]
 
 
+def test_refresh_token_flow(client, test_db):
+    # Use a unique username to avoid conflict with other tests
+    setup_resp = client.post(
+        "/api/auth/setup", json={"username": "admin_refresh", "password": "password123"}
+    )
+    if setup_resp.status_code == 403:
+        # setup already done, skip
+        return
+    assert setup_resp.status_code == 200
+    assert "access_token" in setup_resp.json()
+    assert "refresh_token" in setup_resp.cookies
+
+    refresh_resp = client.post(
+        "/api/auth/refresh",
+        cookies={"refresh_token": setup_resp.cookies["refresh_token"]},
+    )
+    assert refresh_resp.status_code == 200
+    assert "access_token" in refresh_resp.json()
+
+
+def test_logout_revokes_refresh_token(client, test_db):
+    setup_resp = client.post(
+        "/api/auth/setup", json={"username": "admin_logout", "password": "password123"}
+    )
+    if setup_resp.status_code == 403:
+        return
+    assert setup_resp.status_code == 200
+    cookie = setup_resp.cookies["refresh_token"]
+
+    client.post("/api/auth/logout", cookies={"refresh_token": cookie})
+
+    refresh_resp = client.post("/api/auth/refresh", cookies={"refresh_token": cookie})
+    assert refresh_resp.status_code == 401
+
+
 def test_reprocess_report_resets_status(client, test_db, create_user, auth_headers):
     from app.db.models import Report
     from datetime import datetime, timezone
@@ -558,9 +606,12 @@ def test_reprocess_report_resets_status(client, test_db, create_user, auth_heade
         tmp_path = f.name
 
     report = Report(
-        filename="r.pdf", original_filename="r.pdf",
-        file_path=tmp_path, status="failed",
-        uploaded_at=datetime.now(timezone.utc), user_id=user.id,
+        filename="r.pdf",
+        original_filename="r.pdf",
+        file_path=tmp_path,
+        status="failed",
+        uploaded_at=datetime.now(timezone.utc),
+        user_id=user.id,
     )
     test_db.add(report)
     test_db.commit()
@@ -586,12 +637,17 @@ def test_list_reports_date_filter(client, test_db, create_user, auth_headers):
 
     user = create_user()
     for d in ["2024-01-15", "2024-06-15", "2025-01-15"]:
-        test_db.add(Report(
-            filename=f"{d}.pdf", original_filename=f"{d}.pdf",
-            file_path=f"/tmp/{d}.pdf", status="done",
-            uploaded_at=datetime.now(timezone.utc), sample_date=date.fromisoformat(d),
-            user_id=user.id,
-        ))
+        test_db.add(
+            Report(
+                filename=f"{d}.pdf",
+                original_filename=f"{d}.pdf",
+                file_path=f"/tmp/{d}.pdf",
+                status="done",
+                uploaded_at=datetime.now(timezone.utc),
+                sample_date=date.fromisoformat(d),
+                user_id=user.id,
+            )
+        )
     test_db.commit()
 
     resp = client.get(
@@ -602,3 +658,47 @@ def test_list_reports_date_filter(client, test_db, create_user, auth_headers):
     data = resp.json()
     assert len(data) == 2
     assert all("2024" in (r["sample_date"] or "") for r in data)
+
+
+def test_dashboard_trend_alert_on_large_change(
+    client, test_db, create_user, auth_headers
+):
+    from app.db.models import Report, ReportResult, Biomarker
+    from app.db.seed_loader import load_biomarkers
+    from datetime import datetime, date, timezone
+
+    load_biomarkers(test_db)
+    user = create_user()
+
+    for i, (d, val) in enumerate([("2024-01-01", 85.0), ("2024-06-01", 120.0)]):
+        r = Report(
+            filename=f"r{i}.pdf",
+            original_filename=f"r{i}.pdf",
+            file_path=f"/tmp/r{i}.pdf",
+            status="done",
+            uploaded_at=datetime.now(timezone.utc),
+            sample_date=date.fromisoformat(d),
+            user_id=user.id,
+        )
+        test_db.add(r)
+        test_db.commit()
+        glucose = test_db.query(Biomarker).filter(Biomarker.name == "Glucose").first()
+        test_db.add(
+            ReportResult(
+                report_id=r.id,
+                biomarker_id=glucose.id,
+                raw_name="Glucose",
+                value=val,
+                unit="mg/dL",
+                is_flagged_unknown=False,
+            )
+        )
+        test_db.commit()
+
+    resp = client.get("/api/biomarkers/summary", headers=auth_headers(user))
+    assert resp.status_code == 200
+    data = resp.json()
+    glucose_summary = next(s for s in data if s["biomarker"]["name"] == "Glucose")
+    assert glucose_summary["trend_alert"] is True
+    assert glucose_summary["trend_delta"] is not None
+    assert abs(glucose_summary["trend_delta"]) >= 20

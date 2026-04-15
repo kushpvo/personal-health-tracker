@@ -15,8 +15,17 @@ export default function BiomarkerCard({ summary }: Props) {
   return (
     <button
       onClick={() => navigate(`/biomarkers/${biomarker.id}`)}
-      className="text-left w-full p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+      className="relative text-left w-full p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
     >
+      {summary.trend_alert && (
+        <span
+          title={`${summary.trend_delta !== null ? (summary.trend_delta > 0 ? "+" : "") + summary.trend_delta + "%" : "Zone changed"} from previous`}
+          className="absolute top-2 right-2 flex h-2 w-2"
+        >
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
+        </span>
+      )}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
@@ -37,6 +46,11 @@ export default function BiomarkerCard({ summary }: Props) {
         </span>
         <span className="text-xs text-gray-500 dark:text-gray-400">{latest_unit}</span>
       </div>
+      {summary.trend_delta !== null && (
+        <p className="text-xs mt-0.5" style={{ color: summary.trend_delta > 0 ? "#f97316" : "#22c55e" }}>
+          {summary.trend_delta > 0 ? "▲" : "▼"} {Math.abs(summary.trend_delta)}% vs previous
+        </p>
+      )}
       <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
         {formatDate(latest_date)} · {result_count} {result_count === 1 ? "test" : "tests"}
       </p>
