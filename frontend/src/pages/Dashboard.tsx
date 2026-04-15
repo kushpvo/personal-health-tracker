@@ -37,11 +37,11 @@ export default function Dashboard() {
   const categories = [...new Set(allSummaries.map(s => s.biomarker.category).filter(Boolean))].sort();
   const { data: reports = [], isLoading: isLoadingReports } = useQuery({
     queryKey: ["reports"],
-    queryFn: api.reports.list,
+    queryFn: () => api.reports.list(),
   });
 
   const isLoading = isLoadingSummaries || isLoadingReports;
-  const parsedResultsCount = reports.reduce((total, report) => total + report.result_count, 0);
+  const parsedResultsCount = reports.reduce((total: number, report) => total + report.result_count, 0);
   const recognizedCount = summaries.length;
 
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>;

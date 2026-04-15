@@ -23,7 +23,7 @@ export default function ReportDashboard() {
   });
   const { data: reports = [] } = useQuery({
     queryKey: ["reports"],
-    queryFn: api.reports.list,
+    queryFn: () => api.reports.list(),
   });
 
   const report = reports.find((r) => r.id === reportId);

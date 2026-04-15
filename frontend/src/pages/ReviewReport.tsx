@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Trash2, Plus } from "lucide-react";
 import { api } from "../lib/api";
-import type { BiomarkerListItem, ReportResultItem } from "../lib/api";
+import type { BiomarkerListItem, ReportListItem, ReportResultItem } from "../lib/api";
 
 const COMMON_UNITS = [
   "g/L", "g/dL", "mg/dL", "mg/L", "mmol/L", "umol/L", "nmol/L", "pmol/L",
@@ -60,10 +60,10 @@ export default function ReviewReport() {
 
   const { data: reports = [] } = useQuery({
     queryKey: ["reports"],
-    queryFn: api.reports.list,
+    queryFn: () => api.reports.list(),
   });
 
-  const report = reports.find((r) => r.id === reportId);
+  const report = reports.find((r: ReportListItem) => r.id === reportId);
 
   const [draftTitle, setDraftTitle] = useState("");
   const [draftDate, setDraftDate] = useState("");
