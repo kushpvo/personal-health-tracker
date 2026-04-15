@@ -111,6 +111,51 @@ export interface UnknownBiomarkerItem {
   resolved_biomarker_id: number | null;
 }
 
+export interface SupplementDoseItem {
+  id: number;
+  dose: number;
+  started_on: string;      // YYYY-MM-DD
+  ended_on: string | null; // YYYY-MM-DD or null = active
+  is_active: boolean;
+}
+
+export interface SupplementLogItem {
+  id: number;
+  name: string;
+  unit: string;
+  frequency: string;
+  notes: string | null;
+  created_at: string;
+  doses: SupplementDoseItem[];
+}
+
+export interface CreateSupplementInput {
+  name: string;
+  unit: string;
+  frequency: string;
+  dose: number;
+  started_on: string;
+  notes?: string;
+}
+
+export interface UpdateSupplementInput {
+  name?: string;
+  unit?: string;
+  frequency?: string;
+  notes?: string;
+}
+
+export interface AddDoseInput {
+  dose: number;
+  started_on: string;
+}
+
+export interface UpdateDoseInput {
+  dose?: number;
+  started_on?: string;
+  ended_on?: string;
+}
+
 export interface UserInfo {
   id: number;
   username: string;
@@ -329,6 +374,54 @@ export const api = {
       }).then(async (r) => {
         if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
         return r.json() as Promise<UnknownBiomarkerItem>;
+      }),
+  },
+  supplements: {
+    list: () => get<SupplementLogItem[]>("/supplements"),
+    activeDuring: (from_date: string, to_date: string) =>
+      get<SupplementLogItem[]>(`/supplements/active-during?from_date=${from_date}&to_date=${to_date}`),
+    create: (body: CreateSupplementInput) =>
+      authFetch("/supplements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<SupplementLogItem>;
+      }),
+    update: (id: number, body: UpdateSupplementInput) =>
+      authFetch(`/supplements/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<SupplementLogItem>;
+      }),
+    delete: (id: number) =>
+      authFetch(`/supplements/${id}`, { method: "DELETE" }),
+    addDose: (id: number, body: AddDoseInput) =>
+      authFetch(`/supplements/${id}/doses`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<SupplementLogItem>;
+      }),
+    updateDose: (id: number, doseId: number, body: UpdateDoseInput) =>
+      authFetch(`/supplements/${id}/doses/${doseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<SupplementLogItem>;
+      }),
+    deleteDose: (id: number, doseId: number) =>
+      authFetch(`/supplements/${id}/doses/${doseId}`, { method: "DELETE" }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<SupplementLogItem>;
       }),
   },
   biomarkers: {

@@ -14,6 +14,7 @@ export default function BiomarkerDetail() {
 
   const qc = useQueryClient();
   const [changingUnit, setChangingUnit] = useState(false);
+  const [visibleSupplements, setVisibleSupplements] = useState<Set<number>>(new Set());
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["biomarker", biomarkerId],
@@ -21,11 +22,27 @@ export default function BiomarkerDetail() {
     enabled: !isNaN(biomarkerId),
   });
 
+  // Supplement query — enabled only after main data loads so we have the date range
+  const { data: supplementsInRange = [] } = useQuery({
+    queryKey: ["supplements-active", biomarkerId],
+    queryFn: async () => {
+      const allResults = data?.results ?? [];
+      const dates = allResults.map((r) => r.sample_date).filter(Boolean) as string[];
+      if (dates.length === 0) return [];
+      return api.supplements.activeDuring(dates[0], dates[dates.length - 1]);
+    },
+    enabled: !!data && data.results.length > 0,
+  });
+
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>;
   if (isError || !data) return <p className="text-sm text-red-500">Failed to load biomarker.</p>;
 
   const { biomarker, results } = data;
   const latest = results[results.length - 1];
+
+  const datesWithData = results.map((r) => r.sample_date).filter(Boolean) as string[];
+  const chartFromDate = datesWithData.length > 0 ? datesWithData[0] : null;
+  const chartToDate = datesWithData.length > 0 ? datesWithData[datesWithData.length - 1] : null;
 
   async function handleUnitChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const newUnit = e.target.value;
@@ -112,9 +129,61 @@ export default function BiomarkerDetail() {
         </div>
       </div>
 
+      {/* Supplement toggles */}
+      {supplementsInRange.length > 0 && (
+        <div className="mb-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Supplements</p>
+          <div className="flex flex-wrap gap-2">
+            {supplementsInRange.map((s) => {
+              const on = visibleSupplements.has(s.id);
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => {
+                    setVisibleSupplements((prev) => {
+                      const next = new Set(prev);
+                      if (on) next.delete(s.id);
+                      else next.add(s.id);
+                      return next;
+                    });
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    on
+                      ? "bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300"
+                      : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-purple-300"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${on ? "bg-purple-500" : "border border-gray-400"}`} />
+                  {s.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Trend chart */}
       <div className="mb-8">
-        <TrendChart biomarker={biomarker} results={results} />
+        <TrendChart
+          biomarker={biomarker}
+          results={results}
+          supplementPeriods={
+            supplementsInRange
+              .filter((s) => visibleSupplements.has(s.id))
+              .flatMap((s) =>
+                s.doses.map((d) => ({
+                  supplementName: s.name,
+                  supplementId: s.id,
+                  dose: d.dose,
+                  unit: s.unit,
+                  started_on: d.started_on,
+                  ended_on: d.ended_on,
+                }))
+              )
+          }
+          chartFromDate={chartFromDate}
+          chartToDate={chartToDate}
+        />
       </div>
 
       {/* History table */}

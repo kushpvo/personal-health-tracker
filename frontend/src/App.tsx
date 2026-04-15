@@ -13,6 +13,7 @@ import BiomarkerDetail from "./pages/BiomarkerDetail";
 import ReportDashboard from "./pages/ReportDashboard";
 import ReviewReport from "./pages/ReviewReport";
 import UnknownBiomarkers from "./pages/UnknownBiomarkers";
+import Supplements from "./pages/Supplements";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="biomarkers/:id" element={<BiomarkerDetail />} />
             <Route path="settings" element={<Settings />} />
             <Route path="unknown-biomarkers" element={<UnknownBiomarkers />} />
+            <Route path="supplements" element={<Supplements />} />
             <Route element={<AdminRoute />}>
               <Route path="admin" element={<Admin />} />
             </Route>

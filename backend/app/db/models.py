@@ -95,6 +95,37 @@ class UnknownBiomarker(Base):
     resolved_biomarker_id = Column(Integer, ForeignKey("biomarkers.id"), nullable=True)
 
 
+class SupplementLog(Base):
+    __tablename__ = "supplement_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String, nullable=False)
+    unit = Column(String, nullable=False)
+    frequency = Column(String, nullable=False)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    doses = relationship(
+        "SupplementDose",
+        back_populates="supplement",
+        cascade="all, delete-orphan",
+        order_by="SupplementDose.started_on",
+    )
+
+
+class SupplementDose(Base):
+    __tablename__ = "supplement_doses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    supplement_id = Column(Integer, ForeignKey("supplement_logs.id"), nullable=False)
+    dose = Column(Float, nullable=False)
+    started_on = Column(Date, nullable=False)
+    ended_on = Column(Date, nullable=True)
+
+    supplement = relationship("SupplementLog", back_populates="doses")
+
+
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
