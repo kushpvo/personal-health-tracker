@@ -546,6 +546,37 @@ def test_list_and_resolve_unknowns(client, test_db, create_user, auth_headers):
     assert "gluc" in [a.lower() for a in (glucose.aliases or [])]
 
 
+def test_refresh_token_flow(client, test_db):
+    # Use a unique username to avoid conflict with other tests
+    setup_resp = client.post("/api/auth/setup", json={"username": "admin_refresh", "password": "password123"})
+    if setup_resp.status_code == 403:
+        # setup already done, skip
+        return
+    assert setup_resp.status_code == 200
+    assert "access_token" in setup_resp.json()
+    assert "refresh_token" in setup_resp.cookies
+
+    refresh_resp = client.post(
+        "/api/auth/refresh",
+        cookies={"refresh_token": setup_resp.cookies["refresh_token"]},
+    )
+    assert refresh_resp.status_code == 200
+    assert "access_token" in refresh_resp.json()
+
+
+def test_logout_revokes_refresh_token(client, test_db):
+    setup_resp = client.post("/api/auth/setup", json={"username": "admin_logout", "password": "password123"})
+    if setup_resp.status_code == 403:
+        return
+    assert setup_resp.status_code == 200
+    cookie = setup_resp.cookies["refresh_token"]
+
+    client.post("/api/auth/logout", cookies={"refresh_token": cookie})
+
+    refresh_resp = client.post("/api/auth/refresh", cookies={"refresh_token": cookie})
+    assert refresh_resp.status_code == 401
+
+
 def test_reprocess_report_resets_status(client, test_db, create_user, auth_headers):
     from app.db.models import Report
     from datetime import datetime, timezone

@@ -1,4 +1,6 @@
+import hashlib
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -13,8 +15,17 @@ from app.db.models import User
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_DAYS = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
+REFRESH_TOKEN_EXPIRE_DAYS = 30
 IMPERSONATION_EXPIRE_HOURS = 8
+
+
+def create_refresh_token() -> str:
+    return secrets.token_urlsafe(48)
+
+
+def hash_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer()
@@ -37,7 +48,7 @@ def create_access_token(
     delta = (
         timedelta(hours=expire_hours)
         if expire_hours is not None
-        else timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+        else timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     payload = {
         "sub": str(user_id),
