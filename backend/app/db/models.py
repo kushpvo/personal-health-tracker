@@ -25,6 +25,7 @@ class Biomarker(Base):
     # {"from_unit": {"to_unit": factor}}
     # e.g. {"mg/dL": {"mmol/L": 0.02586}}
     unit_conversions = Column(JSON, default=dict)
+    sex = Column(String, nullable=True)   # 'male' | 'female' | NULL (neutral)
 
     results = relationship("ReportResult", back_populates="biomarker")
 
@@ -37,6 +38,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     role = Column(String, nullable=False, default="user")
     is_active = Column(Boolean, default=True)
+    sex = Column(String, nullable=True)   # 'male' | 'female' | 'other' | NULL
     created_at = Column(DateTime, default=datetime.utcnow)
 
     reports = relationship("Report", back_populates="owner")

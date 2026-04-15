@@ -32,6 +32,7 @@ def load_biomarkers(db: Session) -> None:
                 sufficient_min=entry.get("sufficient_min"),
                 sufficient_max=entry.get("sufficient_max"),
                 unit_conversions=entry.get("unit_conversions", {}),
+                sex=entry.get("sex"),
             ))
             added += 1
         else:
