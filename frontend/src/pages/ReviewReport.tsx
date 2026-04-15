@@ -67,8 +67,10 @@ export default function ReviewReport() {
 
   const [draftTitle, setDraftTitle] = useState("");
   const [draftDate, setDraftDate] = useState("");
+  const [tags, setTags] = useState("");
   const [drafts, setDrafts] = useState<DraftResult[]>([]);
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
+  const [resultNotes, setResultNotes] = useState<Record<number, string>>({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -87,12 +89,18 @@ export default function ReviewReport() {
           isNew: false,
         }))
       );
+      const notesInit: Record<number, string> = {};
+      for (const r of rawResults) {
+        if (r.notes) notesInit[r.id] = r.notes;
+      }
+      setResultNotes(notesInit);
     }
   }, [rawResults]);
 
   useEffect(() => {
     if (report && !draftTitle) setDraftTitle(report.report_name ?? report.original_filename);
     if (report && !draftDate) setDraftDate(report.sample_date ?? "");
+    if (report && !tags) setTags(report.tags ?? "");
   }, [report]);
 
   const byCategory = useMemo(() => {
@@ -185,6 +193,8 @@ export default function ReviewReport() {
           unit: d.draftUnit,
         })),
         deleted_result_ids: deletedIds,
+        tags: tags || undefined,
+        result_notes: resultNotes,
       });
       navigate("/");
     } finally {
@@ -204,7 +214,7 @@ export default function ReviewReport() {
       </nav>
 
       {/* Report metadata */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-xs text-gray-500 mb-1">Report title</label>
           <input
@@ -223,6 +233,16 @@ export default function ReviewReport() {
             className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
           />
         </div>
+      </div>
+      <div className="mb-6">
+        <label className="block text-sm font-medium mb-1">Tags (comma-separated)</label>
+        <input
+          type="text"
+          placeholder="Annual Physical, Fasting"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="w-full rounded border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-600"
+        />
       </div>
 
       {/* Summary + top action */}
@@ -250,6 +270,7 @@ export default function ReviewReport() {
               <th className="px-4 py-3 text-left w-32">Value</th>
               <th className="px-4 py-3 text-left w-44">Unit</th>
               <th className="px-4 py-3 text-left">Status</th>
+              <th className="px-4 py-3 text-left">Notes</th>
               <th className="px-4 py-3 w-10"></th>
             </tr>
           </thead>
@@ -385,6 +406,21 @@ export default function ReviewReport() {
                         Added
                       </span>
                     )}
+                  </td>
+
+                  {/* Notes */}
+                  <td className="px-4 py-3">
+                    <textarea
+                      value={d.id > 0 ? (resultNotes[d.id] ?? "") : ""}
+                      onChange={(e) => {
+                        if (d.id > 0) {
+                          setResultNotes((prev) => ({ ...prev, [d.id]: e.target.value }));
+                        }
+                      }}
+                      placeholder="Optional note…"
+                      rows={1}
+                      className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs resize-none"
+                    />
                   </td>
 
                   {/* Delete */}

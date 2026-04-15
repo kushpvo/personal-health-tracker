@@ -57,6 +57,8 @@ class Report(Base):
     error_message = Column(Text)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
+    tags = Column(Text, nullable=True)  # comma-separated, e.g. "Annual Physical,Fasting"
+
     owner = relationship("User", back_populates="reports")
     results = relationship(
         "ReportResult", back_populates="report", cascade="all, delete-orphan"

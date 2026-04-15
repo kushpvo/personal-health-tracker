@@ -10,6 +10,7 @@ export interface ReportListItem {
   uploaded_at: string;
   status: string;
   result_count: number;
+  tags: string | null;
 }
 
 export interface ReportStatus {
@@ -64,6 +65,7 @@ export interface ReportResultItem {
   sort_order: number | null;
   biomarker_id: number | null;
   biomarker_name: string | null;
+  notes: string | null;
 }
 
 export interface BiomarkerListItem {
@@ -93,6 +95,8 @@ export interface ReviewReportInput {
   results: ReviewResultInput[];
   new_results?: NewResultInput[];
   deleted_result_ids?: number[];
+  tags?: string;
+  result_notes?: Record<number, string>;
 }
 
 export interface UnknownBiomarkerItem {

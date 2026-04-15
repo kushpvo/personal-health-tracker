@@ -578,3 +578,34 @@ def test_reprocess_report_resets_status(client, test_db, create_user, auth_heade
     assert report.status == "pending"
 
     os.unlink(tmp_path)
+
+
+def test_report_tags_saved_on_review(client, test_db, create_user, auth_headers):
+    from app.db.models import Report
+    from datetime import datetime, timezone
+
+    user = create_user()
+    report = Report(
+        filename="t.pdf", original_filename="t.pdf",
+        file_path="/tmp/t.pdf", status="done",
+        uploaded_at=datetime.now(timezone.utc), user_id=user.id,
+    )
+    test_db.add(report)
+    test_db.commit()
+
+    resp = client.put(
+        f"/api/reports/{report.id}/review",
+        json={
+            "report_name": "Blood Work",
+            "sample_date": None,
+            "results": [],
+            "tags": "Annual Physical,Fasting",
+            "result_notes": {},
+        },
+        headers=auth_headers(user),
+    )
+    assert resp.status_code == 200
+
+    resp = client.get("/api/reports", headers=auth_headers(user))
+    data = resp.json()
+    assert data[0]["tags"] == "Annual Physical,Fasting"
