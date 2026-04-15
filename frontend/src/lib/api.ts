@@ -259,6 +259,21 @@ export const api = {
       );
     },
   },
+  export: {
+    pdf: async () => {
+      const res = await authFetch("/export/pdf");
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `health-summary-${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    },
+  },
   unknowns: {
     list: () => get<UnknownBiomarkerItem[]>("/unknowns"),
     resolve: (id: number, biomarker_id: number) =>

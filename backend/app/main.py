@@ -10,6 +10,7 @@ from app.api import admin as admin_router
 from app.api import auth as auth_router
 from app.api import reports as reports_router
 from app.api import biomarkers as biomarkers_router
+from app.api import export as export_router
 from app.api import unknowns as unknowns_router
 from app.db.database import Base, SessionLocal, engine
 from app.db.seed_loader import load_biomarkers
@@ -56,6 +57,7 @@ app.include_router(reports_router.router)
 app.include_router(biomarkers_router.router)
 app.include_router(auth_router.router)
 app.include_router(admin_router.router)
+app.include_router(export_router.router)
 app.include_router(unknowns_router.router)
 
 # Serve React static build — must come last
