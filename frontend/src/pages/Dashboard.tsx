@@ -46,6 +46,7 @@ export default function Dashboard() {
   });
 
   const isLoading = isLoadingSummaries || isLoadingReports;
+  const needsSexForMatching = me != null && me.sex !== "male" && me.sex !== "female";
   const parsedResultsCount = reports.reduce((total: number, report) => total + report.result_count, 0);
   const recognizedCount = summaries.length;
 
@@ -77,14 +78,14 @@ export default function Dashboard() {
 
   return (
     <div>
-      {me && me.sex === null && (
+      {needsSexForMatching && (
         <div className="mb-4 flex items-center justify-between rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-200">
           <span>
             Set your biological sex in{" "}
             <Link to="/settings" className="font-medium underline">
               Settings
             </Link>{" "}
-            to get accurate matching for hormones and other sex-specific biomarkers.
+            to get accurate matching for hormones and other sex-specific biomarkers. Matching is only sex-aware when set to Male or Female.
           </span>
         </div>
       )}

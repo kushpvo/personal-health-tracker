@@ -14,6 +14,18 @@ from app.services.parser import extract_biomarkers, extract_metadata
 from app.services.unit_converter import convert_to_default_unit, normalize_unit
 
 
+RETIRED_DEFAULT_VARIANTS = {
+    "testosterone": "Testosterone (Male)",
+    "shbg": "SHBG (Male)",
+    "lh": "LH (Male)",
+    "fsh": "FSH (Male)",
+    "dhea-s": "DHEA-S (Male)",
+    "estradiol": "Estradiol (Female)",
+    "progesterone": "Progesterone (Female)",
+    "prolactin": "Prolactin (Female)",
+}
+
+
 def _get_ocr_backend() -> OCRBackend:
     backend_name = os.getenv("OCR_BACKEND", "tesseract").lower()
     if backend_name == "tesseract":
@@ -47,6 +59,11 @@ def _match_biomarker(
         match = _search(sex_specific)
         if match:
             return match
+
+    if user_sex not in (None, "male", "female"):
+        fallback_name = RETIRED_DEFAULT_VARIANTS.get(simplified)
+        if fallback_name:
+            return db.query(Biomarker).filter(Biomarker.name == fallback_name).first()
 
     # Pass 2: neutral (sex IS NULL)
     neutral = db.query(Biomarker).filter(Biomarker.sex.is_(None)).all()

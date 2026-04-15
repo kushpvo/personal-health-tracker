@@ -7,7 +7,7 @@ SEED_PATH = os.path.join(os.path.dirname(__file__), "seed", "biomarkers.json")
 
 
 def load_biomarkers(db: Session) -> None:
-    """Insert new biomarkers and sync aliases for existing ones from JSON."""
+    """Insert new biomarkers and sync existing ones from JSON."""
     with open(SEED_PATH, "r") as f:
         entries = json.load(f)
 
@@ -38,12 +38,36 @@ def load_biomarkers(db: Session) -> None:
             )
             added += 1
         else:
-            # Sync aliases: add any new ones from the seed without removing manual additions
             b = existing[entry["name"]]
-            current = set(b.aliases or [])
-            new_aliases = [a for a in seed_aliases if a not in current]
-            if new_aliases:
-                b.aliases = list(current) + new_aliases
+            current_aliases = b.aliases or []
+            merged_aliases = current_aliases + [
+                alias for alias in seed_aliases if alias not in current_aliases
+            ]
+
+            changed = False
+            if merged_aliases != current_aliases:
+                b.aliases = merged_aliases
+                changed = True
+
+            for field in (
+                "loinc_code",
+                "category",
+                "description",
+                "default_unit",
+                "alternate_units",
+                "optimal_min",
+                "optimal_max",
+                "sufficient_min",
+                "sufficient_max",
+                "unit_conversions",
+                "sex",
+            ):
+                seed_value = entry.get(field)
+                if getattr(b, field) != seed_value:
+                    setattr(b, field, seed_value)
+                    changed = True
+
+            if changed:
                 updated += 1
 
     if added or updated:
@@ -113,6 +137,7 @@ def migrate_sex_specific_results(db: Session) -> None:
         results = (
             db.query(ReportResult).filter(ReportResult.biomarker_id == old.id).all()
         )
+        migrated = 0
 
         for result in results:
             report = db.query(Report).filter(Report.id == result.report_id).first()
@@ -126,11 +151,15 @@ def migrate_sex_specific_results(db: Session) -> None:
             chosen_sex = user_sex if user_sex in ("male", "female") else default_sex
             chosen_variant = male_variant if chosen_sex == "male" else female_variant
             result.biomarker_id = chosen_variant.id
+            migrated += 1
 
-        db.delete(old)
+        db.flush()
+        db.query(Biomarker).filter(Biomarker.id == old.id).delete(
+            synchronize_session=False
+        )
         db.flush()
         print(
-            f"migrate_sex_specific_results: migrated {len(results)} results for '{name}' -> {chosen_sex} variant, deleted old neutral row"
+            f"migrate_sex_specific_results: migrated {migrated} results for '{name}', deleted old neutral row"
         )
 
     db.commit()
