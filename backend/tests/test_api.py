@@ -628,41 +628,37 @@ def test_reprocess_report_resets_status(client, test_db, create_user, auth_heade
     test_db.refresh(report)
     assert report.status == "pending"
 
-    os.unlink(tmp_path)
+
+os.unlink(tmp_path)
 
 
-def test_report_tags_saved_on_review(client, test_db, create_user, auth_headers):
+def test_list_reports_date_filter(client, test_db, create_user, auth_headers):
     from app.db.models import Report
-    from datetime import datetime, timezone
+    from datetime import datetime, date, timezone
 
     user = create_user()
-    report = Report(
-        filename="t.pdf",
-        original_filename="t.pdf",
-        file_path="/tmp/t.pdf",
-        status="done",
-        uploaded_at=datetime.now(timezone.utc),
-        user_id=user.id,
-    )
-    test_db.add(report)
+    for d in ["2024-01-15", "2024-06-15", "2025-01-15"]:
+        test_db.add(
+            Report(
+                filename=f"{d}.pdf",
+                original_filename=f"{d}.pdf",
+                file_path=f"/tmp/{d}.pdf",
+                status="done",
+                uploaded_at=datetime.now(timezone.utc),
+                sample_date=date.fromisoformat(d),
+                user_id=user.id,
+            )
+        )
     test_db.commit()
 
-    resp = client.put(
-        f"/api/reports/{report.id}/review",
-        json={
-            "report_name": "Blood Work",
-            "sample_date": None,
-            "results": [],
-            "tags": "Annual Physical,Fasting",
-            "result_notes": {},
-        },
+    resp = client.get(
+        "/api/reports?from_date=2024-01-01&to_date=2024-12-31",
         headers=auth_headers(user),
     )
     assert resp.status_code == 200
-
-    resp = client.get("/api/reports", headers=auth_headers(user))
     data = resp.json()
-    assert data[0]["tags"] == "Annual Physical,Fasting"
+    assert len(data) == 2
+    assert all("2024" in (r["sample_date"] or "") for r in data)
 
 
 def test_dashboard_trend_alert_on_large_change(
