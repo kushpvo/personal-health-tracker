@@ -37,6 +37,8 @@ export interface BiomarkerSummary {
   latest_date: string | null;
   latest_zone: "optimal" | "sufficient" | "out_of_range" | "unknown";
   result_count: number;
+  trend_delta: number | null;
+  trend_alert: boolean;
 }
 
 export interface ResultPoint {
