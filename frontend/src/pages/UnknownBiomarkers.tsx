@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 import type { BiomarkerListItem } from "../lib/api";
+
+const SEX_SPECIFIC_NAMES = new Set([
+  "testosterone", "shbg", "lh", "fsh",
+  "estradiol", "progesterone", "prolactin", "dhea-s",
+]);
 
 export default function UnknownBiomarkers() {
   const qc = useQueryClient();
@@ -14,6 +20,16 @@ export default function UnknownBiomarkers() {
     queryKey: ["biomarkers-list"],
     queryFn: api.biomarkers.list,
   });
+
+  const { data: me } = useQuery({
+    queryKey: ["me"],
+    queryFn: api.auth.me,
+  });
+
+  const hasSexRelatedUnknowns = unknowns.some((u) =>
+    SEX_SPECIFIC_NAMES.has(u.raw_name.toLowerCase())
+  );
+  const needsSexForMatching = me != null && me.sex !== "male" && me.sex !== "female";
 
   const resolve = useMutation({
     mutationFn: ({ id, biomarker_id }: { id: number; biomarker_id: number }) =>
@@ -36,6 +52,13 @@ export default function UnknownBiomarkers() {
   return (
     <div className="max-w-3xl space-y-4">
       <h1 className="text-2xl font-semibold">Unrecognised Biomarkers</h1>
+      {hasSexRelatedUnknowns && needsSexForMatching && (
+        <div className="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-200">
+          Some markers may be unmatched because your biological sex is not set to Male or Female.{" "}
+          <Link to="/settings" className="font-medium underline">Set it in Settings</Link>,
+          then reprocess the report. Matching is only sex-aware when set to Male or Female.
+        </div>
+      )}
       <p className="text-sm text-gray-500">
         Link each name to a known biomarker. Future reports with the same name will match automatically.
       </p>

@@ -496,34 +496,6 @@
     }
   },
   {
-    "name": "Testosterone",
-    "loinc_code": "2986-8",
-    "aliases": [
-      "testosterone",
-      "total testosterone",
-      "testosterone total",
-      "test"
-    ],
-    "category": "Hormones",
-    "description": "Total testosterone level.",
-    "default_unit": "ng/dL",
-    "alternate_units": [
-      "nmol/L"
-    ],
-    "optimal_min": 600,
-    "optimal_max": 900,
-    "sufficient_min": 400,
-    "sufficient_max": 599,
-    "unit_conversions": {
-      "ng/dL": {
-        "nmol/L": 0.03467
-      },
-      "nmol/L": {
-        "ng/dL": 28.84
-      }
-    }
-  },
-  {
     "name": "Homocysteine",
     "loinc_code": "13965-9",
     "aliases": [
@@ -818,7 +790,7 @@
       "sed rate",
       "sedimentation rate"
     ],
-    "category": "Inflammatory",
+    "category": "Inflammation",
     "description": "Erythrocyte sedimentation rate, a marker of inflammation.",
     "default_unit": "mm/Hour",
     "alternate_units": [],
@@ -1350,35 +1322,6 @@
     }
   },
   {
-    "name": "DHEA-S",
-    "loinc_code": "2191-5",
-    "aliases": [
-      "dhea-s",
-      "dheas",
-      "dhea sulfate",
-      "dehydroepiandrosterone sulfate",
-      "dhea sulphate"
-    ],
-    "category": "Hormones",
-    "description": "DHEA sulfate, an adrenal androgen hormone.",
-    "default_unit": "umol/L",
-    "alternate_units": [
-      "ug/dL"
-    ],
-    "optimal_min": 5.0,
-    "optimal_max": 12.0,
-    "sufficient_min": 2.2,
-    "sufficient_max": 15.0,
-    "unit_conversions": {
-      "umol/L": {
-        "ug/dL": 38.61
-      },
-      "ug/dL": {
-        "umol/L": 0.0259
-      }
-    }
-  },
-  {
     "name": "Cortisol",
     "loinc_code": "2143-6",
     "aliases": [
@@ -1403,143 +1346,6 @@
       },
       "ug/dL": {
         "nmol/L": 27.59
-      }
-    }
-  },
-  {
-    "name": "Estradiol",
-    "loinc_code": "2243-4",
-    "aliases": [
-      "estradiol",
-      "oestradiol",
-      "e2",
-      "17-beta estradiol"
-    ],
-    "category": "Hormones",
-    "description": "Estradiol, primary estrogen hormone.",
-    "default_unit": "pmol/L",
-    "alternate_units": [
-      "pg/mL"
-    ],
-    "optimal_min": 40,
-    "optimal_max": 130,
-    "sufficient_min": 40,
-    "sufficient_max": 161,
-    "unit_conversions": {
-      "pmol/L": {
-        "pg/mL": 0.2724
-      },
-      "pg/mL": {
-        "pmol/L": 3.671
-      }
-    }
-  },
-  {
-    "name": "Progesterone",
-    "loinc_code": "2839-9",
-    "aliases": [
-      "progesterone",
-      "prog",
-      "serum progesterone"
-    ],
-    "category": "Hormones",
-    "description": "Progesterone hormone.",
-    "default_unit": "nmol/L",
-    "alternate_units": [
-      "ng/mL"
-    ],
-    "optimal_min": 0.5,
-    "optimal_max": 2.0,
-    "sufficient_min": 0.3,
-    "sufficient_max": 2.5,
-    "unit_conversions": {
-      "nmol/L": {
-        "ng/mL": 0.3145
-      },
-      "ng/mL": {
-        "nmol/L": 3.18
-      }
-    }
-  },
-  {
-    "name": "LH",
-    "loinc_code": "10501-5",
-    "aliases": [
-      "lh",
-      "luteinising hormone",
-      "luteinizing hormone",
-      "lutropin"
-    ],
-    "category": "Hormones",
-    "description": "Luteinising hormone.",
-    "default_unit": "IU/L",
-    "alternate_units": [],
-    "optimal_min": 2.0,
-    "optimal_max": 8.0,
-    "sufficient_min": 1.5,
-    "sufficient_max": 9.3,
-    "unit_conversions": {}
-  },
-  {
-    "name": "FSH",
-    "loinc_code": "15067-2",
-    "aliases": [
-      "fsh",
-      "follicle stimulating hormone",
-      "follitropin"
-    ],
-    "category": "Hormones",
-    "description": "Follicle-stimulating hormone.",
-    "default_unit": "IU/L",
-    "alternate_units": [],
-    "optimal_min": 2.0,
-    "optimal_max": 10.0,
-    "sufficient_min": 1.4,
-    "sufficient_max": 18.1,
-    "unit_conversions": {}
-  },
-  {
-    "name": "SHBG",
-    "loinc_code": "13967-5",
-    "aliases": [
-      "shbg",
-      "sex hormone binding globulin",
-      "sex hormone-binding globulin"
-    ],
-    "category": "Hormones",
-    "description": "Sex hormone-binding globulin.",
-    "default_unit": "nmol/L",
-    "alternate_units": [],
-    "optimal_min": 20,
-    "optimal_max": 55,
-    "sufficient_min": 10,
-    "sufficient_max": 70,
-    "unit_conversions": {}
-  },
-  {
-    "name": "Prolactin",
-    "loinc_code": "2842-3",
-    "aliases": [
-      "prolactin",
-      "prl",
-      "serum prolactin"
-    ],
-    "category": "Hormones",
-    "description": "Prolactin hormone.",
-    "default_unit": "mIU/L",
-    "alternate_units": [
-      "ng/mL"
-    ],
-    "optimal_min": 45,
-    "optimal_max": 250,
-    "sufficient_min": 45,
-    "sufficient_max": 375,
-    "unit_conversions": {
-      "mIU/L": {
-        "ng/mL": 0.04706
-      },
-      "ng/mL": {
-        "mIU/L": 21.2
       }
     }
   },
@@ -1710,7 +1516,7 @@
       "hsCRP",
       "ultrasensitive crp"
     ],
-    "category": "Inflammatory",
+    "category": "Inflammation",
     "description": "High-sensitivity C-reactive protein, cardiovascular risk marker.",
     "default_unit": "mg/L",
     "alternate_units": [],
@@ -1718,6 +1524,514 @@
     "optimal_max": 1.0,
     "sufficient_min": 0,
     "sufficient_max": 3.0,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Testosterone (Male)",
+    "loinc_code": "2986-8",
+    "aliases": ["testosterone", "total testosterone", "testosterone total", "serum testosterone", "testo", "testosterone, total"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Total testosterone in males. Optimal 600-900 ng/dL (functional medicine); clinical normal 270-1070 ng/dL.",
+    "default_unit": "ng/dL",
+    "alternate_units": ["nmol/L"],
+    "optimal_min": 600, "optimal_max": 900,
+    "sufficient_min": 350, "sufficient_max": 1000,
+    "unit_conversions": {"ng/dL": {"nmol/L": 0.03467}, "nmol/L": {"ng/dL": 28.84}}
+  },
+  {
+    "name": "Testosterone (Female)",
+    "loinc_code": "2986-8",
+    "aliases": ["testosterone", "total testosterone", "testosterone total", "serum testosterone", "testo", "testosterone, total"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Total testosterone in females. Optimal 40-60 ng/dL; clinical normal 15-70 ng/dL.",
+    "default_unit": "ng/dL",
+    "alternate_units": ["nmol/L"],
+    "optimal_min": 40, "optimal_max": 60,
+    "sufficient_min": 15, "sufficient_max": 70,
+    "unit_conversions": {"ng/dL": {"nmol/L": 0.03467}, "nmol/L": {"ng/dL": 28.84}}
+  },
+  {
+    "name": "SHBG (Male)",
+    "loinc_code": "13967-5",
+    "aliases": ["shbg", "sex hormone binding globulin", "sex hormone-binding globulin", "s h b g"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Sex hormone-binding globulin in males. Optimal 20-30 nmol/L; clinical 10-57 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": [],
+    "optimal_min": 20, "optimal_max": 30,
+    "sufficient_min": 10, "sufficient_max": 57,
+    "unit_conversions": {}
+  },
+  {
+    "name": "SHBG (Female)",
+    "loinc_code": "13967-5",
+    "aliases": ["shbg", "sex hormone binding globulin", "sex hormone-binding globulin", "s h b g"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Sex hormone-binding globulin in females. Optimal 40-80 nmol/L; clinical 18-144 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": [],
+    "optimal_min": 40, "optimal_max": 80,
+    "sufficient_min": 18, "sufficient_max": 144,
+    "unit_conversions": {}
+  },
+  {
+    "name": "LH (Male)",
+    "loinc_code": "10501-5",
+    "aliases": ["lh", "luteinising hormone", "luteinizing hormone", "lh hormone", "luteotropin"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Luteinising hormone in males. Optimal 3-10 IU/L; clinical 1.5-9.3 IU/L.",
+    "default_unit": "IU/L",
+    "alternate_units": ["mIU/mL"],
+    "optimal_min": 3, "optimal_max": 10,
+    "sufficient_min": 1.5, "sufficient_max": 9.3,
+    "unit_conversions": {"IU/L": {"mIU/mL": 1.0}, "mIU/mL": {"IU/L": 1.0}}
+  },
+  {
+    "name": "LH (Female)",
+    "loinc_code": "10501-5",
+    "aliases": ["lh", "luteinising hormone", "luteinizing hormone", "lh hormone", "luteotropin"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Luteinising hormone in females (follicular phase reference). Optimal 2-15 IU/L; clinical 1.9-12.5 IU/L.",
+    "default_unit": "IU/L",
+    "alternate_units": ["mIU/mL"],
+    "optimal_min": 2, "optimal_max": 15,
+    "sufficient_min": 1.9, "sufficient_max": 12.5,
+    "unit_conversions": {"IU/L": {"mIU/mL": 1.0}, "mIU/mL": {"IU/L": 1.0}}
+  },
+  {
+    "name": "FSH (Male)",
+    "loinc_code": "15067-2",
+    "aliases": ["fsh", "follicle stimulating hormone", "follicle-stimulating hormone", "follitropin"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Follicle-stimulating hormone in males. Optimal 2-8 IU/L; clinical 1.5-12.4 IU/L.",
+    "default_unit": "IU/L",
+    "alternate_units": ["mIU/mL"],
+    "optimal_min": 2, "optimal_max": 8,
+    "sufficient_min": 1.5, "sufficient_max": 12.4,
+    "unit_conversions": {"IU/L": {"mIU/mL": 1.0}, "mIU/mL": {"IU/L": 1.0}}
+  },
+  {
+    "name": "FSH (Female)",
+    "loinc_code": "15067-2",
+    "aliases": ["fsh", "follicle stimulating hormone", "follicle-stimulating hormone", "follitropin"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Follicle-stimulating hormone in females (follicular phase reference). Optimal 3-10 IU/L; clinical 2.5-10.2 IU/L.",
+    "default_unit": "IU/L",
+    "alternate_units": ["mIU/mL"],
+    "optimal_min": 3, "optimal_max": 10,
+    "sufficient_min": 2.5, "sufficient_max": 10.2,
+    "unit_conversions": {"IU/L": {"mIU/mL": 1.0}, "mIU/mL": {"IU/L": 1.0}}
+  },
+  {
+    "name": "Estradiol (Male)",
+    "loinc_code": "2243-4",
+    "aliases": ["estradiol", "oestradiol", "e2", "17-beta estradiol", "estradiol e2"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Estradiol (E2) in males. Optimal 73-110 pmol/L (20-30 pg/mL); clinical 25-155 pmol/L.",
+    "default_unit": "pmol/L",
+    "alternate_units": ["pg/mL"],
+    "optimal_min": 73, "optimal_max": 110,
+    "sufficient_min": 25, "sufficient_max": 155,
+    "unit_conversions": {"pmol/L": {"pg/mL": 0.2724}, "pg/mL": {"pmol/L": 3.671}}
+  },
+  {
+    "name": "Estradiol (Female)",
+    "loinc_code": "2243-4",
+    "aliases": ["estradiol", "oestradiol", "e2", "17-beta estradiol", "estradiol e2"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Estradiol (E2) in females (follicular phase reference). Optimal 294-734 pmol/L (80-200 pg/mL); clinical 110-1469 pmol/L.",
+    "default_unit": "pmol/L",
+    "alternate_units": ["pg/mL"],
+    "optimal_min": 294, "optimal_max": 734,
+    "sufficient_min": 110, "sufficient_max": 1469,
+    "unit_conversions": {"pmol/L": {"pg/mL": 0.2724}, "pg/mL": {"pmol/L": 3.671}}
+  },
+  {
+    "name": "Progesterone (Male)",
+    "loinc_code": "2839-9",
+    "aliases": ["progesterone", "prog", "p4", "serum progesterone"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Progesterone in males. Optimal 0.95-3.8 nmol/L (0.3-1.2 ng/mL); clinical 0.32-4.45 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ng/mL"],
+    "optimal_min": 0.95, "optimal_max": 3.8,
+    "sufficient_min": 0.32, "sufficient_max": 4.45,
+    "unit_conversions": {"nmol/L": {"ng/mL": 0.3145}, "ng/mL": {"nmol/L": 3.18}}
+  },
+  {
+    "name": "Progesterone (Female)",
+    "loinc_code": "2839-9",
+    "aliases": ["progesterone", "prog", "p4", "serum progesterone"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Progesterone in females (follicular phase reference). Optimal 1.59-9.54 nmol/L (0.5-3.0 ng/mL); clinical 0.32-11.13 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ng/mL"],
+    "optimal_min": 1.59, "optimal_max": 9.54,
+    "sufficient_min": 0.32, "sufficient_max": 11.13,
+    "unit_conversions": {"nmol/L": {"ng/mL": 0.3145}, "ng/mL": {"nmol/L": 3.18}}
+  },
+  {
+    "name": "Prolactin (Male)",
+    "loinc_code": "2842-3",
+    "aliases": ["prolactin", "prl", "lactotropin", "luteotropin", "luteotrophic hormone"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "Prolactin in males. Optimal 105-210 mIU/L (5-10 ng/mL); clinical 45-375 mIU/L.",
+    "default_unit": "mIU/L",
+    "alternate_units": ["ng/mL"],
+    "optimal_min": 105, "optimal_max": 210,
+    "sufficient_min": 45, "sufficient_max": 375,
+    "unit_conversions": {"mIU/L": {"ng/mL": 0.04717}, "ng/mL": {"mIU/L": 21.2}}
+  },
+  {
+    "name": "Prolactin (Female)",
+    "loinc_code": "2842-3",
+    "aliases": ["prolactin", "prl", "lactotropin", "luteotropin", "luteotrophic hormone"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "Prolactin in females (non-pregnant). Optimal 105-420 mIU/L (5-20 ng/mL); clinical 64-636 mIU/L.",
+    "default_unit": "mIU/L",
+    "alternate_units": ["ng/mL"],
+    "optimal_min": 105, "optimal_max": 420,
+    "sufficient_min": 64, "sufficient_max": 636,
+    "unit_conversions": {"mIU/L": {"ng/mL": 0.04717}, "ng/mL": {"mIU/L": 21.2}}
+  },
+  {
+    "name": "DHEA-S (Male)",
+    "loinc_code": "2191-5",
+    "aliases": ["dhea-s", "dheas", "dhea sulphate", "dhea sulfate", "dehydroepiandrosterone sulphate", "dehydroepiandrosterone sulfate", "dhea-so4"],
+    "category": "Hormones",
+    "sex": "male",
+    "description": "DHEA-Sulphate in males (broad adult range). Optimal 5.4-10.9 umol/L (200-400 ug/dL); clinical 2.7-13.6 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 5.4, "optimal_max": 10.9,
+    "sufficient_min": 2.7, "sufficient_max": 13.6,
+    "unit_conversions": {"umol/L": {"ug/dL": 36.84}, "ug/dL": {"umol/L": 0.02714}}
+  },
+  {
+    "name": "DHEA-S (Female)",
+    "loinc_code": "2191-5",
+    "aliases": ["dhea-s", "dheas", "dhea sulphate", "dhea sulfate", "dehydroepiandrosterone sulphate", "dehydroepiandrosterone sulfate", "dhea-so4"],
+    "category": "Hormones",
+    "sex": "female",
+    "description": "DHEA-Sulphate in females (broad adult range). Optimal 4.1-8.1 umol/L (150-300 ug/dL); clinical 1.9-10.9 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 4.1, "optimal_max": 8.1,
+    "sufficient_min": 1.9, "sufficient_max": 10.9,
+    "unit_conversions": {"umol/L": {"ug/dL": 36.84}, "ug/dL": {"umol/L": 0.02714}}
+  },
+  {
+    "name": "Reverse T3",
+    "loinc_code": "3051-0",
+    "aliases": ["reverse t3", "rt3", "rt 3", "reverse triiodothyronine", "r-t3", "reverse t 3", "rT3"],
+    "category": "Thyroid",
+    "description": "Reverse T3 — inactive form of T3. Elevated levels can block thyroid receptor sites. Optimal <15 ng/dL; clinical 9-24 ng/dL.",
+    "default_unit": "ng/dL",
+    "alternate_units": [],
+    "optimal_min": 9, "optimal_max": 15,
+    "sufficient_min": 9, "sufficient_max": 24,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Total T3",
+    "loinc_code": "3053-6",
+    "aliases": ["total t3", "t3 total", "triiodothyronine total", "t3", "tri-iodothyronine", "t 3 total"],
+    "category": "Thyroid",
+    "description": "Total triiodothyronine. Optimal 1.7-2.2 nmol/L (111-143 ng/dL); clinical 1.2-2.7 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ng/dL"],
+    "optimal_min": 1.7, "optimal_max": 2.2,
+    "sufficient_min": 1.2, "sufficient_max": 2.7,
+    "unit_conversions": {"nmol/L": {"ng/dL": 65.1}, "ng/dL": {"nmol/L": 0.01536}}
+  },
+  {
+    "name": "Total T4",
+    "loinc_code": "3026-2",
+    "aliases": ["total t4", "t4 total", "thyroxine total", "t4", "t 4 total", "total thyroxine"],
+    "category": "Thyroid",
+    "description": "Total thyroxine. Optimal 80-120 nmol/L (6.2-9.3 ug/dL); clinical 58-154 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 80, "optimal_max": 120,
+    "sufficient_min": 58, "sufficient_max": 154,
+    "unit_conversions": {"nmol/L": {"ug/dL": 0.07775}, "ug/dL": {"nmol/L": 12.87}}
+  },
+  {
+    "name": "Thyroid Peroxidase Ab",
+    "loinc_code": "2798-7",
+    "aliases": ["tpo ab", "tpo antibody", "anti-tpo", "antitpo", "thyroid peroxidase antibody", "thyroid peroxidase antibodies", "tpo-ab", "anti tpo", "microsomal antibodies"],
+    "category": "Thyroid",
+    "description": "Thyroid peroxidase antibodies. Elevated indicates autoimmune thyroid disease (Hashimoto's). Optimal <10 IU/mL; negative <35 IU/mL.",
+    "default_unit": "IU/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 9,
+    "sufficient_min": 0, "sufficient_max": 34,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Thyroglobulin Ab",
+    "loinc_code": "2800-1",
+    "aliases": ["tgab", "tg ab", "anti-tg", "thyroglobulin antibody", "thyroglobulin antibodies", "anti thyroglobulin", "anti-thyroglobulin"],
+    "category": "Thyroid",
+    "description": "Thyroglobulin antibodies. Elevated indicates autoimmune thyroid disease. Optimal <11 IU/mL; negative <40 IU/mL.",
+    "default_unit": "IU/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 10,
+    "sufficient_min": 0, "sufficient_max": 40,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Selenium",
+    "loinc_code": "2993-4",
+    "aliases": ["selenium", "serum selenium", "selenium level", "se"],
+    "category": "Vitamins",
+    "description": "Serum selenium. Optimal 1.2-1.8 umol/L (95-142 ug/L); clinical 0.8-2.0 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/L"],
+    "optimal_min": 1.2, "optimal_max": 1.8,
+    "sufficient_min": 0.8, "sufficient_max": 2.0,
+    "unit_conversions": {"umol/L": {"ug/L": 79.0}, "ug/L": {"umol/L": 0.01266}}
+  },
+  {
+    "name": "Vitamin A",
+    "loinc_code": "2923-1",
+    "aliases": ["vitamin a", "retinol", "vit a", "serum retinol", "retinol level"],
+    "category": "Vitamins",
+    "description": "Serum retinol (Vitamin A). Optimal 1.7-2.8 umol/L; clinical 1.05-3.49 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 1.7, "optimal_max": 2.8,
+    "sufficient_min": 1.05, "sufficient_max": 3.49,
+    "unit_conversions": {"umol/L": {"ug/dL": 28.65}, "ug/dL": {"umol/L": 0.03491}}
+  },
+  {
+    "name": "Vitamin E",
+    "loinc_code": "2968-6",
+    "aliases": ["vitamin e", "alpha-tocopherol", "alpha tocopherol", "vit e", "tocopherol"],
+    "category": "Vitamins",
+    "description": "Serum alpha-tocopherol (Vitamin E). Optimal 25-35 umol/L; clinical 12-42 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["mg/L"],
+    "optimal_min": 25, "optimal_max": 35,
+    "sufficient_min": 12, "sufficient_max": 42,
+    "unit_conversions": {"umol/L": {"mg/L": 0.4306}, "mg/L": {"umol/L": 2.322}}
+  },
+  {
+    "name": "Lp(a)",
+    "loinc_code": "10190-7",
+    "aliases": ["lp(a)", "lpa", "lipoprotein a", "lipoprotein(a)", "lp a"],
+    "category": "Cardiac",
+    "description": "Lipoprotein(a) — independent cardiovascular risk marker. Lower is better. Optimal <30 nmol/L; intermediate risk 30-75 nmol/L; high risk >125 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 0, "optimal_max": 30,
+    "sufficient_min": 0, "sufficient_max": 75,
+    "unit_conversions": {"nmol/L": {"mg/dL": 0.4}, "mg/dL": {"nmol/L": 2.5}}
+  },
+  {
+    "name": "ApoB",
+    "loinc_code": "1884-7",
+    "aliases": ["apob", "apo b", "apolipoprotein b", "apolipoprotein b-100", "apo b-100"],
+    "category": "Cardiac",
+    "description": "Apolipoprotein B — key marker of atherogenic particle number. Optimal <0.8 g/L; clinical <1.0 g/L.",
+    "default_unit": "g/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 0.0, "optimal_max": 0.8,
+    "sufficient_min": 0.0, "sufficient_max": 1.0,
+    "unit_conversions": {"g/L": {"mg/dL": 100.0}, "mg/dL": {"g/L": 0.01}}
+  },
+  {
+    "name": "ApoA1",
+    "loinc_code": "1869-8",
+    "aliases": ["apoa1", "apo a1", "apolipoprotein a1", "apolipoprotein a-1", "apo a-1"],
+    "category": "Cardiac",
+    "description": "Apolipoprotein A1 — main protein of HDL; higher is cardioprotective. Optimal 1.4-1.8 g/L; clinical >1.2 g/L.",
+    "default_unit": "g/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 1.4, "optimal_max": 1.8,
+    "sufficient_min": 1.2, "sufficient_max": 2.0,
+    "unit_conversions": {"g/L": {"mg/dL": 100.0}, "mg/dL": {"g/L": 0.01}}
+  },
+  {
+    "name": "Troponin I",
+    "loinc_code": "49563-7",
+    "aliases": ["troponin i", "trop i", "tnl", "cardiac troponin i", "hs troponin i", "high sensitivity troponin i"],
+    "category": "Cardiac",
+    "description": "High-sensitivity cardiac Troponin I. Elevated indicates myocardial injury. Optimal 0-14 ng/L; clinical upper limit ~52 ng/L.",
+    "default_unit": "ng/L",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 14,
+    "sufficient_min": 0, "sufficient_max": 52,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Troponin T",
+    "loinc_code": "6597-9",
+    "aliases": ["troponin t", "trop t", "tnt", "cardiac troponin t", "hs troponin t", "high sensitivity troponin t", "hstnt"],
+    "category": "Cardiac",
+    "description": "High-sensitivity cardiac Troponin T. Optimal 0-9 ng/L; clinical upper limit 14 ng/L.",
+    "default_unit": "ng/L",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 9,
+    "sufficient_min": 0, "sufficient_max": 14,
+    "unit_conversions": {}
+  },
+  {
+    "name": "BNP",
+    "loinc_code": "30449-7",
+    "aliases": ["bnp", "b-type natriuretic peptide", "brain natriuretic peptide", "b natriuretic peptide"],
+    "category": "Cardiac",
+    "description": "B-type natriuretic peptide — marker of cardiac stress and heart failure. Optimal <40 pg/mL; clinical normal <100 pg/mL.",
+    "default_unit": "pg/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 40,
+    "sufficient_min": 0, "sufficient_max": 100,
+    "unit_conversions": {}
+  },
+  {
+    "name": "NT-proBNP",
+    "loinc_code": "33762-6",
+    "aliases": ["nt-probnp", "nt probnp", "n-terminal probnp", "proBNP", "n terminal pro b-type natriuretic peptide"],
+    "category": "Cardiac",
+    "description": "N-terminal pro-BNP — marker of cardiac stress. Optimal <75 pg/mL; clinical normal <125 pg/mL (age-dependent).",
+    "default_unit": "pg/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 75,
+    "sufficient_min": 0, "sufficient_max": 125,
+    "unit_conversions": {}
+  },
+  {
+    "name": "IL-6",
+    "loinc_code": "26881-3",
+    "aliases": ["il-6", "il6", "interleukin 6", "interleukin-6", "il 6"],
+    "category": "Inflammation",
+    "description": "Interleukin-6 — pro-inflammatory cytokine. Elevated in infection, inflammation, autoimmune disease. Optimal <2 pg/mL; clinical <7 pg/mL.",
+    "default_unit": "pg/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 2,
+    "sufficient_min": 0, "sufficient_max": 7,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Direct Bilirubin",
+    "loinc_code": "1968-8",
+    "aliases": ["direct bilirubin", "conjugated bilirubin", "direct bili", "bilirubin direct", "bilirubin conjugated"],
+    "category": "Liver",
+    "description": "Conjugated (direct) bilirubin. Elevated indicates hepatic obstruction or liver disease. Optimal 0-5 umol/L; clinical 0-7 umol/L.",
+    "default_unit": "umol/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 0, "optimal_max": 5,
+    "sufficient_min": 0, "sufficient_max": 7,
+    "unit_conversions": {"umol/L": {"mg/dL": 0.0585}, "mg/dL": {"umol/L": 17.1}}
+  },
+  {
+    "name": "LDH",
+    "loinc_code": "2532-0",
+    "aliases": ["ldh", "lactate dehydrogenase", "lactic dehydrogenase", "lactic acid dehydrogenase", "ld"],
+    "category": "Liver",
+    "description": "Lactate dehydrogenase — tissue damage marker. Optimal 140-220 U/L; clinical 140-280 U/L.",
+    "default_unit": "U/L",
+    "alternate_units": [],
+    "optimal_min": 140, "optimal_max": 220,
+    "sufficient_min": 140, "sufficient_max": 280,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Cystatin C",
+    "loinc_code": "33863-2",
+    "aliases": ["cystatin c", "cys c", "cystatin-c", "serum cystatin c"],
+    "category": "Metabolic",
+    "description": "Cystatin C — kidney function marker, less affected by muscle mass than creatinine. Optimal 0.51-0.80 mg/L; clinical 0.51-0.98 mg/L.",
+    "default_unit": "mg/L",
+    "alternate_units": [],
+    "optimal_min": 0.51, "optimal_max": 0.80,
+    "sufficient_min": 0.51, "sufficient_max": 0.98,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Microalbumin",
+    "loinc_code": "14957-5",
+    "aliases": ["microalbumin", "urine albumin", "albumin urine", "urinary albumin", "microalbuminuria"],
+    "category": "Metabolic",
+    "description": "Urine microalbumin — early marker of kidney damage. Optimal <15 mg/L; clinical normal <30 mg/L (microalbuminuria threshold).",
+    "default_unit": "mg/L",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 15,
+    "sufficient_min": 0, "sufficient_max": 30,
+    "unit_conversions": {}
+  },
+  {
+    "name": "UACR",
+    "loinc_code": "9318-7",
+    "aliases": ["uacr", "urine albumin creatinine ratio", "albumin creatinine ratio", "acr", "albumin to creatinine ratio"],
+    "category": "Metabolic",
+    "description": "Urine albumin-to-creatinine ratio — sensitive marker for diabetic nephropathy. Optimal <10 mg/g; clinical normal <30 mg/g.",
+    "default_unit": "mg/g",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 10,
+    "sufficient_min": 0, "sufficient_max": 30,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Lead (Blood)",
+    "loinc_code": "5671-3",
+    "aliases": ["lead", "blood lead", "lead level", "pb", "serum lead", "lead blood"],
+    "category": "Heavy Metals",
+    "description": "Blood lead level. No safe level — lower is better. Optimal <0.10 umol/L (<2 ug/dL); action level >0.24 umol/L (>5 ug/dL).",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/dL"],
+    "optimal_min": 0, "optimal_max": 0.10,
+    "sufficient_min": 0, "sufficient_max": 0.24,
+    "unit_conversions": {"umol/L": {"ug/dL": 20.72}, "ug/dL": {"umol/L": 0.04826}}
+  },
+  {
+    "name": "Mercury (Blood)",
+    "loinc_code": "5695-2",
+    "aliases": ["mercury", "blood mercury", "mercury level", "hg", "serum mercury", "mercury blood"],
+    "category": "Heavy Metals",
+    "description": "Blood mercury level. Optimal <15 nmol/L (<3 ug/L); clinical normal <45 nmol/L (<9 ug/L).",
+    "default_unit": "nmol/L",
+    "alternate_units": ["ug/L"],
+    "optimal_min": 0, "optimal_max": 15,
+    "sufficient_min": 0, "sufficient_max": 45,
+    "unit_conversions": {"nmol/L": {"ug/L": 0.2006}, "ug/L": {"nmol/L": 4.985}}
+  },
+  {
+    "name": "Arsenic (Urine)",
+    "loinc_code": "5583-0",
+    "aliases": ["arsenic", "urine arsenic", "arsenic level", "as", "urinary arsenic", "arsenic urine"],
+    "category": "Heavy Metals",
+    "description": "Urine total arsenic. Optimal <0.13 umol/L (<10 ug/L); clinical normal <0.47 umol/L (<35 ug/L).",
+    "default_unit": "umol/L",
+    "alternate_units": ["ug/L"],
+    "optimal_min": 0, "optimal_max": 0.13,
+    "sufficient_min": 0, "sufficient_max": 0.47,
+    "unit_conversions": {"umol/L": {"ug/L": 74.9}, "ug/L": {"umol/L": 0.01334}}
+  },
+  {
+    "name": "Calprotectin",
+    "loinc_code": "48166-0",
+    "aliases": ["calprotectin", "fecal calprotectin", "faecal calprotectin", "stool calprotectin", "calprotectin fecal"],
+    "category": "Gut",
+    "description": "Fecal calprotectin — marker of intestinal inflammation. Elevated in IBD. Optimal <30 ug/g; clinical normal <50 ug/g.",
+    "default_unit": "ug/g",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 30,
+    "sufficient_min": 0, "sufficient_max": 50,
     "unit_conversions": {}
   }
 ]

@@ -230,6 +230,7 @@ class UserInfo(BaseModel):
     username: str
     role: str
     is_active: bool
+    sex: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -251,3 +252,8 @@ class CreateUserInput(BaseModel):
 class UpdateUserInput(BaseModel):
     is_active: Optional[bool] = None
     password: Optional[str] = None
+    sex: Optional[str] = None
+
+
+class UpdateProfileInput(BaseModel):
+    sex: Optional[str] = None

@@ -20,6 +20,7 @@ from app.schemas.schemas import (
     LoginInput,
     SetupInput,
     TokenResponse,
+    UpdateProfileInput,
     UserInfo,
 )
 
@@ -145,3 +146,18 @@ def change_password(
     current_user.hashed_password = hash_password(body.new_password)
     db.commit()
     return {"ok": True}
+
+
+@router.patch("/me/profile", response_model=UserInfo)
+def update_profile(
+    body: UpdateProfileInput,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    VALID_SEX = {"male", "female", "other", None}
+    if body.sex not in VALID_SEX:
+        raise HTTPException(status_code=422, detail="sex must be 'male', 'female', 'other', or null")
+    current_user.sex = body.sex
+    db.commit()
+    db.refresh(current_user)
+    return current_user
