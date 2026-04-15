@@ -93,6 +93,18 @@ def get_dashboard_summary(
         latest = results[0]
         zone = _compute_zone(latest.value, b)
 
+        trend_delta = None
+        trend_alert = False
+        if len(results) >= 2:
+            prev = results[1]
+            prev_zone = _compute_zone(prev.value, b)
+            if prev.value != 0:
+                trend_delta = round(((latest.value - prev.value) / abs(prev.value)) * 100, 1)
+            trend_alert = (
+                (trend_delta is not None and abs(trend_delta) >= 20)
+                or (prev_zone != zone)
+            )
+
         summaries.append(
             BiomarkerSummary(
                 biomarker=BiomarkerInfo(
@@ -111,6 +123,8 @@ def get_dashboard_summary(
                 latest_date=latest.report.sample_date if latest.report else None,
                 latest_zone=zone,
                 result_count=len(results),
+                trend_delta=trend_delta,
+                trend_alert=trend_alert,
             )
         )
 

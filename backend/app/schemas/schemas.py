@@ -75,6 +75,8 @@ class BiomarkerSummary(BaseModel):
     latest_date: Optional[date]
     latest_zone: str
     result_count: int
+    trend_delta: Optional[float] = None   # % change from previous result
+    trend_alert: bool = False             # True if delta ≥ 20% or zone changed
 
 
 # ── Review flow ────────────────────────────────────────────────────────────────

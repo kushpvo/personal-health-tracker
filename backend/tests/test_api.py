@@ -578,3 +578,37 @@ def test_reprocess_report_resets_status(client, test_db, create_user, auth_heade
     assert report.status == "pending"
 
     os.unlink(tmp_path)
+
+
+def test_dashboard_trend_alert_on_large_change(client, test_db, create_user, auth_headers):
+    from app.db.models import Report, ReportResult, Biomarker
+    from app.db.seed_loader import load_biomarkers
+    from datetime import datetime, date, timezone
+
+    load_biomarkers(test_db)
+    user = create_user()
+
+    for i, (d, val) in enumerate([("2024-01-01", 85.0), ("2024-06-01", 120.0)]):
+        r = Report(
+            filename=f"r{i}.pdf", original_filename=f"r{i}.pdf",
+            file_path=f"/tmp/r{i}.pdf", status="done",
+            uploaded_at=datetime.now(timezone.utc), sample_date=date.fromisoformat(d),
+            user_id=user.id,
+        )
+        test_db.add(r)
+        test_db.commit()
+        glucose = test_db.query(Biomarker).filter(Biomarker.name == "Glucose").first()
+        test_db.add(ReportResult(
+            report_id=r.id, biomarker_id=glucose.id,
+            raw_name="Glucose", value=val, unit="mg/dL",
+            is_flagged_unknown=False,
+        ))
+        test_db.commit()
+
+    resp = client.get("/api/biomarkers/summary", headers=auth_headers(user))
+    assert resp.status_code == 200
+    data = resp.json()
+    glucose_summary = next(s for s in data if s["biomarker"]["name"] == "Glucose")
+    assert glucose_summary["trend_alert"] is True
+    assert glucose_summary["trend_delta"] is not None
+    assert abs(glucose_summary["trend_delta"]) >= 20
