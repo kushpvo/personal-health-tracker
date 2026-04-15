@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Activity } from "lucide-react";
+import { Activity, FileDown } from "lucide-react";
 import { api } from "../lib/api";
 import type { BiomarkerSummary } from "../lib/api";
 import BiomarkerCard from "../components/BiomarkerCard";
@@ -11,6 +11,16 @@ const STATUS_ORDER: Zone[] = ["out_of_range", "sufficient", "optimal", "unknown"
 
 export default function Dashboard() {
   const [groupBy, setGroupBy] = useState<"category" | "status">("status");
+  const [exporting, setExporting] = useState(false);
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      await api.export.pdf();
+    } finally {
+      setExporting(false);
+    }
+  }
   const { data: summaries = [], isLoading: isLoadingSummaries } = useQuery({
     queryKey: ["biomarkers-summary"],
     queryFn: api.biomarkers.summary,
@@ -59,7 +69,16 @@ export default function Dashboard() {
             {parsedResultsCount} parsed results / {recognizedCount} recognized
           </p>
         </div>
-        <div className="flex rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden text-sm shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={handleExport}
+            disabled={exporting || summaries.length === 0}
+            className="flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-40"
+          >
+            <FileDown size={14} />
+            {exporting ? "Generating…" : "Export PDF"}
+          </button>
+        <div className="flex rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
           {(["category", "status"] as const).map((mode) => (
             <button
               key={mode}
@@ -73,6 +92,7 @@ export default function Dashboard() {
               {mode}
             </button>
           ))}
+        </div>
         </div>
       </div>
       <div className="space-y-8">
