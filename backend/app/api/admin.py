@@ -66,6 +66,11 @@ def update_user(
                 detail="Password must be at least 8 characters",
             )
         user.hashed_password = hash_password(body.password)
+    if body.sex is not None or "sex" in body.model_fields_set:
+        VALID_SEX = {"male", "female", "other", None}
+        if body.sex not in VALID_SEX:
+            raise HTTPException(status_code=422, detail="sex must be 'male', 'female', 'other', or null")
+        user.sex = body.sex
     db.commit()
     db.refresh(user)
     return user
