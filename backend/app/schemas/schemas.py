@@ -155,6 +155,59 @@ class ResolveUnknownInput(BaseModel):
     biomarker_id: int
 
 
+# ── Supplements ───────────────────────────────────────────────────────────────
+
+class SupplementDoseItem(BaseModel):
+    id: int
+    dose: float
+    started_on: date
+    ended_on: Optional[date] = None
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class SupplementLogItem(BaseModel):
+    id: int
+    name: str
+    unit: str
+    frequency: str
+    notes: Optional[str] = None
+    created_at: datetime
+    doses: List[SupplementDoseItem] = []
+
+    class Config:
+        from_attributes = True
+
+
+class CreateSupplementInput(BaseModel):
+    name: str
+    unit: str
+    frequency: str
+    dose: float
+    started_on: date
+    notes: Optional[str] = None
+
+
+class UpdateSupplementInput(BaseModel):
+    name: Optional[str] = None
+    unit: Optional[str] = None
+    frequency: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class AddDoseInput(BaseModel):
+    dose: float
+    started_on: date
+
+
+class UpdateDoseInput(BaseModel):
+    dose: Optional[float] = None
+    started_on: Optional[date] = None
+    ended_on: Optional[date] = None
+
+
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
 class TokenResponse(BaseModel):

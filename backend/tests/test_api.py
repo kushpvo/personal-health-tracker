@@ -628,8 +628,7 @@ def test_reprocess_report_resets_status(client, test_db, create_user, auth_heade
     test_db.refresh(report)
     assert report.status == "pending"
 
-
-os.unlink(tmp_path)
+    os.unlink(tmp_path)
 
 
 def test_list_reports_date_filter(client, test_db, create_user, auth_headers):

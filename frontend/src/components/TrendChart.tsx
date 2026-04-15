@@ -14,9 +14,34 @@ import type { BiomarkerInfo, ResultPoint } from "../lib/api";
 import { formatDate, zoneColor } from "../lib/utils";
 import type { Zone } from "../lib/utils";
 
+export interface SupplementPeriod {
+  supplementName: string;
+  supplementId: number;
+  dose: number;
+  unit: string;
+  started_on: string;   // YYYY-MM-DD
+  ended_on: string | null;
+}
+
+// 6 colors that don't clash with zone colors (#22c55e green, #06b6d4 cyan, #f97316 orange)
+const SUPP_PALETTE = ["#a855f7", "#ec4899", "#f59e0b", "#6366f1", "#14b8a6", "#84cc16"];
+
+function hashName(name: string): number {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function suppColor(name: string): string {
+  return SUPP_PALETTE[hashName(name) % SUPP_PALETTE.length];
+}
+
 interface Props {
   biomarker: BiomarkerInfo;
   results: ResultPoint[];
+  supplementPeriods?: SupplementPeriod[];
+  chartFromDate?: string | null;
+  chartToDate?: string | null;
 }
 
 interface ChartPoint {
@@ -63,7 +88,7 @@ function fmtTick(v: number): string {
   return parseFloat(v.toFixed(1)).toString();
 }
 
-export default function TrendChart({ biomarker, results }: Props) {
+export default function TrendChart({ biomarker, results, supplementPeriods = [], chartFromDate, chartToDate }: Props) {
   if (results.length === 0) {
     return <p className="text-sm text-gray-400">No data points yet.</p>;
   }
@@ -108,6 +133,16 @@ export default function TrendChart({ biomarker, results }: Props) {
     boundaryLines.push({ y: sufficient_max!, color: "#06b6d4" });
   }
 
+  // Clamp supplement period dates to the chart data domain
+  const today = new Date().toISOString().slice(0, 10);
+  const domainStart = chartFromDate ?? data[0]?.date ?? today;
+  const domainEnd = chartToDate ?? data[data.length - 1]?.date ?? today;
+
+  // Unique supplements for legend
+  const uniqueSupps = Array.from(
+    new Map(supplementPeriods.map((p) => [p.supplementId, p])).values()
+  );
+
   return (
     <div className="rounded-[28px] border border-slate-800/80 bg-[#050914] px-4 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
       {/* Legend */}
@@ -128,6 +163,18 @@ export default function TrendChart({ biomarker, results }: Props) {
               style={{ borderColor: zoneColor(zone), boxShadow: `0 0 12px ${zoneColor(zone)}55` }}
             />
             {label}
+          </span>
+        ))}
+        {uniqueSupps.map((p) => (
+          <span
+            key={p.supplementId}
+            className="flex items-center gap-2 rounded-full border border-white/6 bg-white/[0.03] px-3 py-1.5 text-slate-200"
+          >
+            <span
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: suppColor(p.supplementName), opacity: 0.8 }}
+            />
+            {p.supplementName}
           </span>
         ))}
       </div>
@@ -164,6 +211,26 @@ export default function TrendChart({ biomarker, results }: Props) {
               stroke="none"
             />
           )}
+
+          {/* Supplement overlays — vertical bands per dose period */}
+          {supplementPeriods.map((p, idx) => {
+            const x1 = p.started_on < domainStart ? domainStart : p.started_on;
+            const x2 = (p.ended_on ?? today) > domainEnd ? domainEnd : (p.ended_on ?? today);
+            const color = suppColor(p.supplementName);
+            return (
+              <ReferenceArea
+                key={`${p.supplementId}-${idx}`}
+                x1={x1}
+                x2={x2}
+                fill={color}
+                fillOpacity={0.15}
+                stroke={color}
+                strokeOpacity={0.3}
+                strokeWidth={1}
+                label={{ value: `${p.dose}${p.unit}`, position: "insideTop", fontSize: 9, fill: color }}
+              />
+            );
+          })}
 
           {/* Thin boundary lines at zone edges */}
           {boundaryLines.map(({ y, color }) => (
