@@ -6,7 +6,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
+from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker, User
 from app.services.ocr.base import OCRBackend
 from app.services.ocr.tesseract import TesseractBackend
 from app.services.preprocessor import prepare_images
@@ -21,18 +21,36 @@ def _get_ocr_backend() -> OCRBackend:
     raise ValueError(f"Unknown OCR_BACKEND: {backend_name}")
 
 
-def _match_biomarker(raw_name: str, db: Session) -> Optional[Biomarker]:
-    """Find a biomarker by matching raw_name against name and aliases."""
+def _match_biomarker(
+    raw_name: str, db: Session, user_sex: str | None = None
+) -> Optional[Biomarker]:
+    """
+    Two-pass biomarker lookup:
+    Pass 1: sex-specific match (if user_sex is 'male' or 'female')
+    Pass 2: neutral match (sex IS NULL)
+    """
     normalized = raw_name.lower().strip()
     normalized = re.sub(r"\s+", " ", normalized)
     simplified = re.sub(r"\s*\([^)]*\)", "", normalized).strip()
-    biomarkers = db.query(Biomarker).all()
-    for b in biomarkers:
-        names = [b.name.lower(), *(b.aliases or [])]
-        normalized_names = [re.sub(r"\s+", " ", name.strip().lower()) for name in names]
-        if normalized in normalized_names or simplified in normalized_names:
-            return b
-    return None
+
+    def _search(biomarkers):
+        for b in biomarkers:
+            names = [b.name.lower(), *(b.aliases or [])]
+            normalized_names = [re.sub(r"\s+", " ", n.strip().lower()) for n in names]
+            if normalized in normalized_names or simplified in normalized_names:
+                return b
+        return None
+
+    # Pass 1: sex-specific
+    if user_sex in ("male", "female"):
+        sex_specific = db.query(Biomarker).filter(Biomarker.sex == user_sex).all()
+        match = _search(sex_specific)
+        if match:
+            return match
+
+    # Pass 2: neutral (sex IS NULL)
+    neutral = db.query(Biomarker).filter(Biomarker.sex.is_(None)).all()
+    return _search(neutral)
 
 
 def _upsert_unknown(raw_name: str, raw_unit: str, db: Session) -> None:
@@ -59,6 +77,9 @@ def run_pipeline(report_id: int, db: Session) -> None:
     report = db.query(Report).filter(Report.id == report_id).first()
     if not report:
         return
+
+    _user = db.query(User).filter(User.id == report.user_id).first()
+    user_sex = _user.sex if _user else None
 
     report.status = "processing"
     db.commit()
@@ -95,7 +116,7 @@ def run_pipeline(report_id: int, db: Session) -> None:
             )
 
         for i, item in enumerate(parsed):
-            biomarker = _match_biomarker(item.raw_name, db)
+            biomarker = _match_biomarker(item.raw_name, db, user_sex=user_sex)
             is_unknown = biomarker is None
 
             if is_unknown:
