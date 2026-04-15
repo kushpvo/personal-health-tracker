@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { Activity, FileDown } from "lucide-react";
 import { api } from "../lib/api";
 import type { BiomarkerSummary } from "../lib/api";
@@ -39,8 +40,13 @@ export default function Dashboard() {
     queryKey: ["reports"],
     queryFn: () => api.reports.list(),
   });
+  const { data: me } = useQuery({
+    queryKey: ["me"],
+    queryFn: api.auth.me,
+  });
 
   const isLoading = isLoadingSummaries || isLoadingReports;
+  const needsSexForMatching = me != null && me.sex !== "male" && me.sex !== "female";
   const parsedResultsCount = reports.reduce((total: number, report) => total + report.result_count, 0);
   const recognizedCount = summaries.length;
 
@@ -72,6 +78,17 @@ export default function Dashboard() {
 
   return (
     <div>
+      {needsSexForMatching && (
+        <div className="mb-4 flex items-center justify-between rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-200">
+          <span>
+            Set your biological sex in{" "}
+            <Link to="/settings" className="font-medium underline">
+              Settings
+            </Link>{" "}
+            to get accurate matching for hormones and other sex-specific biomarkers. Matching is only sex-aware when set to Male or Female.
+          </span>
+        </div>
+      )}
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">Dashboard</h2>

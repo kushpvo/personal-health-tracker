@@ -24,6 +24,13 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] }),
   });
 
+  const updateSex = useMutation({
+    mutationFn: ({ id, sex }: { id: number; sex: string | null }) =>
+      api.admin.updateUser(id, { sex: sex as "male" | "female" | "other" | null }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] }),
+  });
+
   const resetPassword = useMutation({
     mutationFn: ({ id, password }: { id: number; password: string }) =>
       api.admin.updateUser(id, { password }),
@@ -70,6 +77,7 @@ export default function Admin() {
           <tr>
             <th className="px-4 py-2 text-left">Username</th>
             <th className="px-4 py-2 text-left">Role</th>
+            <th className="px-4 py-2 text-left">Sex</th>
             <th className="px-4 py-2 text-left">Status</th>
             <th className="px-4 py-2 text-left">Actions</th>
           </tr>
@@ -79,6 +87,21 @@ export default function Admin() {
             <tr key={u.id} className="border-t dark:border-gray-700">
               <td className="px-4 py-2">{u.username}</td>
               <td className="px-4 py-2 capitalize">{u.role}</td>
+              <td className="px-4 py-2">
+                <select
+                  value={u.sex ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updateSex.mutate({ id: u.id, sex: val === "" ? null : val });
+                  }}
+                  className="rounded border px-1 py-0.5 text-xs dark:bg-gray-800 dark:border-gray-600"
+                >
+                  <option value="">—</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </td>
               <td className="px-4 py-2">{u.is_active ? "Active" : "Inactive"}</td>
               <td className="flex gap-2 px-4 py-2">
                 <button

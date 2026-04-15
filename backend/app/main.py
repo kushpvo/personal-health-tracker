@@ -14,7 +14,7 @@ from app.api import export as export_router
 from app.api import unknowns as unknowns_router
 from app.api import supplements as supplements_router
 from app.db.database import Base, SessionLocal, engine
-from app.db.seed_loader import load_biomarkers
+from app.db.seed_loader import load_biomarkers, migrate_sex_specific_results
 
 
 @asynccontextmanager
@@ -28,6 +28,8 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE report_results ADD COLUMN human_matched BOOLEAN DEFAULT 0",
             "ALTER TABLE reports ADD COLUMN tags TEXT",
             "ALTER TABLE report_results ADD COLUMN notes TEXT",
+            "ALTER TABLE users ADD COLUMN sex TEXT",
+            "ALTER TABLE biomarkers ADD COLUMN sex TEXT",
         ]:
             try:
                 conn.execute(text(stmt))
@@ -38,6 +40,7 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         load_biomarkers(db)
+        migrate_sex_specific_results(db)
     finally:
         db.close()
     yield
