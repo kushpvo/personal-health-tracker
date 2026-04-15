@@ -252,7 +252,13 @@ export const api = {
       ),
   },
   reports: {
-    list: () => get<ReportListItem[]>("/reports"),
+    list: (params?: { from_date?: string; to_date?: string }) => {
+      const qs = new URLSearchParams();
+      if (params?.from_date) qs.set("from_date", params.from_date);
+      if (params?.to_date) qs.set("to_date", params.to_date);
+      const query = qs.toString();
+      return get<ReportListItem[]>(`/reports${query ? `?${query}` : ""}`);
+    },
     summary: (id: number) => get<BiomarkerSummary[]>(`/reports/${id}/summary`),
     status: (id: number) => get<ReportStatus>(`/reports/${id}/status`),
     results: (id: number) => get<ReportResultItem[]>(`/reports/${id}/results`),
@@ -326,7 +332,13 @@ export const api = {
       }),
   },
   biomarkers: {
-    summary: () => get<BiomarkerSummary[]>("/biomarkers/summary"),
+    summary: (params?: { search?: string; category?: string }) => {
+      const qs = new URLSearchParams();
+      if (params?.search) qs.set("search", params.search);
+      if (params?.category) qs.set("category", params.category);
+      const query = qs.toString();
+      return get<BiomarkerSummary[]>(`/biomarkers/summary${query ? `?${query}` : ""}`);
+    },
     detail: (id: number) => get<BiomarkerDetail>(`/biomarkers/${id}`),
     list: () => get<BiomarkerListItem[]>("/biomarkers/list"),
     changeDefaultUnit: (id: number, unit: string) =>

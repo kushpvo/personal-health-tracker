@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, Trash2, FileText, ClipboardEdit, RefreshCw } from "lucide-react";
@@ -15,9 +16,15 @@ const STATUS_BADGE: Record<string, string> = {
 export default function Reports() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   const { data: reports = [], isLoading } = useQuery({
-    queryKey: ["reports"],
-    queryFn: api.reports.list,
+    queryKey: ["reports", fromDate, toDate],
+    queryFn: () => api.reports.list({
+      from_date: fromDate || undefined,
+      to_date: toDate || undefined,
+    }),
   });
 
   async function handleDelete(id: number) {
@@ -38,11 +45,46 @@ export default function Reports() {
 
   if (isLoading) return <p className="text-sm text-gray-500">Loading…</p>;
 
+  const filterBar = (
+    <div className="flex flex-wrap gap-3 mb-6 items-end">
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1">From</label>
+        <input
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          className="rounded border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1">To</label>
+        <input
+          type="date"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+          className="rounded border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+        />
+      </div>
+      {(fromDate || toDate) && (
+        <button
+          onClick={() => { setFromDate(""); setToDate(""); }}
+          className="text-xs text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 pb-1"
+        >
+          Reset
+        </button>
+      )}
+    </div>
+  );
+
   if (reports.length === 0) {
     return (
-      <div className="text-center py-20">
-        <FileText size={40} className="mx-auto text-gray-300 dark:text-gray-700 mb-3" />
-        <p className="text-gray-500 dark:text-gray-400 text-sm">No reports uploaded yet.</p>
+      <div>
+        <h2 className="text-2xl font-bold mb-6">Reports</h2>
+        {filterBar}
+        <div className="text-center py-20">
+          <FileText size={40} className="mx-auto text-gray-300 dark:text-gray-700 mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 text-sm">No reports uploaded yet.</p>
+        </div>
       </div>
     );
   }
@@ -50,6 +92,7 @@ export default function Reports() {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">Reports</h2>
+      {filterBar}
       <div className="space-y-3">
         {reports.map((r: ReportListItem) => (
           <div

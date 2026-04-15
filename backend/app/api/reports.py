@@ -1,6 +1,8 @@
 import os
 import uuid
+from datetime import date as date_type
 from pathlib import Path
+from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
@@ -10,9 +12,14 @@ from app.core.auth import get_effective_user_id
 from app.db.database import get_db
 from app.db.models import Biomarker, Report, ReportResult, UnknownBiomarker
 from app.schemas.schemas import (
-    BiomarkerInfo, BiomarkerSummary,
-    ReportListItem, ReportResultItem, ReportStatus, ReportUploadResponse,
-    ReviewReportInput, NewResultInput,
+    BiomarkerInfo,
+    BiomarkerSummary,
+    ReportListItem,
+    ReportResultItem,
+    ReportStatus,
+    ReportUploadResponse,
+    ReviewReportInput,
+    NewResultInput,
 )
 from app.services.pipeline import run_pipeline
 from app.services.unit_converter import convert_to_default_unit
@@ -61,7 +68,9 @@ async def upload_report(
 
     content = await file.read()
     if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
-        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit.")
+        raise HTTPException(
+            status_code=413, detail=f"File exceeds {MAX_UPLOAD_MB} MB limit."
+        )
 
     stored_name = f"{uuid.uuid4()}{suffix}"
     file_path = os.path.join(_uploads_dir(), stored_name)
@@ -88,13 +97,15 @@ async def upload_report(
 def list_reports(
     db: Session = Depends(get_db),
     effective_user_id: int = Depends(get_effective_user_id),
+    from_date: Optional[date_type] = None,
+    to_date: Optional[date_type] = None,
 ):
-    reports = (
-        db.query(Report)
-        .filter(Report.user_id == effective_user_id)
-        .order_by(Report.uploaded_at.desc())
-        .all()
-    )
+    q = db.query(Report).filter(Report.user_id == effective_user_id)
+    if from_date:
+        q = q.filter(Report.sample_date >= from_date)
+    if to_date:
+        q = q.filter(Report.sample_date <= to_date)
+    reports = q.order_by(Report.uploaded_at.desc()).all()
     items = []
     for r in reports:
         count = db.query(ReportResult).filter(ReportResult.report_id == r.id).count()
@@ -288,9 +299,11 @@ def submit_review(
 
     # Delete removed rows
     for del_id in body.deleted_result_ids:
-        result = db.query(ReportResult).filter(
-            ReportResult.id == del_id, ReportResult.report_id == report_id
-        ).first()
+        result = (
+            db.query(ReportResult)
+            .filter(ReportResult.id == del_id, ReportResult.report_id == report_id)
+            .first()
+        )
         if result:
             db.delete(result)
 
@@ -304,7 +317,9 @@ def submit_review(
         result.unit = item.unit
 
         if item.biomarker_id and result.biomarker_id != item.biomarker_id:
-            biomarker = db.query(Biomarker).filter(Biomarker.id == item.biomarker_id).first()
+            biomarker = (
+                db.query(Biomarker).filter(Biomarker.id == item.biomarker_id).first()
+            )
             if biomarker:
                 converted_value, used_unit = convert_to_default_unit(
                     item.value, item.unit, biomarker
@@ -325,27 +340,35 @@ def submit_review(
 
     # Insert user-added rows
     for new_item in body.new_results:
-        biomarker = db.query(Biomarker).filter(Biomarker.id == new_item.biomarker_id).first()
+        biomarker = (
+            db.query(Biomarker).filter(Biomarker.id == new_item.biomarker_id).first()
+        )
         if not biomarker:
             continue
         converted_value, used_unit = convert_to_default_unit(
             new_item.value, new_item.unit, biomarker
         )
-        db.add(ReportResult(
-            report_id=report_id,
-            biomarker_id=biomarker.id,
-            raw_name=biomarker.name,
-            value=converted_value,
-            unit=used_unit,
-            is_flagged_unknown=False,
-            human_matched=True,
-        ))
+        db.add(
+            ReportResult(
+                report_id=report_id,
+                biomarker_id=biomarker.id,
+                raw_name=biomarker.name,
+                value=converted_value,
+                unit=used_unit,
+                is_flagged_unknown=False,
+                human_matched=True,
+            )
+        )
 
     for result_id, note_text in body.result_notes.items():
-        result = db.query(ReportResult).filter(
-            ReportResult.id == result_id,
-            ReportResult.report_id == report_id,
-        ).first()
+        result = (
+            db.query(ReportResult)
+            .filter(
+                ReportResult.id == result_id,
+                ReportResult.report_id == report_id,
+            )
+            .first()
+        )
         if result:
             result.notes = note_text
 

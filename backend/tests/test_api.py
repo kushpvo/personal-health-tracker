@@ -707,3 +707,32 @@ def test_dashboard_trend_alert_on_large_change(
     assert glucose_summary["trend_alert"] is True
     assert glucose_summary["trend_delta"] is not None
     assert abs(glucose_summary["trend_delta"]) >= 20
+
+
+def test_list_reports_date_filter(client, test_db, create_user, auth_headers):
+    from app.db.models import Report
+    from datetime import datetime, date, timezone
+
+    user = create_user()
+    for d in ["2024-01-15", "2024-06-15", "2025-01-15"]:
+        test_db.add(
+            Report(
+                filename=f"{d}.pdf",
+                original_filename=f"{d}.pdf",
+                file_path=f"/tmp/{d}.pdf",
+                status="done",
+                uploaded_at=datetime.now(timezone.utc),
+                sample_date=date.fromisoformat(d),
+                user_id=user.id,
+            )
+        )
+    test_db.commit()
+
+    resp = client.get(
+        "/api/reports?from_date=2024-01-01&to_date=2024-12-31",
+        headers=auth_headers(user),
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 2
+    assert all("2024" in (r["sample_date"] or "") for r in data)
