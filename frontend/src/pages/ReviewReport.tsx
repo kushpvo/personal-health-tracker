@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Trash2, Plus } from "lucide-react";
 import { api } from "../lib/api";
-import type { BiomarkerListItem, ReportListItem, ReportResultItem } from "../lib/api";
+import type { BiomarkerListItem, ReportListItem } from "../lib/api";
 
 const COMMON_UNITS = [
   "g/L", "g/dL", "mg/dL", "mg/L", "mmol/L", "umol/L", "nmol/L", "pmol/L",
@@ -73,18 +73,20 @@ export default function ReviewReport() {
   const [resultNotes, setResultNotes] = useState<Record<number, string>>({});
   const [saving, setSaving] = useState(false);
 
+const initialized = useRef(false);
   useEffect(() => {
-    if (rawResults && drafts.length === 0) {
+    if (!initialized.current && rawResults) {
+      initialized.current = true;
       setDrafts(
-        rawResults.map((r: ReportResultItem) => ({
+        rawResults.map((r) => ({
           id: r.id,
           raw_name: r.raw_name,
           is_flagged_unknown: r.is_flagged_unknown,
           biomarker_id: r.biomarker_id,
           draftValue: String(r.value),
           draftUnit: r.unit,
-          draftBiomarkerId: null,
-          draftBiomarkerName: null,
+          draftBiomarkerId: r.biomarker_id,
+          draftBiomarkerName: r.biomarker_name,
           valueError: null,
           isNew: false,
         }))
@@ -97,10 +99,14 @@ export default function ReviewReport() {
     }
   }, [rawResults]);
 
+  // Initialize draftTitle, draftDate, tags from report
   useEffect(() => {
-    if (report && !draftTitle) setDraftTitle(report.report_name ?? report.original_filename);
-    if (report && !draftDate) setDraftDate(report.sample_date ?? "");
-    if (report && !tags) setTags(report.tags ?? "");
+    if (report) {
+      if (!draftTitle) setDraftTitle(report.report_name ?? report.original_filename);
+      if (!draftDate) setDraftDate(report.sample_date ?? "");
+      if (!tags) setTags(report.tags ?? "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report]);
 
   const byCategory = useMemo(() => {

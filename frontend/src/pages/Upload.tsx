@@ -19,8 +19,8 @@ export default function Upload() {
       const { id } = await api.reports.upload(file);
       setReportId(id);
       setStage("processing");
-    } catch (e: any) {
-      setError(e.message ?? "Upload failed");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Upload failed");
       setStage("failed");
     }
   }

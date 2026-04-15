@@ -27,15 +27,22 @@ interface ChartPoint {
   unit: string;
 }
 
-function CustomDot(props: any) {
+import type { DotProps } from "recharts";
+
+function CustomDot(props: DotProps & { payload?: ChartPoint }) {
   const { cx, cy, payload } = props;
-  const color = zoneColor(payload.zone);
+  const color = payload ? zoneColor(payload.zone) : "#0b1020";
   return (
     <Dot cx={cx} cy={cy} r={6} fill="#0b1020" stroke={color} strokeWidth={3} />
   );
 }
 
-function CustomTooltip({ active, payload }: any) {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: ChartPoint }>;
+}
+
+function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
   const p: ChartPoint = payload[0].payload;
   return (
