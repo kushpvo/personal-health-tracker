@@ -95,6 +95,16 @@ export interface ReviewReportInput {
   deleted_result_ids?: number[];
 }
 
+export interface UnknownBiomarkerItem {
+  id: number;
+  raw_name: string;
+  raw_unit: string | null;
+  times_seen: number;
+  first_seen_at: string;
+  last_seen_at: string;
+  resolved_biomarker_id: number | null;
+}
+
 export interface UserInfo {
   id: number;
   username: string;
@@ -230,6 +240,11 @@ export const api = {
       URL.revokeObjectURL(url);
     },
     delete: (id: number) => authFetch(`/reports/${id}`, { method: "DELETE" }),
+    reprocess: (id: number) =>
+      authFetch(`/reports/${id}/reprocess`, { method: "POST" }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<{ id: number; status: string }>;
+      }),
     upload: (file: File) => {
       const form = new FormData();
       form.append("file", file);
@@ -258,6 +273,18 @@ export const api = {
       link.remove();
       URL.revokeObjectURL(url);
     },
+  },
+  unknowns: {
+    list: () => get<UnknownBiomarkerItem[]>("/unknowns"),
+    resolve: (id: number, biomarker_id: number) =>
+      authFetch(`/unknowns/${id}/resolve`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ biomarker_id }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail ?? "Failed");
+        return r.json() as Promise<UnknownBiomarkerItem>;
+      }),
   },
   biomarkers: {
     summary: () => get<BiomarkerSummary[]>("/biomarkers/summary"),

@@ -130,6 +130,25 @@ class ChangeDefaultUnitInput(BaseModel):
     unit: str
 
 
+# ── Unknowns ──────────────────────────────────────────────────────────────────
+
+class UnknownBiomarkerItem(BaseModel):
+    id: int
+    raw_name: str
+    raw_unit: Optional[str]
+    times_seen: int
+    first_seen_at: datetime
+    last_seen_at: datetime
+    resolved_biomarker_id: Optional[int]
+
+    class Config:
+        from_attributes = True
+
+
+class ResolveUnknownInput(BaseModel):
+    biomarker_id: int
+
+
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
 class TokenResponse(BaseModel):
