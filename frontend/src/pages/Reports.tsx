@@ -114,6 +114,18 @@ export default function Reports() {
                 Sampled {formatDate(r.sample_date)} · Uploaded {formatDate(r.uploaded_at)} ·{" "}
                 {r.result_count} biomarkers
               </p>
+              {r.tags && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {r.tags.split(",").map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                    >
+                      {tag.trim()}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span

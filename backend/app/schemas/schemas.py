@@ -25,6 +25,7 @@ class ReportListItem(BaseModel):
     uploaded_at: datetime
     status: str
     result_count: int
+    tags: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -91,6 +92,7 @@ class ReportResultItem(BaseModel):
     sort_order: Optional[int]
     biomarker_id: Optional[int]
     biomarker_name: Optional[str]
+    notes: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -115,6 +117,8 @@ class ReviewReportInput(BaseModel):
     results: List[ReviewResultInput]
     new_results: List[NewResultInput] = []
     deleted_result_ids: List[int] = []
+    tags: Optional[str] = None
+    result_notes: dict[int, str] = {}
 
 
 class BiomarkerListItem(BaseModel):

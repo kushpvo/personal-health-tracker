@@ -7,9 +7,16 @@ A self-hosted app for tracking blood work and lab results over time. Upload PDF 
 - **OCR extraction** — upload a PDF or image of any lab report; Tesseract reads the values automatically
 - **Review & correct** — edit misread values, relink biomarkers, add or remove rows before saving
 - **Trend charts** — plot any biomarker over time with optimal/sufficient/out-of-range zone bands
+- **Trend alerts** — biomarkers with ≥20% change or zone crossing are flagged on the dashboard
 - **71 built-in biomarkers** across CBC, Lipids, Metabolic, Hormones, Thyroid, Vitamins, Liver, Iron Studies, Inflammation, Minerals, Coagulation, and Cancer Markers panels
 - **Unit switching** — change a biomarker's display unit (e.g. mg/dL ↔ mmol/L) and all historical values convert retroactively
 - **Multi-user** — each user sees only their own data; admin can manage users and impersonate accounts
+- **Search & filter** — filter reports by date range; search and filter biomarkers by name or category
+- **Report tags & notes** — tag reports (e.g. "Annual Physical") and add notes to individual results
+- **Re-run OCR** — reprocess any report to re-run the OCR pipeline
+- **Unknown biomarker resolution** — link unrecognized OCR names to known biomarkers for automatic matching
+- **PDF export** — export latest biomarker results as a downloadable PDF
+- **Dark mode** — toggle dark/light theme with preference persisted to localStorage
 
 ## Running with Docker (recommended)
 
@@ -54,11 +61,26 @@ The Vite dev server proxies `/api` requests to the backend on port 8080.
 | Layer | Technology |
 |-------|-----------|
 | Backend | Python 3.12, FastAPI, SQLAlchemy, SQLite |
-| Auth | JWT (python-jose), bcrypt (passlib) |
+| Auth | JWT (python-jose), bcrypt (passlib), refresh tokens with httpOnly cookies |
 | OCR | Tesseract 4 via pytesseract, pdf2image, OpenCV |
 | Frontend | React 19, TypeScript, Vite, TanStack Query |
 | Styling | Tailwind CSS |
 | Charts | Recharts |
+| PDF generation | reportlab |
+
+## Authentication
+
+The app uses short-lived access tokens (15 minutes) with long-lived refresh tokens (30 days). Refresh tokens are stored as httpOnly cookies and automatically refreshed by the frontend on 401 responses. The `/api/auth/refresh` endpoint handles token refresh, and `/api/auth/logout` revokes the refresh token.
+
+## Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SECRET_KEY` | (required) | Key for signing JWTs |
+| `DATA_DIR` | `./data` | Directory for SQLite DB and uploaded files |
+| `ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:8080` | CORS allowlist |
+| `MAX_UPLOAD_MB` | `50` | Max upload size in MB |
+| `OCR_BACKEND` | `tesseract` | OCR backend (only tesseract supported) |
 
 ## Adding biomarkers
 
