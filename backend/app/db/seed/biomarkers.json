@@ -1829,5 +1829,101 @@
     "optimal_min": 25, "optimal_max": 35,
     "sufficient_min": 12, "sufficient_max": 42,
     "unit_conversions": {"umol/L": {"mg/L": 0.4306}, "mg/L": {"umol/L": 2.322}}
+  },
+  {
+    "name": "Lp(a)",
+    "loinc_code": "10190-7",
+    "aliases": ["lp(a)", "lpa", "lipoprotein a", "lipoprotein(a)", "lp a"],
+    "category": "Cardiac",
+    "description": "Lipoprotein(a) — independent cardiovascular risk marker. Lower is better. Optimal <30 nmol/L; intermediate risk 30-75 nmol/L; high risk >125 nmol/L.",
+    "default_unit": "nmol/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 0, "optimal_max": 30,
+    "sufficient_min": 0, "sufficient_max": 75,
+    "unit_conversions": {"nmol/L": {"mg/dL": 0.4}, "mg/dL": {"nmol/L": 2.5}}
+  },
+  {
+    "name": "ApoB",
+    "loinc_code": "1884-7",
+    "aliases": ["apob", "apo b", "apolipoprotein b", "apolipoprotein b-100", "apo b-100"],
+    "category": "Cardiac",
+    "description": "Apolipoprotein B — key marker of atherogenic particle number. Optimal <0.8 g/L; clinical <1.0 g/L.",
+    "default_unit": "g/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 0.0, "optimal_max": 0.8,
+    "sufficient_min": 0.0, "sufficient_max": 1.0,
+    "unit_conversions": {"g/L": {"mg/dL": 100.0}, "mg/dL": {"g/L": 0.01}}
+  },
+  {
+    "name": "ApoA1",
+    "loinc_code": "1869-8",
+    "aliases": ["apoa1", "apo a1", "apolipoprotein a1", "apolipoprotein a-1", "apo a-1"],
+    "category": "Cardiac",
+    "description": "Apolipoprotein A1 — main protein of HDL; higher is cardioprotective. Optimal 1.4-1.8 g/L; clinical >1.2 g/L.",
+    "default_unit": "g/L",
+    "alternate_units": ["mg/dL"],
+    "optimal_min": 1.4, "optimal_max": 1.8,
+    "sufficient_min": 1.2, "sufficient_max": 2.0,
+    "unit_conversions": {"g/L": {"mg/dL": 100.0}, "mg/dL": {"g/L": 0.01}}
+  },
+  {
+    "name": "Troponin I",
+    "loinc_code": "49563-7",
+    "aliases": ["troponin i", "trop i", "tnl", "cardiac troponin i", "hs troponin i", "high sensitivity troponin i"],
+    "category": "Cardiac",
+    "description": "High-sensitivity cardiac Troponin I. Elevated indicates myocardial injury. Optimal 0-14 ng/L; clinical upper limit ~52 ng/L.",
+    "default_unit": "ng/L",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 14,
+    "sufficient_min": 0, "sufficient_max": 52,
+    "unit_conversions": {}
+  },
+  {
+    "name": "Troponin T",
+    "loinc_code": "6597-9",
+    "aliases": ["troponin t", "trop t", "tnt", "cardiac troponin t", "hs troponin t", "high sensitivity troponin t", "hstnt"],
+    "category": "Cardiac",
+    "description": "High-sensitivity cardiac Troponin T. Optimal 0-9 ng/L; clinical upper limit 14 ng/L.",
+    "default_unit": "ng/L",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 9,
+    "sufficient_min": 0, "sufficient_max": 14,
+    "unit_conversions": {}
+  },
+  {
+    "name": "BNP",
+    "loinc_code": "30449-7",
+    "aliases": ["bnp", "b-type natriuretic peptide", "brain natriuretic peptide", "b natriuretic peptide"],
+    "category": "Cardiac",
+    "description": "B-type natriuretic peptide — marker of cardiac stress and heart failure. Optimal <40 pg/mL; clinical normal <100 pg/mL.",
+    "default_unit": "pg/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 40,
+    "sufficient_min": 0, "sufficient_max": 100,
+    "unit_conversions": {}
+  },
+  {
+    "name": "NT-proBNP",
+    "loinc_code": "33762-6",
+    "aliases": ["nt-probnp", "nt probnp", "n-terminal probnp", "proBNP", "n terminal pro b-type natriuretic peptide"],
+    "category": "Cardiac",
+    "description": "N-terminal pro-BNP — marker of cardiac stress. Optimal <75 pg/mL; clinical normal <125 pg/mL (age-dependent).",
+    "default_unit": "pg/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 75,
+    "sufficient_min": 0, "sufficient_max": 125,
+    "unit_conversions": {}
+  },
+  {
+    "name": "IL-6",
+    "loinc_code": "26881-3",
+    "aliases": ["il-6", "il6", "interleukin 6", "interleukin-6", "il 6"],
+    "category": "Inflammation",
+    "description": "Interleukin-6 — pro-inflammatory cytokine. Elevated in infection, inflammation, autoimmune disease. Optimal <2 pg/mL; clinical <7 pg/mL.",
+    "default_unit": "pg/mL",
+    "alternate_units": [],
+    "optimal_min": 0, "optimal_max": 2,
+    "sufficient_min": 0, "sufficient_max": 7,
+    "unit_conversions": {}
   }
 ]
