@@ -1,4 +1,4 @@
-import { clearTokens, getToken } from "./auth";
+import { clearTokens, getToken, setToken } from "./auth";
 
 const BASE = "/api";
 
@@ -38,6 +38,8 @@ export interface BiomarkerSummary {
   latest_date: string | null;
   latest_zone: "optimal" | "sufficient" | "out_of_range" | "unknown";
   result_count: number;
+  trend_delta: number | null;
+  trend_alert: boolean;
 }
 
 export interface ResultPoint {
@@ -126,15 +128,48 @@ function authHeaders(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+let _refreshing: Promise<boolean> | null = null;
+
+async function tryRefresh(): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    setToken(data.access_token);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function authFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       ...authHeaders(),
       ...((init.headers as Record<string, string> | undefined) ?? {}),
     },
   });
+
   if (res.status === 401) {
+    if (!_refreshing) {
+      _refreshing = tryRefresh().finally(() => { _refreshing = null; });
+    }
+    const refreshed = await _refreshing;
+    if (refreshed) {
+      return fetch(`${BASE}${path}`, {
+        ...init,
+        credentials: "include",
+        headers: {
+          ...authHeaders(),
+          ...((init.headers as Record<string, string> | undefined) ?? {}),
+        },
+      });
+    }
     clearTokens();
     window.location.href = "/login";
     throw new Error("Unauthorized");

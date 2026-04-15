@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
 import { api } from "../lib/api";
 import {
-  clearTokens,
   getImpersonatedUsername,
   getToken,
   isImpersonating,
+  logout,
   parseToken,
   stopImpersonation,
 } from "../lib/auth";
@@ -42,8 +42,7 @@ export default function Layout() {
   const impersonatedUsername = getImpersonatedUsername();
 
   function handleLogout() {
-    clearTokens();
-    navigate("/login", { replace: true });
+    logout().then(() => navigate("/login", { replace: true }));
   }
 
   function handleExitImpersonation() {
