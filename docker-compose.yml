@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    image: personal-health-tracker:latest
+    image: ghcr.io/kushpvo/personal-health-tracker:latest
     container_name: health-tracker
     ports:
       - "8080:8080"
