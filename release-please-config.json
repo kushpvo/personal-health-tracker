@@ -2,7 +2,8 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "personal-health-tracker"
+      "package-name": "personal-health-tracker",
+      "include-component-in-tag": false
     }
   }
 }
