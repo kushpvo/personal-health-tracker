@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Activity, AlertCircle, FileText, LogOut, Moon, Pill, Settings, Shield, Sun, Upload } from "lucide-react";
+import { Activity, AlertCircle, ChevronLeft, ChevronRight, FileText, LogOut, Moon, Pill, Settings, Shield, Sun, Upload } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
 import { api } from "../lib/api";
@@ -18,6 +18,15 @@ export default function Layout() {
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
+  const [isCollapsed, setIsCollapsed] = useState(
+    localStorage.getItem("sidebarCollapsed") === "true"
+  );
+
+  function handleCollapseToggle() {
+    const next = !isCollapsed;
+    setIsCollapsed(next);
+    localStorage.setItem("sidebarCollapsed", String(next));
+  }
 
   function handleThemeToggle() {
     const next = !isDark;
@@ -76,24 +85,40 @@ export default function Layout() {
         </div>
       )}
       <div className="flex flex-1">
-        <aside className="flex w-56 shrink-0 flex-col border-r border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
-          <div className="px-5 py-6">
-            <h1 className="text-lg font-semibold tracking-tight">Lab Tracker</h1>
-            {payload && (
-              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                {payload.role === "admin" ? "Admin" : "User"}
-              </p>
+        <aside className={cn(
+          "flex shrink-0 flex-col border-r border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900 transition-all duration-200",
+          isCollapsed ? "w-14" : "w-56"
+        )}>
+          <div className={cn("flex items-center py-6", isCollapsed ? "justify-center px-0" : "justify-between px-5")}>
+            {!isCollapsed && (
+              <div>
+                <h1 className="text-lg font-semibold tracking-tight">Lab Tracker</h1>
+                {payload && (
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    {payload.role === "admin" ? "Admin" : "User"}
+                  </p>
+                )}
+              </div>
             )}
+            <button
+              onClick={handleCollapseToggle}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700"
+            >
+              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
           </div>
-          <nav className="flex-1 space-y-1 px-3">
+          <nav className="flex-1 space-y-1 px-2">
             {navItems.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
+                title={isCollapsed ? label : undefined}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isCollapsed ? "justify-center gap-0" : "gap-3",
                     isActive
                       ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
                       : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
@@ -101,24 +126,32 @@ export default function Layout() {
                 }
               >
                 <Icon size={16} />
-                {label}
+                {!isCollapsed && label}
               </NavLink>
             ))}
           </nav>
-          <div className="px-3 pb-4 space-y-1">
+          <div className="px-2 pb-4 space-y-1">
             <button
               onClick={handleThemeToggle}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+              title={isCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}
+              className={cn(
+                "flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800",
+                isCollapsed ? "justify-center gap-0" : "gap-3"
+              )}
             >
               {isDark ? <Sun size={16} /> : <Moon size={16} />}
-              {isDark ? "Light mode" : "Dark mode"}
+              {!isCollapsed && (isDark ? "Light mode" : "Dark mode")}
             </button>
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+              title={isCollapsed ? "Log out" : undefined}
+              className={cn(
+                "flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800",
+                isCollapsed ? "justify-center gap-0" : "gap-3"
+              )}
             >
               <LogOut size={16} />
-              Log out
+              {!isCollapsed && "Log out"}
             </button>
           </div>
         </aside>
