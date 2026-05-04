@@ -44,8 +44,8 @@ def test_dashboard_summary_with_data(client, test_db, create_user, auth_headers)
         report_id=report.id,
         biomarker_id=chol.id,
         raw_name="Total Cholesterol",
-        value=183.0,
-        unit="mg/dL",
+        value=4.5,
+        unit="mmol/L",
         is_flagged_unknown=False,
     )
     test_db.add(result)
@@ -56,8 +56,8 @@ def test_dashboard_summary_with_data(client, test_db, create_user, auth_headers)
     data = response.json()
     assert len(data) == 1
     assert data[0]["biomarker"]["name"] == "Total Cholesterol"
-    assert data[0]["latest_value"] == 183.0
-    # 183 is in sufficient range (150-199), not optimal (100-149)
+    assert data[0]["latest_value"] == 4.5
+    # 4.5 mmol/L is in sufficient range (3.88-5.15), not optimal (2.59-3.85)
     assert data[0]["latest_zone"] == "sufficient"
 
 
@@ -313,9 +313,9 @@ def test_submit_review_triggers_unit_conversion(
     )
 
     test_db.refresh(result)
-    # 5.6 mmol/L * 38.67 = 216.552 mg/dL
-    assert result.unit == "mg/dL"
-    assert abs(result.value - 216.552) < 0.01
+    # default_unit is mmol/L, so 5.6 mmol/L is stored as-is
+    assert result.unit == "mmol/L"
+    assert abs(result.value - 5.6) < 0.01
 
 
 def test_change_default_unit_success(client, test_db, create_user, auth_headers):
@@ -344,8 +344,8 @@ def test_change_default_unit_success(client, test_db, create_user, auth_headers)
         report_id=report.id,
         biomarker_id=chol.id,
         raw_name="Total Cholesterol",
-        value=200.0,
-        unit="mg/dL",
+        value=5.0,
+        unit="mmol/L",
         is_flagged_unknown=False,
         sort_order=0,
     )
@@ -355,20 +355,20 @@ def test_change_default_unit_success(client, test_db, create_user, auth_headers)
 
     resp = client.patch(
         f"/api/biomarkers/{chol.id}/default-unit",
-        json={"unit": "mmol/L"},
+        json={"unit": "mg/dL"},
         headers=auth_headers(user),
     )
     assert resp.status_code == 200
     data = resp.json()
-    assert data["default_unit"] == "mmol/L"
+    assert data["default_unit"] == "mg/dL"
 
     test_db.refresh(chol)
     test_db.refresh(result)
-    # 200 mg/dL * 0.02586 = 5.172 mmol/L
-    assert result.unit == "mmol/L"
-    assert abs(result.value - 5.172) < 0.01
-    assert chol.default_unit == "mmol/L"
-    assert chol.optimal_min is not None and chol.optimal_min < 10  # was ~100 mg/dL
+    # 5.0 mmol/L * 38.67 = 193.35 mg/dL
+    assert result.unit == "mg/dL"
+    assert abs(result.value - 193.35) < 0.01
+    assert chol.default_unit == "mg/dL"
+    assert chol.optimal_min is not None and chol.optimal_min > 10  # was ~3.85 mmol/L
 
 
 def test_change_default_unit_invalid_unit(client, test_db, create_user, auth_headers):
