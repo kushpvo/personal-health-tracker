@@ -50,7 +50,7 @@ BIOMARKER_WITH_PAREN_RANGE = re.compile(
     r"(?P<unit>[A-Za-z%µu£][A-Za-z0-9/%µu·\^\-]*)"
     r"\s+"
     r"\([<>]?\s*\d*\.?\d+\s*(?:[-–]\s*[<>]?\s*\d*\.?\d+)?\)"
-    r"(?:\s+\S+)?"
+    r"(?:\s+\S+)*"
     r"\s*$",
     re.IGNORECASE,
 )
@@ -113,6 +113,8 @@ def _normalize_ocr_unit(raw_unit: str) -> str:
     unit = unit.replace("xl0", "x10")
     # OCR reads superscript exponent marker: x10^9/L → x1049/L (^ read as 4)
     unit = re.sub(r"x104(\d)", r"x10^\1", unit)
+    # OCR misreads 'L' as 'H': fH → fL (femtoliters)
+    unit = unit.replace("fH", "fL")
     return unit
 
 
@@ -124,8 +126,9 @@ def _normalize_table_line(line: str) -> str:
     normalized = re.sub(r"\s+", " ", normalized).strip()
     # Strip trailing punctuation/backslash artifacts left after delimiter removal
     normalized = normalized.rstrip(" .,\\")
-    # OCR misreads '!' as '1'; remove the spurious '1' between a numeric value and a unit
-    normalized = re.sub(r"(\d) 1 ([A-Za-z%])", r"\1 \2", normalized)
+    # OCR misreads '!' as '1'; remove the spurious '1' between a numeric value and a unit.
+    # Capture the full number (not just one digit) so values ending in '1' aren't truncated.
+    normalized = re.sub(r"(\d+\.?\d*) 1 ([A-Za-z%])", r"\1 \2", normalized)
     return normalized
 
 

@@ -101,6 +101,8 @@ SAMPLE_MEDDBASE = """
 ' Globulins ' 27 1 g/L ' (23-35) 1 !
 ' TSH ' 13.80 ' mIU/L ' (0.27-4.20) 'HH
 ' Vitamin D ' 76 ' nmol/L ' (50-175) 1
+' MCH ' 30.1 1 pg ' (27-34) 1 !
+' Platelets ' 419 1 xl0^9/L ! (150-410) 1 H
 """
 
 
@@ -127,15 +129,24 @@ def test_extract_biomarkers_meddbase_format():
     assert "vitamin d" in by_name
     assert by_name["vitamin d"].value == pytest.approx(76.0)
 
+    assert "mch" in by_name
+    assert by_name["mch"].value == pytest.approx(30.1)
+    assert by_name["mch"].unit == "pg"
+
+    assert "platelets" in by_name
+    assert by_name["platelets"].value == pytest.approx(419.0)
+
 
 def test_extract_biomarkers_normalizes_common_ocr_unit_errors():
     text = """
     MCV 94.4 ( 81-101 ) £L
     Platelets 419 H ( 150-410 ) xl0e9/L
+    MCH 30.1 ( 27-34 ) fH
     """
 
     results = extract_biomarkers(text)
 
-    assert len(results) == 2
+    assert len(results) == 3
     assert results[0].unit == "fL"
     assert results[1].unit == "x10e9/L"
+    assert results[2].unit == "fL"
