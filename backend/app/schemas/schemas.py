@@ -257,3 +257,10 @@ class UpdateUserInput(BaseModel):
 
 class UpdateProfileInput(BaseModel):
     sex: Optional[str] = None
+
+
+# ── Export ────────────────────────────────────────────────────────────────────
+
+class CustomExportInput(BaseModel):
+    biomarker_ids: List[int] = []
+    supplement_ids: List[int] = []

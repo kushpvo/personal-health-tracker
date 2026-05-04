@@ -14,6 +14,7 @@ import ReportDashboard from "./pages/ReportDashboard";
 import ReviewReport from "./pages/ReviewReport";
 import UnknownBiomarkers from "./pages/UnknownBiomarkers";
 import Supplements from "./pages/Supplements";
+import ExportPage from "./pages/ExportPage";
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="unknown-biomarkers" element={<UnknownBiomarkers />} />
             <Route path="supplements" element={<Supplements />} />
+            <Route path="export" element={<ExportPage />} />
             <Route element={<AdminRoute />}>
               <Route path="admin" element={<Admin />} />
             </Route>
