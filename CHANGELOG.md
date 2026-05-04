@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/kushpvo/personal-health-tracker/compare/v1.0.0...v1.1.0) (2026-05-04)
+
+
+### Features
+
+* add selective custom PDF export with charts and supplements ([#18](https://github.com/kushpvo/personal-health-tracker/issues/18)) ([006860e](https://github.com/kushpvo/personal-health-tracker/commit/006860edfd317161a67644551972ccf64b65166e))
+
 ## 1.0.0 (2026-04-30)
 
 
