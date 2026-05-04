@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Activity, AlertCircle, ChevronLeft, ChevronRight, FileText, LogOut, Moon, Pill, Settings, Shield, Sun, Upload } from "lucide-react";
+import { Activity, AlertCircle, ChevronLeft, ChevronRight, FileDown, FileText, LogOut, Moon, Pill, Settings, Shield, Sun, Upload } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
 import { api } from "../lib/api";
@@ -65,6 +65,7 @@ export default function Layout() {
     { to: "/reports", label: "Reports", icon: FileText, end: false },
     { to: "/reports/upload", label: "Upload", icon: Upload, end: false },
     { to: "/supplements", label: "Supplements", icon: Pill, end: false },
+    { to: "/export", label: "Custom Export", icon: FileDown, end: false },
     { to: "/settings", label: "Settings", icon: Settings, end: false },
     ...(unknowns.length > 0
       ? [{ to: "/unknown-biomarkers", label: `Unknowns (${unknowns.length})`, icon: AlertCircle, end: false }]

@@ -373,6 +373,26 @@ export const api = {
       link.remove();
       URL.revokeObjectURL(url);
     },
+    customPdf: async (biomarkerIds: number[], supplementIds: number[]) => {
+      const res = await authFetch("/export/custom-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ biomarker_ids: biomarkerIds, supplement_ids: supplementIds }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: "Export failed" }));
+        throw new Error(err.detail ?? "Export failed");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `health-custom-export-${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    },
   },
   unknowns: {
     list: () => get<UnknownBiomarkerItem[]>("/unknowns"),
