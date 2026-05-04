@@ -55,9 +55,9 @@ BIOMARKER_WITH_PAREN_RANGE = re.compile(
     re.IGNORECASE,
 )
 
-# Table-cell delimiter lines from Meddbase-style PDFs start with ' or |
-_TABLE_DELIM_LINE = re.compile(r"^['\|]")
-_TABLE_DELIMS = re.compile(r"['\|!:]")
+# Table-cell delimiter lines from Meddbase-style PDFs start with ' | ! or Unicode left-quote
+_TABLE_DELIM_LINE = re.compile(r"^['‘\|!]")
+_TABLE_DELIMS = re.compile(r"['‘\|!:;+]")
 
 DATE_LABEL_PATTERNS = [
     re.compile(
@@ -115,6 +115,10 @@ def _normalize_ocr_unit(raw_unit: str) -> str:
     unit = re.sub(r"x104(\d)", r"x10^\1", unit)
     # OCR misreads 'L' as 'H': fH → fL (femtoliters)
     unit = unit.replace("fH", "fL")
+    # OCR misreads 'g' as 'B': B/L → g/L (grams per litre)
+    unit = unit.replace("B/L", "g/L")
+    # OCR capitalises picogram: Pg → pg
+    unit = unit.replace("Pg", "pg")
     return unit
 
 
@@ -126,9 +130,11 @@ def _normalize_table_line(line: str) -> str:
     normalized = re.sub(r"\s+", " ", normalized).strip()
     # Strip trailing punctuation/backslash artifacts left after delimiter removal
     normalized = normalized.rstrip(" .,\\")
-    # OCR misreads '!' as '1'; remove the spurious '1' between a numeric value and a unit.
-    # Capture the full number (not just one digit) so values ending in '1' aren't truncated.
+    # OCR misreads '!' as '1'; remove spurious '1' between value and unit or before range paren.
     normalized = re.sub(r"(\d+\.?\d*) 1 ([A-Za-z%])", r"\1 \2", normalized)
+    normalized = re.sub(r" 1 \(", " (", normalized)
+    # Normalize European decimal commas in values and range bounds (e.g. 4,3 → 4.3)
+    normalized = re.sub(r"(\d),(\d)", r"\1.\2", normalized)
     return normalized
 
 

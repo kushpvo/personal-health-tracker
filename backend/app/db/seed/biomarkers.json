@@ -10,14 +10,14 @@
     ],
     "category": "Lipids",
     "description": "Total amount of cholesterol in the blood.",
-    "default_unit": "mg/dL",
+    "default_unit": "mmol/L",
     "alternate_units": [
-      "mmol/L"
+      "mg/dL"
     ],
-    "optimal_min": 100,
-    "optimal_max": 149,
-    "sufficient_min": 150,
-    "sufficient_max": 199,
+    "optimal_min": 2.59,
+    "optimal_max": 3.85,
+    "sufficient_min": 3.88,
+    "sufficient_max": 5.15,
     "unit_conversions": {
       "mg/dL": {
         "mmol/L": 0.02586
