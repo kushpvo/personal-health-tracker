@@ -40,6 +40,25 @@ BIOMARKER_INLINE_UNIT = re.compile(
     re.IGNORECASE,
 )
 
+# Meddbase patient portal format: NAME VALUE UNIT (RANGE) [FLAG]
+# e.g. "Haemoglobin 142 g/L (130-170) 1"  or  "TSH 13.80 mIU/L (0.27-4.20) HH"
+BIOMARKER_WITH_PAREN_RANGE = re.compile(
+    r"^(?P<name>[A-Za-z][A-Za-z0-9\s,\(\)/\-.%]+?)"
+    r"\s+"
+    r"(?P<value>[<>]?\s*\d+\.?\d*)"
+    r"\s+"
+    r"(?P<unit>[A-Za-z%µu£][A-Za-z0-9/%µu·\^\-]*)"
+    r"\s+"
+    r"\([<>]?\s*\d*\.?\d+\s*(?:[-–]\s*[<>]?\s*\d*\.?\d+)?\)"
+    r"(?:\s+\S+)?"
+    r"\s*$",
+    re.IGNORECASE,
+)
+
+# Table-cell delimiter lines from Meddbase-style PDFs start with ' or |
+_TABLE_DELIM_LINE = re.compile(r"^['\|]")
+_TABLE_DELIMS = re.compile(r"['\|!:]")
+
 DATE_LABEL_PATTERNS = [
     re.compile(
         r"(?:collection date|date of service|date collected|specimen date|"
@@ -97,6 +116,19 @@ def _normalize_ocr_unit(raw_unit: str) -> str:
     return unit
 
 
+def _normalize_table_line(line: str) -> str:
+    """Strip Meddbase-style table cell delimiters (' | ! :) so rows parse cleanly."""
+    if not _TABLE_DELIM_LINE.match(line):
+        return line
+    normalized = _TABLE_DELIMS.sub(" ", line)
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    # Strip trailing punctuation/backslash artifacts left after delimiter removal
+    normalized = normalized.rstrip(" .,\\")
+    # OCR misreads '!' as '1'; remove the spurious '1' between a numeric value and a unit
+    normalized = re.sub(r"(\d) 1 ([A-Za-z%])", r"\1 \2", normalized)
+    return normalized
+
+
 # Trailing differential percentage: "Neutrophils 49.2%" → "Neutrophils"
 _TRAILING_PCT = re.compile(r"\s+\d+\.?\d*%\s*$")
 
@@ -145,12 +177,17 @@ def extract_biomarkers(text: str) -> List[ParsedResult]:
         line = line.strip()
         if not line or len(line) < 5:
             continue
+        line = _normalize_table_line(line)
         if SKIP_PATTERNS.match(line):
             continue
 
         m = BIOMARKER_LINE.match(line) or BIOMARKER_INLINE_UNIT.match(line)
+        paren_range_match = False
         if not m:
             m = BIOMARKER_WITH_RANGE_FLAG.match(line)
+        if not m:
+            m = BIOMARKER_WITH_PAREN_RANGE.match(line)
+            paren_range_match = m is not None
         if not m:
             m = SINGLE_SPACE_WITH_RANGE.match(line)
         if not m:
@@ -158,6 +195,9 @@ def extract_biomarkers(text: str) -> List[ParsedResult]:
 
         raw_name = (m.groupdict().get("name") or m.group(1)).strip().rstrip(".,")
         raw_name = _TRAILING_PCT.sub("", raw_name).strip()
+        # Meddbase OCR often appends a digit artifact (! misread as 1) to the name
+        if paren_range_match:
+            raw_name = re.sub(r"\s+\d+\.?\d*$", "", raw_name).strip()
         raw_value = (m.groupdict().get("value") or m.group(2)).strip()
         raw_unit = _normalize_ocr_unit((m.groupdict().get("unit") or m.group(3)).strip())
 

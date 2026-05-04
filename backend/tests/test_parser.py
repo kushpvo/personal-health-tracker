@@ -94,6 +94,40 @@ def test_extract_biomarkers_handles_single_space_lab_rows():
     assert results[3].raw_name == "Vitamin D (25-0OH)"
 
 
+SAMPLE_MEDDBASE = """
+' Haemoglobin ' 142 | g/L ! (130-170) 1 !
+' Haematocrit ' 0.44 | L/L ! (0.40-0.54) 1 !
+' RDW ' 12.7 1 % ' (11.6-14.0) 1 !
+' Globulins ' 27 1 g/L ' (23-35) 1 !
+' TSH ' 13.80 ' mIU/L ' (0.27-4.20) 'HH
+' Vitamin D ' 76 ' nmol/L ' (50-175) 1
+"""
+
+
+def test_extract_biomarkers_meddbase_format():
+    results = extract_biomarkers(SAMPLE_MEDDBASE)
+    by_name = {r.raw_name.lower(): r for r in results}
+
+    assert "haemoglobin" in by_name
+    assert by_name["haemoglobin"].value == pytest.approx(142.0)
+    assert by_name["haemoglobin"].unit == "g/L"
+
+    assert "rdw" in by_name
+    assert by_name["rdw"].value == pytest.approx(12.7)
+    assert by_name["rdw"].unit == "%"
+
+    assert "globulins" in by_name
+    assert by_name["globulins"].value == pytest.approx(27.0)
+    assert by_name["globulins"].unit == "g/L"
+
+    assert "tsh" in by_name
+    assert by_name["tsh"].value == pytest.approx(13.80)
+    assert by_name["tsh"].unit == "mIU/L"
+
+    assert "vitamin d" in by_name
+    assert by_name["vitamin d"].value == pytest.approx(76.0)
+
+
 def test_extract_biomarkers_normalizes_common_ocr_unit_errors():
     text = """
     MCV 94.4 ( 81-101 ) £L
