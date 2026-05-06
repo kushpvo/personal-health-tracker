@@ -154,6 +154,11 @@ export default function Layout() {
               <LogOut size={16} />
               {!isCollapsed && "Log out"}
             </button>
+            {!isCollapsed && (
+              <p className="px-3 pt-2 text-[10px] text-gray-400 dark:text-gray-600">
+                v{import.meta.env.VITE_APP_VERSION || "dev"}
+              </p>
+            )}
           </div>
         </aside>
         <main className="flex-1 overflow-auto p-8">
