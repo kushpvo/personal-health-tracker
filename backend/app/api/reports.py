@@ -93,6 +93,24 @@ async def upload_report(
     return ReportUploadResponse(id=report.id, status=report.status)
 
 
+@router.post("/manual", response_model=ReportUploadResponse, status_code=201)
+def create_manual_report(
+    db: Session = Depends(get_db),
+    effective_user_id: int = Depends(get_effective_user_id),
+):
+    report = Report(
+        filename="",
+        original_filename="Manual Entry",
+        file_path="",
+        status="done",
+        user_id=effective_user_id,
+    )
+    db.add(report)
+    db.commit()
+    db.refresh(report)
+    return ReportUploadResponse(id=report.id, status=report.status)
+
+
 @router.get("", response_model=list[ReportListItem])
 def list_reports(
     db: Session = Depends(get_db),
