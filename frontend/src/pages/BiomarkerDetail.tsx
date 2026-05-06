@@ -49,8 +49,11 @@ export default function BiomarkerDetail() {
     setChangingUnit(true);
     try {
       await api.biomarkers.changeDefaultUnit(biomarkerId, newUnit);
-      qc.invalidateQueries({ queryKey: ["biomarker", biomarkerId] });
-      qc.invalidateQueries({ queryKey: ["biomarkers-summary"] });
+      await qc.invalidateQueries({ queryKey: ["biomarker", biomarkerId] });
+      await qc.invalidateQueries({ queryKey: ["biomarkers-summary"] });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to change unit";
+      alert(msg);
     } finally {
       setChangingUnit(false);
     }
