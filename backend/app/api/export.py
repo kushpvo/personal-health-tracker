@@ -209,15 +209,18 @@ def _build_biomarker_chart(b: Biomarker, results):
 
 def _build_supplement_table(s: SupplementLog, styles):
     heading = Paragraph(f"<b>{s.name}</b> ({s.frequency})", styles["Heading3"])
-    dose_data = [["Dose", "Started", "Ended", "Status"]]
+    dose_data = [["Dose", "Started", "Ended", "Days", "Status"]]
     for d in s.doses:
+        ended = d.ended_on or date.today()
+        days = (ended - d.started_on).days + 1
         dose_data.append([
             f"{d.dose} {s.unit}",
             d.started_on.strftime("%d %b %Y"),
             d.ended_on.strftime("%d %b %Y") if d.ended_on else "—",
+            str(days),
             "Active" if d.ended_on is None else "Ended",
         ])
-    t = Table(dose_data, colWidths=[4 * cm, 3.5 * cm, 3.5 * cm, 3 * cm])
+    t = Table(dose_data, colWidths=[3.5 * cm, 3 * cm, 3 * cm, 2 * cm, 2.5 * cm])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1f2937")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
