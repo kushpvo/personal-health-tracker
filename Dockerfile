@@ -1,6 +1,9 @@
 # ── Stage 1: Build React frontend ────────────────────────────────────────────
 FROM node:20-alpine AS frontend-build
 
+ARG VITE_APP_VERSION=dev
+ENV VITE_APP_VERSION=${VITE_APP_VERSION}
+
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
