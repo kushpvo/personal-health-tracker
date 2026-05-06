@@ -163,7 +163,20 @@
     "optimal_max": 5.3,
     "sufficient_min": 5.4,
     "sufficient_max": 5.6,
-    "unit_conversions": {}
+    "unit_conversions": {
+      "%": {
+        "mmol/mol": {
+          "factor": 10.929,
+          "offset": -23.497
+        }
+      },
+      "mmol/mol": {
+        "%": {
+          "factor": 0.0915,
+          "offset": 2.15
+        }
+      }
+    }
   },
   {
     "name": "TSH",

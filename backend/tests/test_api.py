@@ -363,10 +363,10 @@ def test_change_default_unit_success(client, test_db, create_user, auth_headers)
     assert data["default_unit"] == "mg/dL"
 
     test_db.refresh(chol)
-    test_db.refresh(result)
-    # 5.0 mmol/L * 38.67 = 193.35 mg/dL
-    assert result.unit == "mg/dL"
-    assert abs(result.value - 193.35) < 0.01
+    # Biomarker definition is updated; stored results are left as-is
+    # (API converts on-the-fly when serving data)
+    assert result.unit == "mmol/L"
+    assert abs(result.value - 5.0) < 0.01
     assert chol.default_unit == "mg/dL"
     assert chol.optimal_min is not None and chol.optimal_min > 10  # was ~3.85 mmol/L
 

@@ -1,4 +1,5 @@
-from typing import List, Optional
+from datetime import date, datetime
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -9,7 +10,8 @@ from app.schemas.schemas import (
     BiomarkerDetail, BiomarkerInfo, BiomarkerListItem, BiomarkerSummary, ResultPoint,
     ChangeDefaultUnitInput,
 )
-from app.services.unit_converter import normalize_unit
+from app.services.unit_converter import normalize_unit, convert_to_default_unit, pick_best_result
+
 router = APIRouter(prefix="/api/biomarkers", tags=["biomarkers"])
 
 
@@ -29,17 +31,18 @@ def _compute_zone(value: float, b: Biomarker) -> str:
     return "out_of_range"
 
 
-def _to_result_point(result: ReportResult) -> ResultPoint:
+def _to_result_point(result: ReportResult, biomarker: Biomarker) -> ResultPoint:
+    value, unit = convert_to_default_unit(result.value, result.unit, biomarker)
     zone = "unknown"
-    if result.biomarker and not result.is_flagged_unknown:
-        zone = _compute_zone(result.value, result.biomarker)
+    if not result.is_flagged_unknown:
+        zone = _compute_zone(value, biomarker)
     return ResultPoint(
         id=result.id,
         report_id=result.report_id,
         report_name=result.report.report_name if result.report else None,
         sample_date=result.report.sample_date if result.report else None,
-        value=result.value,
-        unit=result.unit,
+        value=value,
+        unit=unit,
         zone=zone,
     )
 
@@ -67,8 +70,8 @@ def list_all_biomarkers(
 def get_dashboard_summary(
     db: Session = Depends(get_db),
     effective_user_id: int = Depends(get_effective_user_id),
-    search: Optional[str] = None,
-    category: Optional[str] = None,
+    search: str = None,
+    category: str = None,
 ):
     """
     Returns one entry per biomarker the user has data for.
@@ -97,16 +100,37 @@ def get_dashboard_summary(
         if not results:
             continue
 
-        latest = results[0]
-        zone = _compute_zone(latest.value, b)
+        # Deduplicate per report
+        by_report = {}
+        for r in results:
+            by_report.setdefault(r.report_id, []).append(r)
+
+        deduped = []
+        for group in by_report.values():
+            chosen = pick_best_result(group, b)
+            if chosen:
+                deduped.append(chosen)
+
+        if not deduped:
+            continue
+
+        deduped.sort(
+            key=lambda r: (r.report.sample_date or date.min, r.report.uploaded_at or datetime.min),
+            reverse=True,
+        )
+
+        latest = deduped[0]
+        nv, nu = convert_to_default_unit(latest.value, latest.unit, b)
+        zone = _compute_zone(nv, b)
 
         trend_delta = None
         trend_alert = False
-        if len(results) >= 2:
-            prev = results[1]
-            prev_zone = _compute_zone(prev.value, b)
-            if prev.value != 0:
-                trend_delta = round(((latest.value - prev.value) / abs(prev.value)) * 100, 1)
+        if len(deduped) >= 2:
+            prev = deduped[1]
+            pv, _ = convert_to_default_unit(prev.value, prev.unit, b)
+            prev_zone = _compute_zone(pv, b)
+            if pv != 0:
+                trend_delta = round(((nv - pv) / abs(pv)) * 100, 1)
             trend_alert = (
                 (trend_delta is not None and abs(trend_delta) >= 20)
                 or (prev_zone != zone)
@@ -125,11 +149,11 @@ def get_dashboard_summary(
                     sufficient_max=b.sufficient_max,
                     alternate_units=b.alternate_units or [],
                 ),
-                latest_value=latest.value,
-                latest_unit=latest.unit,
+                latest_value=nv,
+                latest_unit=nu,
                 latest_date=latest.report.sample_date if latest.report else None,
                 latest_zone=zone,
-                result_count=len(results),
+                result_count=len(deduped),
                 trend_delta=trend_delta,
                 trend_alert=trend_alert,
             )
@@ -160,6 +184,21 @@ def get_biomarker_detail(
         .all()
     )
 
+    # Deduplicate per report
+    by_report = {}
+    for r in results:
+        by_report.setdefault(r.report_id, []).append(r)
+
+    deduped = []
+    for group in by_report.values():
+        chosen = pick_best_result(group, b)
+        if chosen:
+            deduped.append(chosen)
+
+    deduped.sort(
+        key=lambda r: (r.report.sample_date or date.min, r.report.uploaded_at or datetime.min)
+    )
+
     return BiomarkerDetail(
         biomarker=BiomarkerInfo(
             id=b.id,
@@ -172,7 +211,7 @@ def get_biomarker_detail(
             sufficient_max=b.sufficient_max,
             alternate_units=b.alternate_units or [],
         ),
-        results=[_to_result_point(r) for r in results],
+        results=[_to_result_point(r, b) for r in deduped],
     )
 
 
@@ -203,12 +242,17 @@ def change_default_unit(
         raise HTTPException(status_code=400, detail=f"Unit '{new_unit}' is not a known alternate unit.")
 
     conversions = b.unit_conversions or {}
-    factor = conversions.get(current_unit, {}).get(new_unit)
-    if factor is None:
+    factor_entry = conversions.get(current_unit, {}).get(new_unit)
+    if factor_entry is None:
         raise HTTPException(status_code=400, detail=f"No conversion factor from '{current_unit}' to '{new_unit}'.")
 
+    from app.services.unit_converter import _get_conversion_factor
+    factor, offset = _get_conversion_factor(factor_entry)
+
     def _conv(v):
-        return round(v * factor, 4) if v is not None else None
+        if v is None:
+            return None
+        return round(v * factor + offset, 4)
 
     b.optimal_min = _conv(b.optimal_min)
     b.optimal_max = _conv(b.optimal_max)
@@ -222,17 +266,6 @@ def change_default_unit(
     if old_unit and normalize_unit(old_unit) not in {normalize_unit(u) for u in alts}:
         alts.append(old_unit)
     b.alternate_units = alts
-
-    results = (
-        db.query(ReportResult)
-        .filter(ReportResult.biomarker_id == biomarker_id, ReportResult.is_flagged_unknown == False)
-        .all()
-    )
-    for r in results:
-        r_factor = conversions.get(normalize_unit(r.unit), {}).get(new_unit)
-        if r_factor is not None:
-            r.value = round(r.value * r_factor, 6)
-            r.unit = new_unit
 
     db.commit()
     db.refresh(b)
