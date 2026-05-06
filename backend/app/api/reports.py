@@ -316,16 +316,12 @@ def submit_review(
         result.value = item.value
         result.unit = item.unit
 
+        biomarker = None
         if item.biomarker_id and result.biomarker_id != item.biomarker_id:
             biomarker = (
                 db.query(Biomarker).filter(Biomarker.id == item.biomarker_id).first()
             )
             if biomarker:
-                converted_value, used_unit = convert_to_default_unit(
-                    item.value, item.unit, biomarker
-                )
-                result.value = converted_value
-                result.unit = used_unit
                 result.biomarker_id = item.biomarker_id
                 result.is_flagged_unknown = False
                 result.human_matched = True
@@ -337,6 +333,17 @@ def submit_review(
                 )
                 if unknown:
                     unknown.resolved_biomarker_id = item.biomarker_id
+        elif result.biomarker_id:
+            biomarker = (
+                db.query(Biomarker).filter(Biomarker.id == result.biomarker_id).first()
+            )
+
+        if biomarker:
+            converted_value, used_unit = convert_to_default_unit(
+                result.value, result.unit, biomarker
+            )
+            result.value = converted_value
+            result.unit = used_unit
 
     # Insert user-added rows
     for new_item in body.new_results:
