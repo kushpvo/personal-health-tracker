@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/kushpvo/personal-health-tracker/compare/v1.1.0...v1.1.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* **ci:** tag Docker images with semver versions from manifest on main branch pushes ([#20](https://github.com/kushpvo/personal-health-tracker/issues/20)) ([0dccc62](https://github.com/kushpvo/personal-health-tracker/commit/0dccc62421f9d7a65a4496a87b90d579d1e9474f))
+
 ## [1.1.0](https://github.com/kushpvo/personal-health-tracker/compare/v1.0.0...v1.1.0) (2026-05-04)
 
 
