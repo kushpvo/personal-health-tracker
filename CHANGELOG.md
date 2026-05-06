@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/kushpvo/personal-health-tracker/compare/v1.2.0...v1.3.0) (2026-05-06)
+
+
+### Features
+
+* add manual report creation without PDF upload ([#24](https://github.com/kushpvo/personal-health-tracker/issues/24)) ([a6c7fb7](https://github.com/kushpvo/personal-health-tracker/commit/a6c7fb7706bc76465f44add19c682554d1e6584f))
+* optional approximate start date for supplement doses ([#26](https://github.com/kushpvo/personal-health-tracker/issues/26)) ([38710b7](https://github.com/kushpvo/personal-health-tracker/commit/38710b72ea1a0965db000355a909534880a5be77))
+
 ## [1.2.0](https://github.com/kushpvo/personal-health-tracker/compare/v1.1.1...v1.2.0) (2026-05-06)
 
 
