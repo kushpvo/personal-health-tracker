@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { XCircle, Loader2 } from "lucide-react";
+import { XCircle, Loader2, PenLine } from "lucide-react";
 import UploadZone from "../components/UploadZone";
 import { api } from "../lib/api";
 
@@ -22,6 +22,16 @@ export default function Upload() {
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Upload failed");
       setStage("failed");
+    }
+  }
+
+  async function handleManual() {
+    setError(null);
+    try {
+      const { id } = await api.reports.createManual();
+      navigate(`/reports/${id}/review`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create report");
     }
   }
 
@@ -53,7 +63,23 @@ export default function Upload() {
         Upload a PDF or image of your blood work. OCR will extract biomarkers automatically.
       </p>
 
-      {stage === "idle" && <UploadZone onFile={handleFile} />}
+      {stage === "idle" && (
+        <div className="space-y-4">
+          <UploadZone onFile={handleFile} />
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+            <span className="text-xs text-gray-400">or</span>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+          </div>
+          <button
+            onClick={handleManual}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 text-sm text-gray-600 dark:text-gray-400 transition-colors"
+          >
+            <PenLine size={16} />
+            Enter results manually
+          </button>
+        </div>
+      )}
 
       {stage === "uploading" && (
         <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">

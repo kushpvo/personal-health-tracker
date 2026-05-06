@@ -358,6 +358,11 @@ export const api = {
         }
       );
     },
+    createManual: (): Promise<{ id: number; status: string }> =>
+      authFetch("/reports/manual", { method: "POST" }).then(async (res) => {
+        if (!res.ok) throw new Error((await res.json()).detail ?? "Failed");
+        return res.json() as Promise<{ id: number; status: string }>;
+      }),
   },
   export: {
     pdf: async () => {

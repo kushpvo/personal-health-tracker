@@ -212,11 +212,21 @@ const initialized = useRef(false);
     <div className="max-w-5xl">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/reports/upload" className="hover:underline">
-          Upload Lab Report
-        </Link>
-        <span className="mx-2">›</span>
-        <span className="text-gray-900 dark:text-gray-100">Review Results</span>
+        {report?.original_filename === "Manual Entry" ? (
+          <>
+            <span>Manual Entry</span>
+            <span className="mx-2">›</span>
+            <span className="text-gray-900 dark:text-gray-100">Review Results</span>
+          </>
+        ) : (
+          <>
+            <Link to="/reports/upload" className="hover:underline">
+              Upload Lab Report
+            </Link>
+            <span className="mx-2">›</span>
+            <span className="text-gray-900 dark:text-gray-100">Review Results</span>
+          </>
+        )}
       </nav>
 
       {/* Report metadata */}
