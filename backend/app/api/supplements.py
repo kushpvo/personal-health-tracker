@@ -27,6 +27,8 @@ def _dose_item(d: SupplementDose) -> SupplementDoseItem:
         started_on=d.started_on,
         ended_on=d.ended_on,
         is_active=d.ended_on is None,
+        date_notes=d.date_notes,
+        is_date_approximate=d.is_date_approximate or False,
     )
 
 
@@ -92,6 +94,8 @@ def create_supplement(
         dose=body.dose,
         started_on=body.started_on,
         ended_on=None,
+        date_notes=body.date_notes,
+        is_date_approximate=body.is_date_approximate or False,
     )
     db.add(dose)
     db.commit()
@@ -150,6 +154,8 @@ def add_dose(
         dose=body.dose,
         started_on=body.started_on,
         ended_on=None,
+        date_notes=body.date_notes,
+        is_date_approximate=body.is_date_approximate or False,
     )
     db.add(new_dose)
     db.commit()
@@ -175,6 +181,10 @@ def update_dose(
         dose.started_on = body.started_on
     if body.ended_on is not None:
         dose.ended_on = body.ended_on
+    if body.date_notes is not None:
+        dose.date_notes = body.date_notes
+    if body.is_date_approximate is not None:
+        dose.is_date_approximate = body.is_date_approximate
     db.commit()
     db.refresh(s)
     return _log_item(s)

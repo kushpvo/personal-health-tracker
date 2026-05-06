@@ -211,15 +211,24 @@ def _build_supplement_table(s: SupplementLog, styles):
     heading = Paragraph(f"<b>{s.name}</b> ({s.frequency})", styles["Heading3"])
     dose_data = [["Dose", "Started", "Ended", "Days", "Status"]]
     for d in s.doses:
-        ended = d.ended_on or date.today()
-        days = (ended - d.started_on).days + 1
-        dose_data.append([
+        if d.is_date_approximate:
+            days_str = "—"
+            started_str = f"~ {d.started_on.strftime('%d %b %Y')}" if d.started_on else "~ —"
+            ended_str = f"~ {d.ended_on.strftime('%d %b %Y')}" if d.ended_on else "—"
+        else:
+            ended = d.ended_on or date.today()
+            days = (ended - d.started_on).days + 1
+            days_str = str(days)
+            started_str = d.started_on.strftime("%d %b %Y")
+            ended_str = d.ended_on.strftime("%d %b %Y") if d.ended_on else "—"
+        row = [
             f"{d.dose} {s.unit}",
-            d.started_on.strftime("%d %b %Y"),
-            d.ended_on.strftime("%d %b %Y") if d.ended_on else "—",
-            str(days),
+            started_str,
+            ended_str,
+            days_str,
             "Active" if d.ended_on is None else "Ended",
-        ])
+        ]
+        dose_data.append(row)
     t = Table(dose_data, colWidths=[3.5 * cm, 3 * cm, 3 * cm, 2 * cm, 2.5 * cm])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1f2937")),
@@ -232,7 +241,16 @@ def _build_supplement_table(s: SupplementLog, styles):
         ("TOPPADDING", (0, 0), (-1, -1), 4),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
-    return [heading, Spacer(1, 0.2 * cm), t, Spacer(1, 0.3 * cm)]
+    items = [heading, Spacer(1, 0.2 * cm), t]
+    # Add date notes for approximate doses as a footnote
+    for d in s.doses:
+        if d.is_date_approximate and d.date_notes:
+            items.append(Paragraph(
+                f"<span style='font-size:8px;color:#6b7280;'>~ {d.date_notes}</span>",
+                styles["Normal"],
+            ))
+    items.append(Spacer(1, 0.3 * cm))
+    return items
 
 
 @router.post("/custom-pdf")

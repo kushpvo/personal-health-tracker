@@ -23,6 +23,17 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
+        # Migration: add date_notes and is_date_approximate to supplement_doses
+        try:
+            db.execute(text("ALTER TABLE supplement_doses ADD COLUMN date_notes TEXT"))
+        except Exception:
+            pass
+        try:
+            db.execute(text("ALTER TABLE supplement_doses ADD COLUMN is_date_approximate BOOLEAN DEFAULT 0"))
+        except Exception:
+            pass
+        db.commit()
+
         load_biomarkers(db)
         migrate_sex_specific_results(db)
     finally:

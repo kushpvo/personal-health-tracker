@@ -117,6 +117,8 @@ export interface SupplementDoseItem {
   started_on: string;      // YYYY-MM-DD
   ended_on: string | null; // YYYY-MM-DD or null = active
   is_active: boolean;
+  date_notes: string | null;
+  is_date_approximate: boolean;
 }
 
 export interface SupplementLogItem {
@@ -136,6 +138,8 @@ export interface CreateSupplementInput {
   dose: number;
   started_on: string;
   notes?: string;
+  date_notes?: string;
+  is_date_approximate?: boolean;
 }
 
 export interface UpdateSupplementInput {
@@ -148,12 +152,16 @@ export interface UpdateSupplementInput {
 export interface AddDoseInput {
   dose: number;
   started_on: string;
+  date_notes?: string;
+  is_date_approximate?: boolean;
 }
 
 export interface UpdateDoseInput {
   dose?: number;
   started_on?: string;
   ended_on?: string;
+  date_notes?: string;
+  is_date_approximate?: boolean;
 }
 
 export interface UserInfo {
