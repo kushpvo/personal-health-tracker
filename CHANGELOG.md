@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/kushpvo/personal-health-tracker/compare/v1.1.1...v1.2.0) (2026-05-06)
+
+
+### Features
+
+* show computed duration days for supplement doses in UI and PDF export ([#22](https://github.com/kushpvo/personal-health-tracker/issues/22)) ([ca5cf94](https://github.com/kushpvo/personal-health-tracker/commit/ca5cf943c8d55dc4f430660b2aeb7291799592aa))
+
 ## [1.1.1](https://github.com/kushpvo/personal-health-tracker/compare/v1.1.0...v1.1.1) (2026-05-06)
 
 
