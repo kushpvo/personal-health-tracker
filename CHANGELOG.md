@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/kushpvo/personal-health-tracker/compare/v1.3.0...v1.3.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* normalize units, deduplicate results, and support affine conversions ([#27](https://github.com/kushpvo/personal-health-tracker/issues/27)) ([9f62c5a](https://github.com/kushpvo/personal-health-tracker/commit/9f62c5a69c2a5f01ad428ac94755c6f2fc2a6447))
+
 ## [1.3.0](https://github.com/kushpvo/personal-health-tracker/compare/v1.2.0...v1.3.0) (2026-05-06)
 
 
