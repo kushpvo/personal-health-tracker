@@ -163,6 +163,8 @@ class SupplementDoseItem(BaseModel):
     started_on: date
     ended_on: Optional[date] = None
     is_active: bool
+    date_notes: Optional[str] = None
+    is_date_approximate: bool = False
 
     class Config:
         from_attributes = True
@@ -188,6 +190,8 @@ class CreateSupplementInput(BaseModel):
     dose: float
     started_on: date
     notes: Optional[str] = None
+    date_notes: Optional[str] = None
+    is_date_approximate: Optional[bool] = None
 
 
 class UpdateSupplementInput(BaseModel):
@@ -200,12 +204,16 @@ class UpdateSupplementInput(BaseModel):
 class AddDoseInput(BaseModel):
     dose: float
     started_on: date
+    date_notes: Optional[str] = None
+    is_date_approximate: Optional[bool] = None
 
 
 class UpdateDoseInput(BaseModel):
     dose: Optional[float] = None
     started_on: Optional[date] = None
     ended_on: Optional[date] = None
+    date_notes: Optional[str] = None
+    is_date_approximate: Optional[bool] = None
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────

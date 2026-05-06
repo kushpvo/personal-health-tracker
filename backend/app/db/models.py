@@ -124,6 +124,8 @@ class SupplementDose(Base):
     dose = Column(Float, nullable=False)
     started_on = Column(Date, nullable=False)
     ended_on = Column(Date, nullable=True)
+    date_notes = Column(Text, nullable=True)
+    is_date_approximate = Column(Boolean, default=False)
 
     supplement = relationship("SupplementLog", back_populates="doses")
 

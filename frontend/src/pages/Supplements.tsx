@@ -46,6 +46,8 @@ interface FormState {
   dose: string;
   started_on: string;
   notes: string;
+  date_notes: string;
+  is_date_approximate: boolean;
 }
 
 const EMPTY_FORM: FormState = {
@@ -55,6 +57,8 @@ const EMPTY_FORM: FormState = {
   dose: "",
   started_on: new Date().toISOString().slice(0, 10),
   notes: "",
+  date_notes: "",
+  is_date_approximate: false,
 };
 
 interface SupplementFormProps {
@@ -151,6 +155,29 @@ function SupplementForm({ initial, editingId, onSubmit, onCancel }: SupplementFo
                 onChange={(e) => set("started_on", e.target.value)}
               />
             </div>
+            <div className="col-span-2 flex items-center gap-2">
+              <input
+                id="approx-date"
+                type="checkbox"
+                className="rounded border-gray-300 dark:border-gray-700"
+                checked={form.is_date_approximate}
+                onChange={(e) => setForm((prev) => ({ ...prev, is_date_approximate: e.target.checked }))}
+              />
+              <label htmlFor="approx-date" className="text-xs text-gray-500">
+                Date is approximate / I don't remember exactly
+              </label>
+            </div>
+            {form.is_date_approximate && (
+              <div className="col-span-2">
+                <label className="block text-xs text-gray-500 mb-1">Date notes</label>
+                <input
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-1.5 text-sm"
+                  placeholder="e.g. Around 2021, not sure exactly"
+                  value={form.date_notes}
+                  onChange={(e) => set("date_notes", e.target.value)}
+                />
+              </div>
+            )}
           </>
         )}
         <div className="col-span-2">
@@ -193,6 +220,8 @@ function AddDoseForm({ supplementId, onDone }: AddDoseFormProps) {
   const qc = useQueryClient();
   const [dose, setDose] = useState("");
   const [startedOn, setStartedOn] = useState(new Date().toISOString().slice(0, 10));
+  const [dateNotes, setDateNotes] = useState("");
+  const [isApprox, setIsApprox] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -202,7 +231,12 @@ function AddDoseForm({ supplementId, onDone }: AddDoseFormProps) {
     setSaving(true);
     setError(null);
     try {
-      const body: AddDoseInput = { dose: parseFloat(dose), started_on: startedOn };
+      const body: AddDoseInput = {
+        dose: parseFloat(dose),
+        started_on: startedOn,
+        date_notes: isApprox ? dateNotes.trim() || undefined : undefined,
+        is_date_approximate: isApprox,
+      };
       await api.supplements.addDose(supplementId, body);
       qc.invalidateQueries({ queryKey: ["supplements"] });
       onDone();
@@ -214,34 +248,56 @@ function AddDoseForm({ supplementId, onDone }: AddDoseFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3 ml-6 flex items-end gap-2 flex-wrap">
-      {error && <p className="w-full text-xs text-red-500">{error}</p>}
-      <div>
-        <label className="block text-xs text-gray-500 mb-1">New dose</label>
-        <input
-          type="number" min="0" step="any"
-          className="w-24 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-sm"
-          placeholder="75"
-          value={dose}
-          onChange={(e) => setDose(e.target.value)}
-        />
+    <form onSubmit={handleSubmit} className="mt-3 ml-6 space-y-2">
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      <div className="flex items-end gap-2 flex-wrap">
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">New dose</label>
+          <input
+            type="number" min="0" step="any"
+            className="w-24 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-sm"
+            placeholder="75"
+            value={dose}
+            onChange={(e) => setDose(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Starting</label>
+          <input
+            type="date"
+            className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-sm"
+            value={startedOn}
+            onChange={(e) => setStartedOn(e.target.value)}
+          />
+        </div>
+        <button type="submit" disabled={saving}
+          className="px-3 py-1 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
+          {saving ? "…" : "Save"}
+        </button>
+        <button type="button" onClick={onDone} className="px-3 py-1 rounded-md text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+          Cancel
+        </button>
       </div>
-      <div>
-        <label className="block text-xs text-gray-500 mb-1">Starting</label>
+      <div className="flex items-center gap-2">
         <input
-          type="date"
-          className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-sm"
-          value={startedOn}
-          onChange={(e) => setStartedOn(e.target.value)}
+          id="add-approx"
+          type="checkbox"
+          className="rounded border-gray-300 dark:border-gray-700"
+          checked={isApprox}
+          onChange={(e) => setIsApprox(e.target.checked)}
         />
+        <label htmlFor="add-approx" className="text-xs text-gray-500">
+          Date is approximate / I don't remember exactly
+        </label>
       </div>
-      <button type="submit" disabled={saving}
-        className="px-3 py-1 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
-        {saving ? "…" : "Save"}
-      </button>
-      <button type="button" onClick={onDone} className="px-3 py-1 rounded-md text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
-        Cancel
-      </button>
+      {isApprox && (
+        <input
+          className="w-full max-w-sm rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-sm"
+          placeholder="e.g. Around 2021, not sure exactly"
+          value={dateNotes}
+          onChange={(e) => setDateNotes(e.target.value)}
+        />
+      )}
     </form>
   );
 }
@@ -259,6 +315,8 @@ function EditDoseForm({ supplementId, dose, onDone }: EditDoseFormProps) {
   const [doseVal, setDoseVal] = useState(String(dose.dose));
   const [startedOn, setStartedOn] = useState(dose.started_on);
   const [endedOn, setEndedOn] = useState(dose.ended_on ?? "");
+  const [dateNotes, setDateNotes] = useState(dose.date_notes ?? "");
+  const [isApprox, setIsApprox] = useState(dose.is_date_approximate);
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -269,6 +327,8 @@ function EditDoseForm({ supplementId, dose, onDone }: EditDoseFormProps) {
         dose: parseFloat(doseVal),
         started_on: startedOn,
         ended_on: endedOn || undefined,
+        date_notes: isApprox ? dateNotes.trim() || undefined : undefined,
+        is_date_approximate: isApprox,
       };
       await api.supplements.updateDose(supplementId, dose.id, body);
       qc.invalidateQueries({ queryKey: ["supplements"] });
@@ -279,32 +339,54 @@ function EditDoseForm({ supplementId, dose, onDone }: EditDoseFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-2 flex-wrap mt-1">
-      <div>
-        <label className="block text-xs text-gray-500 mb-1">Dose</label>
-        <input type="number" min="0" step="any"
-          className="w-20 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
-          value={doseVal} onChange={(e) => setDoseVal(e.target.value)} />
+    <form onSubmit={handleSubmit} className="space-y-2 mt-1">
+      <div className="flex items-end gap-2 flex-wrap">
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Dose</label>
+          <input type="number" min="0" step="any"
+            className="w-20 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
+            value={doseVal} onChange={(e) => setDoseVal(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Started</label>
+          <input type="date"
+            className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
+            value={startedOn} onChange={(e) => setStartedOn(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Ended (blank = active)</label>
+          <input type="date"
+            className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
+            value={endedOn} onChange={(e) => setEndedOn(e.target.value)} />
+        </div>
+        <button type="submit" disabled={saving}
+          className="px-2 py-1 rounded bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 disabled:opacity-50">
+          {saving ? "…" : "Save"}
+        </button>
+        <button type="button" onClick={onDone} className="px-2 py-1 rounded text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+          Cancel
+        </button>
       </div>
-      <div>
-        <label className="block text-xs text-gray-500 mb-1">Started</label>
-        <input type="date"
-          className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
-          value={startedOn} onChange={(e) => setStartedOn(e.target.value)} />
+      <div className="flex items-center gap-2">
+        <input
+          id="edit-approx"
+          type="checkbox"
+          className="rounded border-gray-300 dark:border-gray-700"
+          checked={isApprox}
+          onChange={(e) => setIsApprox(e.target.checked)}
+        />
+        <label htmlFor="edit-approx" className="text-xs text-gray-500">
+          Date is approximate / I don't remember exactly
+        </label>
       </div>
-      <div>
-        <label className="block text-xs text-gray-500 mb-1">Ended (blank = active)</label>
-        <input type="date"
-          className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
-          value={endedOn} onChange={(e) => setEndedOn(e.target.value)} />
-      </div>
-      <button type="submit" disabled={saving}
-        className="px-2 py-1 rounded bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 disabled:opacity-50">
-        {saving ? "…" : "Save"}
-      </button>
-      <button type="button" onClick={onDone} className="px-2 py-1 rounded text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
-        Cancel
-      </button>
+      {isApprox && (
+        <input
+          className="w-full max-w-sm rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-2 py-1 text-xs"
+          placeholder="e.g. Around 2021, not sure exactly"
+          value={dateNotes}
+          onChange={(e) => setDateNotes(e.target.value)}
+        />
+      )}
     </form>
   );
 }
@@ -415,12 +497,27 @@ function SupplementCard({ supplement, onEdit }: SupplementCardProps) {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className="text-sm font-medium">{dose.dose} {supplement.unit}</span>
-                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
-                          {formatDateStr(dose.started_on)} → {formatDateStr(dose.ended_on)}
-                        </span>
-                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
-                          · {computeDays(dose.started_on, dose.ended_on)} days
-                        </span>
+                        {dose.is_date_approximate ? (
+                          <>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                              ~ {formatDateStr(dose.started_on)} → {formatDateStr(dose.ended_on)}
+                            </span>
+                            {dose.date_notes && (
+                              <span className="block text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {dose.date_notes}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                              {formatDateStr(dose.started_on)} → {formatDateStr(dose.ended_on)}
+                            </span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                              · {computeDays(dose.started_on, dose.ended_on)} days
+                            </span>
+                          </>
+                        )}
                       </div>
                       <div className="flex gap-1 shrink-0">
                         <button
@@ -484,6 +581,8 @@ export default function Supplements() {
       dose: parseFloat(form.dose),
       started_on: form.started_on,
       notes: form.notes.trim() || undefined,
+      date_notes: form.is_date_approximate ? form.date_notes.trim() || undefined : undefined,
+      is_date_approximate: form.is_date_approximate,
     };
     await api.supplements.create(body);
     qc.invalidateQueries({ queryKey: ["supplements"] });
@@ -526,6 +625,8 @@ export default function Supplements() {
             dose: "",
             started_on: new Date().toISOString().slice(0, 10),
             notes: editingSupp.notes ?? "",
+            date_notes: "",
+            is_date_approximate: false,
           }}
           onSubmit={handleUpdate}
           onCancel={() => setEditingSupp(null)}
