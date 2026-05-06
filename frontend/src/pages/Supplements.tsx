@@ -30,6 +30,13 @@ function formatDateStr(d: string | null): string {
   return `${months[parseInt(month) - 1]} ${day}, ${year}`;
 }
 
+function computeDays(startedOn: string, endedOn: string | null): number {
+  const start = new Date(startedOn + "T00:00:00");
+  const end = endedOn ? new Date(endedOn + "T00:00:00") : new Date();
+  const diff = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  return diff + 1; // inclusive
+}
+
 // ── Create / Edit form ───────────────────────────────────────────────────────
 
 interface FormState {
@@ -410,6 +417,9 @@ function SupplementCard({ supplement, onEdit }: SupplementCardProps) {
                         <span className="text-sm font-medium">{dose.dose} {supplement.unit}</span>
                         <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
                           {formatDateStr(dose.started_on)} → {formatDateStr(dose.ended_on)}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                          · {computeDays(dose.started_on, dose.ended_on)} days
                         </span>
                       </div>
                       <div className="flex gap-1 shrink-0">
