@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/kushpvo/personal-health-tracker/compare/v1.3.1...v1.3.2) (2026-05-07)
+
+
+### Bug Fixes
+
+* **reportlab:** replace unsupported &lt;span&gt; tags with &lt;font&gt; in PDF export ([#29](https://github.com/kushpvo/personal-health-tracker/issues/29)) ([2b30054](https://github.com/kushpvo/personal-health-tracker/commit/2b3005487819ce058c79a6904ba6277daa4e59fc))
+
 ## [1.3.1](https://github.com/kushpvo/personal-health-tracker/compare/v1.3.0...v1.3.1) (2026-05-06)
 
 
