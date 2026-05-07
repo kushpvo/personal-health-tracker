@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/kushpvo/personal-health-tracker/compare/v1.3.2...v1.3.3) (2026-05-07)
+
+
+### Bug Fixes
+
+* **docker:** build frontend stage on native platform to avoid QEMU hangs ([#31](https://github.com/kushpvo/personal-health-tracker/issues/31)) ([32327a2](https://github.com/kushpvo/personal-health-tracker/commit/32327a2443d26d3630d36bd2c4677ce5955d110f))
+
 ## [1.3.2](https://github.com/kushpvo/personal-health-tracker/compare/v1.3.1...v1.3.2) (2026-05-07)
 
 
