@@ -260,7 +260,7 @@ def _build_supplement_table(s: SupplementLog, styles):
     for d in s.doses:
         if d.is_date_approximate and d.date_notes:
             items.append(Paragraph(
-                f"<span style='font-size:8px;color:#6b7280;'>~ {d.date_notes}</span>",
+                f"<font size='8' color='#6b7280'>~ {d.date_notes}</font>",
                 styles["Normal"],
             ))
     items.append(Spacer(1, 0.3 * cm))
@@ -390,7 +390,7 @@ def export_custom_pdf(
             Paragraph(f"<b>{b.name}</b>", styles["Heading3"]),
         ]
         if range_text:
-            section_flowables.append(Paragraph(f"<span style='font-size:8px'>{range_text}</span>", styles["Normal"]))
+            section_flowables.append(Paragraph(f"<font size='8'>{range_text}</font>", styles["Normal"]))
         section_flowables.append(chart)
         section_flowables.append(Spacer(1, 0.1 * cm))
         section_flowables.append(history_table)
