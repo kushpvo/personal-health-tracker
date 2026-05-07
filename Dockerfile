@@ -1,5 +1,7 @@
 # ── Stage 1: Build React frontend ────────────────────────────────────────────
-FROM node:20-alpine AS frontend-build
+# Build on native platform since JS output is architecture-independent.
+# Avoids QEMU emulation hangs during npm ci on arm64.
+FROM --platform=$BUILDPLATFORM node:20-alpine AS frontend-build
 
 ARG VITE_APP_VERSION=dev
 ENV VITE_APP_VERSION=${VITE_APP_VERSION}
